@@ -1,5 +1,5 @@
 /**
- * @labbs/beakblock-vue
+ * @aurthurm/beakblock-vue
  *
  * Vue bindings for BeakBlock editor.
  *
@@ -77,4 +77,4 @@ export type {
   IconContent,
   InlineContent,
   SlashMenuItem,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';

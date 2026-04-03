@@ -21,7 +21,7 @@ export interface ChartBlockRenderProps {
       data: ChartNodeData;
     };
   };
-  editor: import('@labbs/beakblock-core').BeakBlockEditor;
+  editor: import('@aurthurm/beakblock-core').BeakBlockEditor;
   isEditable: boolean;
 }
 

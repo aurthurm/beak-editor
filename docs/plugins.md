@@ -412,7 +412,7 @@ const editor = new BeakBlockEditor({
 Extend the built-in plugin creator:
 
 ```typescript
-import { createPlugins } from '@labbs/beakblock-core';
+import { createPlugins } from '@aurthurm/beakblock-core';
 
 const plugins = createPlugins({
   schema: mySchema,

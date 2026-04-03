@@ -16,7 +16,7 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['vue', '@labbs/beakblock-core'],
+      external: ['vue', '@aurthurm/beakblock-core'],
     },
     sourcemap: true,
     minify: false,

@@ -1,5 +1,5 @@
 {
-  "name": "@labbs/beakblock-react",
+  "name": "@aurthurm/beakblock-react",
   "version": "1.0.0",
   "description": "React bindings for BeakBlock editor",
   "license": "Apache-2.0",
@@ -35,7 +35,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@labbs/beakblock-core": "workspace:*"
+    "@aurthurm/beakblock-core": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
@@ -54,11 +54,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Labbs/beakblock.git",
+    "url": "https://github.com/aurthurm/beakblock.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/Labbs/beakblock#readme",
+  "homepage": "https://github.com/aurthurm/beakblock#readme",
   "bugs": {
-    "url": "https://github.com/Labbs/beakblock/issues"
+    "url": "https://github.com/aurthurm/beakblock/issues"
   }
 }

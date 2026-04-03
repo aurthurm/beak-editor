@@ -7,7 +7,7 @@ import {
   type MediaMenuState,
   updateMediaAttrs,
   type BeakBlockEditor,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 
 export interface MediaMenuProps {
   editor: BeakBlockEditor | null;

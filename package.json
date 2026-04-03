@@ -5,10 +5,10 @@
   "type": "module",
   "description": "A fully open-source, framework-agnostic rich text editor built on ProseMirror",
   "license": "Apache-2.0",
-  "author": "Labbs",
+  "author": "aurthurm",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Labbs/beakblock.git"
+    "url": "https://github.com/aurthurm/beakblock.git"
   },
   "keywords": [
     "editor",

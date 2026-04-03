@@ -48,18 +48,18 @@ editor.pm.setNodeAttrs(pos, attrs)
 
 ## Installation
 
-BeakBlock packages are published under the `@labbs` scope.
+BeakBlock packages are published under the `@aurthurm` scope.
 
 Add the GitHub Packages registry to your project `.npmrc`:
 
 ```ini
-@labbs:registry=https://npm.pkg.github.com
+@aurthurm:registry=https://npm.pkg.github.com
 ```
 
 Install the packages you need:
 
 ```bash
-pnpm add @labbs/beakblock-core @labbs/beakblock-react @labbs/beakblock-vue
+pnpm add @aurthurm/beakblock-core @aurthurm/beakblock-react @aurthurm/beakblock-vue
 ```
 
 If you only want a single binding layer, install just the package you need.
@@ -69,7 +69,7 @@ If you only want a single binding layer, install just the package you need.
 ### React
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu, TableHandles } from '@labbs/beakblock-react';
+import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu, TableHandles } from '@aurthurm/beakblock-react';
 
 function Editor() {
   const editor = useBeakBlock({
@@ -98,7 +98,7 @@ function Editor() {
 
 ```vue
 <script setup lang="ts">
-import { useBeakBlock, BeakBlockView } from '@labbs/beakblock-vue';
+import { useBeakBlock, BeakBlockView } from '@aurthurm/beakblock-vue';
 
 const editor = useBeakBlock({
   initialContent: [
@@ -120,7 +120,7 @@ const editor = useBeakBlock({
 ### Vanilla JavaScript
 
 ```ts
-import { BeakBlockEditor } from '@labbs/beakblock-core';
+import { BeakBlockEditor } from '@aurthurm/beakblock-core';
 
 const editor = new BeakBlockEditor({
   initialContent: [],
@@ -136,8 +136,8 @@ editor.mount(document.getElementById('editor'));
 The workspace includes two BeakBlock Vue demos:
 
 ```bash
-pnpm --filter @labbs/beakblock-example-vite-vue dev
-pnpm --filter @labbs/beakblock-example-nuxt-vue dev
+pnpm --filter @aurthurm/beakblock-example-vite-vue dev
+pnpm --filter @aurthurm/beakblock-example-nuxt-vue dev
 ```
 
 The examples are intentionally dense and show:
@@ -230,9 +230,9 @@ See the full guide in [`docs/custom-blocks.md`](docs/custom-blocks.md).
 
 | Package | Description |
 | --- | --- |
-| [`@labbs/beakblock-core`](packages/core) | Framework-agnostic editor core |
-| [`@labbs/beakblock-react`](packages/react) | React bindings and components |
-| [`@labbs/beakblock-vue`](packages/vue) | Vue bindings and components |
+| [`@aurthurm/beakblock-core`](packages/core) | Framework-agnostic editor core |
+| [`@aurthurm/beakblock-react`](packages/react) | React bindings and components |
+| [`@aurthurm/beakblock-vue`](packages/vue) | Vue bindings and components |
 
 ## Repository Layout
 

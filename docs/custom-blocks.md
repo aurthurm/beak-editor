@@ -16,7 +16,7 @@ The easiest way to create custom blocks in React applications is using `createRe
 ### Quick Example
 
 ```tsx
-import { createReactBlockSpec } from '@labbs/beakblock-react';
+import { createReactBlockSpec } from '@aurthurm/beakblock-react';
 
 // Define your custom block
 const AlertBlock = createReactBlockSpec(
@@ -51,7 +51,7 @@ const AlertBlock = createReactBlockSpec(
 Register your custom blocks with the editor:
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, useCustomSlashMenuItems } from '@labbs/beakblock-react';
+import { useBeakBlock, BeakBlockView, SlashMenu, useCustomSlashMenuItems } from '@aurthurm/beakblock-react';
 
 // Define all your custom blocks
 const CUSTOM_BLOCKS = [AlertBlock, EmbedBlock, DatabaseBlock];
@@ -167,7 +167,7 @@ render: ({ block, contentRef }) => (
 ### Complete Example: Database Block
 
 ```tsx
-import { createReactBlockSpec, useUpdateBlock } from '@labbs/beakblock-react';
+import { createReactBlockSpec, useUpdateBlock } from '@aurthurm/beakblock-react';
 
 const DatabaseBlock = createReactBlockSpec(
   {

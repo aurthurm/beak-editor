@@ -5,7 +5,7 @@ import {
   type EditorConfig,
   type SlashMenuItem,
   type NodeViewConstructor,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 import type { PropSchema, VueBlockSpec } from '../blocks';
 
 export type UseBeakBlockOptions = Omit<EditorConfig, 'element'> & {

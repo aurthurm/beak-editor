@@ -26,7 +26,7 @@ import {
   Block,
   SlashMenuItem,
   NodeViewConstructor,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 import type { ReactBlockSpec, PropSchema } from '../blocks';
 
 /**

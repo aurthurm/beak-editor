@@ -21,7 +21,7 @@ This is the simplest option and requires no CSS imports.
 For more control, disable auto-injection and import the CSS file:
 
 ```typescript
-import '@labbs/beakblock-core/styles/editor.css';
+import '@aurthurm/beakblock-core/styles/editor.css';
 
 const editor = new BeakBlockEditor({
   injectStyles: false,

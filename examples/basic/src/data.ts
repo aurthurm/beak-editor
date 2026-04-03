@@ -1,4 +1,4 @@
-import type { Block } from '@labbs/beakblock-core';
+import type { Block } from '@aurthurm/beakblock-core';
 
 /**
  * Sample document with all formatting options for testing.

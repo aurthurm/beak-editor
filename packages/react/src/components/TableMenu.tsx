@@ -32,7 +32,7 @@ import {
   addColumnAfter,
   deleteColumn,
   deleteTable,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 
 /**
  * Props for TableMenu component.

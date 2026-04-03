@@ -9,7 +9,7 @@ import {
   type PropType,
   type Ref,
 } from 'vue';
-import { BeakBlockEditor } from '@labbs/beakblock-core';
+import { BeakBlockEditor } from '@aurthurm/beakblock-core';
 
 export interface LinkPopoverProps {
   editor: BeakBlockEditor;

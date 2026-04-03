@@ -21,7 +21,7 @@
  */
 
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { BeakBlockEditor } from '@labbs/beakblock-core';
+import { BeakBlockEditor } from '@aurthurm/beakblock-core';
 
 /**
  * Props for BeakBlockView component

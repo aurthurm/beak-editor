@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### Vue Package (`@labbs/beakblock-vue`)
+#### Vue Package (`@aurthurm/beakblock-vue`)
 - Vue 3 composables for editor lifecycle and state subscriptions
 - `BeakBlockView` component for mounting the editor into Vue templates
 - Package metadata and documentation updates for Vue installation
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### Core Editor (`@labbs/beakblock-core`)
+#### Core Editor (`@aurthurm/beakblock-core`)
 - **Public ProseMirror API** - Full access to ProseMirror internals via `editor.pm.*`
 - **Block-based JSON document format** - Notion-like structure with full TypeScript support
 - **Schema System**
@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **History Support** - Undo/redo via ProseMirror history
 - **CSS Auto-injection** - Automatic style injection with opt-out support
 
-#### React Package (`@labbs/beakblock-react`)
+#### React Package (`@aurthurm/beakblock-react`)
 - **Hooks**
   - `useBeakBlock` - Create and manage editor instances
   - `useEditorContent` - Subscribe to document changes

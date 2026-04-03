@@ -6,9 +6,9 @@ import {
   DEFAULT_CHART_OPTIONS,
   DEFAULT_BORDER_COLORS,
   DEFAULT_CHART_COLORS,
-} from '@labbs/beakblock-vue';
+} from '@aurthurm/beakblock-vue';
 
-describe('@labbs/beakblock-vue chart block', () => {
+describe('@aurthurm/beakblock-vue chart block', () => {
   it('creates default chart data with the expected shape', () => {
     const chart = createDefaultChartData('bar');
 

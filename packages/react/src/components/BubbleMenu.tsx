@@ -138,7 +138,7 @@ import {
   BUBBLE_MENU_PLUGIN_KEY,
   BubbleMenuState,
   BlockTypeInfo,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 import { LinkPopover } from './LinkPopover';
 import { ColorPicker } from './ColorPicker';
 

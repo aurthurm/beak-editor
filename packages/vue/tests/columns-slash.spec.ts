@@ -7,8 +7,8 @@ import {
   TextSelection,
   type Block,
   type BeakBlockEditor,
-} from '@labbs/beakblock-core';
-import { useBeakBlock } from '@labbs/beakblock-vue';
+} from '@aurthurm/beakblock-core';
+import { useBeakBlock } from '@aurthurm/beakblock-vue';
 
 const initialContent: Block[] = [
   {
@@ -68,7 +68,7 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('@labbs/beakblock-vue column slash commands', () => {
+describe('@aurthurm/beakblock-vue column slash commands', () => {
   it.each([
     ['bulletList', 'bulletList'],
     ['orderedList', 'orderedList'],

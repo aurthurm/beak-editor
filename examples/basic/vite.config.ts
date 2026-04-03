@@ -7,10 +7,10 @@ export default defineConfig({
   base: process.env.GITHUB_PAGES ? '/beakblock/' : '/',
   resolve: {
     alias: {
-      // Resolve @labbs/beakblock packages to their source folders for live development
-      '@labbs/beakblock-core/styles/editor.css': path.resolve(__dirname, '../../packages/core/src/styles/editor.css'),
-      '@labbs/beakblock-core': path.resolve(__dirname, '../../packages/core/src'),
-      '@labbs/beakblock-react': path.resolve(__dirname, '../../packages/react/src'),
+      // Resolve @aurthurm/beakblock packages to their source folders for live development
+      '@aurthurm/beakblock-core/styles/editor.css': path.resolve(__dirname, '../../packages/core/src/styles/editor.css'),
+      '@aurthurm/beakblock-core': path.resolve(__dirname, '../../packages/core/src'),
+      '@aurthurm/beakblock-react': path.resolve(__dirname, '../../packages/react/src'),
     },
   },
 });

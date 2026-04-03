@@ -11,7 +11,7 @@ import {
   useCustomSlashMenuItems,
   useEditorContent,
   useBeakBlock,
-} from '@labbs/beakblock-vue';
+} from '@aurthurm/beakblock-vue';
 import { sampleDocument } from '~/data';
 
 useHead({
@@ -44,7 +44,7 @@ const isReady = computed(() => Boolean(editor.value));
       <aside class="hero-panel">
         <div class="hero-stat">
           <span class="hero-stat-label">Package</span>
-          <span class="hero-stat-value">@labbs/beakblock-vue</span>
+          <span class="hero-stat-value">@aurthurm/beakblock-vue</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-label">Aesthetic</span>

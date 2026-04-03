@@ -26,10 +26,10 @@ importers:
 
   examples/basic:
     dependencies:
-      '@labbs/beakblock-core':
+      '@aurthurm/beakblock-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@labbs/beakblock-react':
+      '@aurthurm/beakblock-react':
         specifier: workspace:*
         version: link:../../packages/react
       react:
@@ -57,10 +57,10 @@ importers:
 
   examples/nuxt-vue:
     dependencies:
-      '@labbs/beakblock-core':
+      '@aurthurm/beakblock-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@labbs/beakblock-vue':
+      '@aurthurm/beakblock-vue':
         specifier: workspace:*
         version: link:../../packages/vue
       nuxt:
@@ -76,10 +76,10 @@ importers:
 
   examples/vite-vue:
     dependencies:
-      '@labbs/beakblock-core':
+      '@aurthurm/beakblock-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@labbs/beakblock-vue':
+      '@aurthurm/beakblock-vue':
         specifier: workspace:*
         version: link:../../packages/vue
       vue:
@@ -156,7 +156,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@labbs/beakblock-core':
+      '@aurthurm/beakblock-core':
         specifier: workspace:*
         version: link:../core
       react:
@@ -190,7 +190,7 @@ importers:
       '@iconify/vue':
         specifier: ^5.0.0
         version: 5.0.0(vue@3.5.32(typescript@5.9.3))
-      '@labbs/beakblock-core':
+      '@aurthurm/beakblock-core':
         specifier: workspace:*
         version: link:../core
       chart.js:

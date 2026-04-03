@@ -21,7 +21,7 @@ export default defineConfig({
         'react-dom',
         'react-dom/client',
         'react/jsx-runtime',
-        '@labbs/beakblock-core',
+        '@aurthurm/beakblock-core',
         'prosemirror-commands',
         'prosemirror-dropcursor',
         'prosemirror-gapcursor',

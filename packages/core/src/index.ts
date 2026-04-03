@@ -1,12 +1,12 @@
 /**
- * @labbs/beakblock-core
+ * @aurthurm/beakblock-core
  *
  * A fully open-source, framework-agnostic rich text editor built on ProseMirror.
  * All APIs are PUBLIC - this is a core principle of BeakBlock.
  *
  * @example
  * ```typescript
- * import { BeakBlockEditor } from '@labbs/beakblock-core';
+ * import { BeakBlockEditor } from '@aurthurm/beakblock-core';
  *
  * const editor = new BeakBlockEditor({
  *   element: document.getElementById('editor'),

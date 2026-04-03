@@ -1,4 +1,4 @@
-import { useBeakBlock, BeakBlockView, useEditorContent, SlashMenu, BubbleMenu, TableHandles, MediaMenu } from '@labbs/beakblock-react';
+import { useBeakBlock, BeakBlockView, useEditorContent, SlashMenu, BubbleMenu, TableHandles, MediaMenu } from '@aurthurm/beakblock-react';
 import { sampleDocument } from './data';
 // CSS is now auto-injected by BeakBlockEditor (injectStyles: true by default)
 import './styles.css';

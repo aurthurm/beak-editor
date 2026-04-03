@@ -29,7 +29,7 @@ import {
   deleteMediaNode,
   ImageAttrs,
   EmbedAttrs,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 
 /**
  * Props for MediaMenu component.

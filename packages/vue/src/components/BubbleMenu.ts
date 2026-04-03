@@ -16,7 +16,7 @@ import {
   type BlockTypeInfo,
   type BubbleMenuState,
   type BeakBlockEditor,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';
 import { ColorPicker } from './ColorPicker';
 import { LinkPopover } from './LinkPopover';
 

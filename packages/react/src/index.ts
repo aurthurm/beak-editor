@@ -1,11 +1,11 @@
 /**
- * @labbs/beakblock-react
+ * @aurthurm/beakblock-react
  *
  * React bindings for BeakBlock editor.
  *
  * @example
  * ```tsx
- * import { useBeakBlock, BeakBlockView } from '@labbs/beakblock-react';
+ * import { useBeakBlock, BeakBlockView } from '@aurthurm/beakblock-react';
  *
  * function MyEditor() {
  *   const editor = useBeakBlock({
@@ -88,4 +88,4 @@ export type {
   StyledText,
   InlineContent,
   SlashMenuItem,
-} from '@labbs/beakblock-core';
+} from '@aurthurm/beakblock-core';

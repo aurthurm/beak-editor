@@ -1,5 +1,5 @@
 {
-  "name": "@labbs/beakblock-example-vite-vue",
+  "name": "@aurthurm/beakblock-example-vite-vue",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@labbs/beakblock-core": "workspace:*",
-    "@labbs/beakblock-vue": "workspace:*",
+    "@aurthurm/beakblock-core": "workspace:*",
+    "@aurthurm/beakblock-vue": "workspace:*",
     "vue": "^3.5.26"
   },
   "devDependencies": {

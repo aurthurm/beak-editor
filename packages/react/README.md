@@ -1,20 +1,20 @@
-# @labbs/beakblock-react
+# @aurthurm/beakblock-react
 
 React bindings for the BeakBlock rich text editor.
 
 ## Installation
 
 ```bash
-npm install @labbs/beakblock-react @labbs/beakblock-core
+npm install @aurthurm/beakblock-react @aurthurm/beakblock-core
 # or
-pnpm add @labbs/beakblock-react @labbs/beakblock-core
+pnpm add @aurthurm/beakblock-react @aurthurm/beakblock-core
 ```
 
 ## Quick Start
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@labbs/beakblock-react';
-import '@labbs/beakblock-core/styles/editor.css';
+import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@aurthurm/beakblock-react';
+import '@aurthurm/beakblock-core/styles/editor.css';
 
 function MyEditor() {
   const editor = useBeakBlock({
@@ -136,7 +136,7 @@ See [BubbleMenu Customization](#bubblemenu-customization) for advanced usage.
 Color picker for text and background colors.
 
 ```tsx
-import { ColorPicker } from '@labbs/beakblock-react';
+import { ColorPicker } from '@aurthurm/beakblock-react';
 
 <ColorPicker
   editor={editor}
@@ -194,7 +194,7 @@ interface BubbleMenuProps {
 #### Example: Add a Custom Button
 
 ```tsx
-import { BubbleMenu, BubbleMenuItem } from '@labbs/beakblock-react';
+import { BubbleMenu, BubbleMenuItem } from '@aurthurm/beakblock-react';
 
 const translateButton: BubbleMenuItem = {
   id: 'translate',
@@ -281,7 +281,7 @@ interface SlashMenuProps {
 #### Example: Add Custom Items
 
 ```tsx
-import { SlashMenu, SlashMenuItem } from '@labbs/beakblock-react';
+import { SlashMenu, SlashMenuItem } from '@aurthurm/beakblock-react';
 
 const customItems: SlashMenuItem[] = [
   {
@@ -357,7 +357,7 @@ interface ColorOption {
 #### Default Palettes
 
 ```tsx
-import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@labbs/beakblock-react';
+import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@aurthurm/beakblock-react';
 
 // DEFAULT_TEXT_COLORS includes:
 // Default, Gray, Red, Orange, Yellow, Green, Blue, Purple, Pink
@@ -369,7 +369,7 @@ import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@labbs/beakblock
 #### Example: Brand Color Palette
 
 ```tsx
-import { ColorPicker, ColorOption } from '@labbs/beakblock-react';
+import { ColorPicker, ColorOption } from '@aurthurm/beakblock-react';
 
 const brandTextColors: ColorOption[] = [
   { value: '', label: 'Default' },

@@ -1,5 +1,5 @@
 {
-  "name": "@labbs/beakblock-core",
+  "name": "@aurthurm/beakblock-core",
   "version": "1.0.0",
   "description": "Framework-agnostic core for BeakBlock editor",
   "license": "Apache-2.0",
@@ -72,11 +72,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Labbs/beakblock.git",
+    "url": "https://github.com/aurthurm/beakblock.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/Labbs/beakblock#readme",
+  "homepage": "https://github.com/aurthurm/beakblock#readme",
   "bugs": {
-    "url": "https://github.com/Labbs/beakblock/issues"
+    "url": "https://github.com/aurthurm/beakblock/issues"
   }
 }

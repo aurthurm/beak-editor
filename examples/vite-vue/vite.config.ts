@@ -7,8 +7,8 @@ export default defineConfig({
   base: process.env.GITHUB_PAGES ? '/beakblock/' : '/',
   resolve: {
     alias: {
-      '@labbs/beakblock-core': resolve(__dirname, '../../packages/core/src'),
-      '@labbs/beakblock-vue': resolve(__dirname, '../../packages/vue/src'),
+      '@aurthurm/beakblock-core': resolve(__dirname, '../../packages/core/src'),
+      '@aurthurm/beakblock-vue': resolve(__dirname, '../../packages/vue/src'),
     },
   },
 });

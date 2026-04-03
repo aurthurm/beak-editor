@@ -1,19 +1,19 @@
-# @labbs/beakblock-vue
+# @aurthurm/beakblock-vue
 
 Vue 3 bindings for the BeakBlock rich text editor.
 
 ## Installation
 
 ```bash
-pnpm add @labbs/beakblock-core @labbs/beakblock-vue vue
+pnpm add @aurthurm/beakblock-core @aurthurm/beakblock-vue vue
 ```
 
 ## Quick Start
 
 ```vue
 <script setup lang="ts">
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@labbs/beakblock-vue';
-import { createChartBlockSpec } from '@labbs/beakblock-vue';
+import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@aurthurm/beakblock-vue';
+import { createChartBlockSpec } from '@aurthurm/beakblock-vue';
 
 const editor = useBeakBlock({
   initialContent: [
@@ -119,7 +119,7 @@ Supports `items`, `customItems`, `itemOrder`, `hideItems`, and `renderItem`.
 Adds a Chart.js-backed block with editable data and inline slash menu support.
 
 ```ts
-import { createChartBlockSpec, useCustomSlashMenuItems, useBeakBlock } from '@labbs/beakblock-vue';
+import { createChartBlockSpec, useCustomSlashMenuItems, useBeakBlock } from '@aurthurm/beakblock-vue';
 
 const customBlocks = [createChartBlockSpec()];
 const editor = useBeakBlock({
@@ -219,7 +219,7 @@ interface BubbleMenuProps {
 
 ```vue
 <script setup lang="ts">
-import { BubbleMenu } from '@labbs/beakblock-vue';
+import { BubbleMenu } from '@aurthurm/beakblock-vue';
 
 const translateButton = {
   id: 'translate',
@@ -298,7 +298,7 @@ interface SlashMenuProps {
 
 ```vue
 <script setup lang="ts">
-import { SlashMenu } from '@labbs/beakblock-vue';
+import { SlashMenu } from '@aurthurm/beakblock-vue';
 
 const customItems = [
   {
@@ -370,14 +370,14 @@ interface ColorPickerProps {
 ### Default Palettes
 
 ```ts
-import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@labbs/beakblock-vue';
+import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@aurthurm/beakblock-vue';
 ```
 
 ### Example: Brand Color Palette
 
 ```vue
 <script setup lang="ts">
-import { ColorPicker } from '@labbs/beakblock-vue';
+import { ColorPicker } from '@aurthurm/beakblock-vue';
 
 const brandTextColors = [
   { value: '', label: 'Default' },
@@ -414,7 +414,7 @@ The editor instance exposes the public ProseMirror surface directly:
 
 ```vue
 <script setup lang="ts">
-import { useBeakBlock, BeakBlockView } from '@labbs/beakblock-vue';
+import { useBeakBlock, BeakBlockView } from '@aurthurm/beakblock-vue';
 
 const editor = useBeakBlock({});
 
