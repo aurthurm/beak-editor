@@ -1,0 +1,82 @@
+{
+  "name": "@labbs/beakblock-core",
+  "version": "1.0.0",
+  "description": "Framework-agnostic core for BeakBlock editor",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles": "./dist/styles/editor.css",
+    "./styles/editor.css": "./dist/styles/editor.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "editor",
+    "rich-text",
+    "prosemirror",
+    "block-editor",
+    "wysiwyg",
+    "notion-like",
+    "typescript",
+    "text-editor",
+    "content-editor",
+    "document-editor"
+  ],
+  "scripts": {
+    "build": "vite build && cp -r src/styles dist/",
+    "dev": "vite build --watch",
+    "lint": "eslint src",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "prosemirror-commands": "^1.6.2",
+    "prosemirror-dropcursor": "^1.8.1",
+    "prosemirror-gapcursor": "^1.3.2",
+    "prosemirror-history": "^1.4.1",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-model": "^1.24.1",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.10.2",
+    "prosemirror-view": "^1.37.1",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.4.0"
+  },
+  "peerDependencies": {
+    "yjs": "^13.0.0",
+    "y-prosemirror": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "yjs": { "optional": true },
+    "y-prosemirror": { "optional": true }
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Labbs/beakblock.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/Labbs/beakblock#readme",
+  "bugs": {
+    "url": "https://github.com/Labbs/beakblock/issues"
+  }
+}

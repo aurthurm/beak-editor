@@ -1,0 +1,43 @@
+{
+  "name": "beakblock",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A fully open-source, framework-agnostic rich text editor built on ProseMirror",
+  "license": "Apache-2.0",
+  "author": "Labbs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Labbs/beakblock.git"
+  },
+  "keywords": [
+    "editor",
+    "rich-text",
+    "prosemirror",
+    "block-editor",
+    "wysiwyg",
+    "notion-like",
+    "react",
+    "typescript",
+    "text-editor",
+    "markdown"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "lint": "eslint packages/*/src",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.1.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.53.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

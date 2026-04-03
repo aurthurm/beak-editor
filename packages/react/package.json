@@ -1,0 +1,64 @@
+{
+  "name": "@labbs/beakblock-react",
+  "version": "1.0.0",
+  "description": "React bindings for BeakBlock editor",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "editor",
+    "rich-text",
+    "prosemirror",
+    "block-editor",
+    "wysiwyg",
+    "notion-like",
+    "react",
+    "react-hooks",
+    "typescript",
+    "text-editor"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "lint": "eslint src",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@labbs/beakblock-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.4.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Labbs/beakblock.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/Labbs/beakblock#readme",
+  "bugs": {
+    "url": "https://github.com/Labbs/beakblock/issues"
+  }
+}

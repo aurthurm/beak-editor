@@ -1,0 +1,71 @@
+{
+  "name": "@labbs/beakblock-vue",
+  "version": "1.0.0",
+  "description": "Vue bindings for BeakBlock editor",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "editor",
+    "rich-text",
+    "prosemirror",
+    "block-editor",
+    "wysiwyg",
+    "notion-like",
+    "vue",
+    "vue3",
+    "typescript",
+    "text-editor"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@iconify/vue": "^5.0.0",
+    "@labbs/beakblock-core": "workspace:*",
+    "chart.js": "^4.5.1",
+    "emoji-mart": "^5.6.0"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.4.0",
+    "vitest": "^2.1.8",
+    "vue": "^3.5.26"
+  },
+  "peerDependencies": {
+    "vue": ">=3.5.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Labbs/beakblock.git",
+    "directory": "packages/vue"
+  },
+  "homepage": "https://github.com/Labbs/beakblock#readme",
+  "bugs": {
+    "url": "https://github.com/Labbs/beakblock/issues"
+  }
+}
