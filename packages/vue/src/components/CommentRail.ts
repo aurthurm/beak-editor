@@ -440,16 +440,8 @@ export const CommentRail = defineComponent({
             ])
           : null;
 
-      const shellClass = [
-        'beakblock-comment-shell',
-        count > 0 ? 'beakblock-comment-shell--has-comments' : '',
-      ]
-        .filter(Boolean)
-        .join(' ');
-
-      return h('div', { class: shellClass }, [
-        h('div', { class: 'beakblock-comment-shell__editor', ref: editorColRef }, slots.default?.() ?? []),
-        peek,
+      return h('div', { class: 'beakblock-comment-shell' }, [
+        h('div', { class: 'beakblock-comment-shell__editor', ref: editorColRef }, [slots.default?.() ?? [], peek]),
         aside,
       ]);
     };

@@ -2487,28 +2487,23 @@ th .ob-side-menu,
   position: relative;
 }
 
-/* Same inset whenever threads exist so opening the rail does not change editor text width. */
-.beakblock-comment-shell--has-comments .beakblock-comment-shell__editor {
-  padding-right: 2.75rem;
-}
-
-/* Collapsed: tab on the editor’s right edge (does not shrink editor width). */
+/* Count peek: floats over the editor, 10px from the right (not in the side rail). */
 .beakblock-comment-rail__peek {
   position: absolute;
   top: 0.65rem;
-  right: 0;
+  right: 10px;
   z-index: 24;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.4rem 0.5rem 0.4rem 0.55rem;
+  padding: 0.4rem 0.55rem;
   border: 1px solid hsl(var(--ob-border));
-  border-right: none;
-  border-radius: 10px 0 0 10px;
+  border-radius: 999px;
   background: hsl(var(--ob-background));
   color: hsl(var(--ob-foreground));
   cursor: pointer;
-  box-shadow: -2px 2px 14px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 14px rgba(15, 23, 42, 0.1);
+  pointer-events: auto;
   transition:
     background 0.12s ease,
     box-shadow 0.12s ease;
@@ -2516,7 +2511,7 @@ th .ob-side-menu,
 
 .beakblock-comment-rail__peek:hover {
   background: hsl(var(--ob-muted) / 0.35);
-  box-shadow: -2px 4px 18px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
 }
 
 .beakblock-comment-rail__peek-icon {
