@@ -6,9 +6,18 @@
 </p>
 
 <p align="center">
+  <img src=".github/beakblock-vue-showcase.png" alt="BeakBlock Vue showcase: rich text, callouts, blockquote, lists, links, and inline formatting" width="720" />
+</p>
+<p align="center">
+  <sub>Screenshot from the Vite + Vue showcase (<code>examples/vite-vue</code>).</sub>
+</p>
+
+<p align="center">
   <a href="#what-you-get">What you get</a> •
   <a href="#installation">Installation</a> •
   <a href="#quick-start">Quick Start</a> •
+  <a href="#ai-assistant">AI assistant</a> •
+  <a href="#slash-commands-menu">Slash commands</a> •
   <a href="#examples">Examples</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#packages">Packages</a>
@@ -24,7 +33,7 @@ BeakBlock is a framework-agnostic rich text editor built on ProseMirror. It is d
 - typed APIs instead of hidden implementation details
 - a block-based document model
 - React and Vue bindings over the same core
-- built-in UI for menus, tables, media, charts, and custom blocks
+- built-in UI for menus, tables, media, charts, AI-assisted writing, comments, and custom blocks
 
 Unlike editors that hide ProseMirror behind wrappers, BeakBlock exposes the editor state, view, document, and transaction layer directly through `editor.pm.*`.
 
@@ -42,6 +51,8 @@ editor.pm.setNodeAttrs(pos, attrs)
 - **Vue bindings** with composables and components
 - **Built-in blocks** for headings, paragraphs, lists, checklists, code, tables, columns, images, embeds, icons, charts, and callouts
 - **Built-in menus** for slash commands, bubble formatting, tables, media, and links
+- **AI assistant** — slash command and bubble-menu entry, modal UI in React/Vue, document + selection context helpers, and curated presets in core
+- **Comments** — `CommentModal` and bubble-menu hook for threaded discussions (see Vue/React examples)
 - **Block JSON** that can be stored, transformed, and reloaded
 - **Custom block support** for React and Vue
 - **TypeScript-first APIs** across the workspace
@@ -117,6 +128,8 @@ const editor = useBeakBlock({
 </template>
 ```
 
+Wire **SlashMenu**, **BubbleMenu**, **AIModal**, and **CommentModal** the same way as in [`examples/vite-vue`](examples/vite-vue) or [`examples/nuxt-vue`](examples/nuxt-vue): pass `@ai` / `@comment` handlers from the menus into your modals, and call your backend from the modal’s execute/apply callbacks.
+
 ### Vanilla JavaScript
 
 ```ts
@@ -130,6 +143,121 @@ editor.mount(document.getElementById('editor'));
 ```
 
 > BeakBlock injects its base editor styles by default. If you want to supply your own stylesheet, set `injectStyles: false` in the editor config.
+
+## AI assistant
+
+BeakBlock treats AI as a first-class integration point: the core builds structured **context** (document markdown, block JSON, and optional selection), and the React/Vue packages ship an **AI modal** you can connect to any model or API.
+
+### Where it appears
+
+| Entry | What happens |
+| --- | --- |
+| **Slash menu** → **AI assistant** (`id`: `ai`) | Framework adapters emit an `ai` event (Vue) or you handle the menu (React) so you can open the modal in **slash** mode — tuned for continuing or restructuring from the cursor. |
+| **Bubble menu** → sparkles (**AI**) | Shown when you pass `onAI`; opens the modal in **bubble** mode — tuned for rewriting the current text selection. |
+
+The default slash item is a no-op at the ProseMirror layer on purpose; **React** `SlashMenu` and **Vue** `SlashMenu` detect the `ai` item and delegate to your handler.
+
+### Core helpers and presets
+
+From `@aurthurm/beakblock-core`:
+
+- **`buildAIContext(editor, mode, preset?, instruction?)`** — builds `AIContext` with document blocks, derived markdown, and selection metadata when the selection is non-empty.
+- **`BUBBLE_AI_PRESETS`** / **`SLASH_AI_PRESETS`** — opinionated starter prompts (titles, descriptions, and underlying instructions).
+- **`getAIPresets(mode)`** — returns the preset list for the given entry mode.
+
+**Bubble presets:** Improve writing, Fix grammar, Fix spelling, Simplify, Make shorter, Make longer.
+
+**Slash presets:** Continue writing, Summarize, Add action items, Outline, Rewrite.
+
+### `AIModal` (React and Vue)
+
+Use **`AIModal`** from `@aurthurm/beakblock-react` or `@aurthurm/beakblock-vue`. Typical props:
+
+- **`open`**, **`onClose`** — visibility
+- **`editor`** — `BeakBlockEditor` instance
+- **`mode`** — `'bubble' | 'slash'` (drives which preset list and context shape feel natural)
+- **`presets`** — usually `BUBBLE_AI_PRESETS` or `SLASH_AI_PRESETS`, or your own array of the same shape
+- **`onExecute`** — called with an `AIRequest`; run your model here and return text (see examples)
+- **`onApply`** — insert or replace content in the document from the model output
+
+The shared example helpers in [`examples/shared/ai.ts`](examples/shared/ai.ts) show how to:
+
+- **`buildAIMessages`** — turn an `AIRequest` into chat messages (system + user) including preset, instruction, selection, markdown, and JSON blocks.
+- **`runOpenAICompletion`** — call OpenAI-compatible chat completions using **`OPENAI_API_KEY`**, optional **`BEAKBLOCK_AI_MODEL`** (default `gpt-4.1-mini`), and optional **`BEAKBLOCK_AI_BASE_URL`**.
+- **`sendAIRequest`** — POST JSON to your own route (e.g. `/api/ai`) for server-side keys.
+
+### Comments
+
+**`CommentModal`** works alongside **`BubbleMenu`**’s comment action (`onComment` / `@comment`). The Nuxt and Vite Vue demos wire both AI and comments end-to-end.
+
+## Slash commands (`/` menu)
+
+Type **`/`** at the **start of a block** to open the command palette. The query filters by **title** and **keywords** (case-insensitive). Items are grouped in the UI as below.
+
+Default **`SlashMenuItem` `id` values** (for `hideItems`, `itemOrder`, or custom extensions):
+
+### Basic blocks
+
+| ID | Title | Notes |
+| --- | --- | --- |
+| `heading1` | Heading 1 | Large section heading |
+| `heading2` | Heading 2 | Medium section heading |
+| `heading3` | Heading 3 | Small section heading |
+| `quote` | Quote | Blockquote |
+| `calloutInfo` | Callout | Info-style callout |
+| `calloutWarning` | Warning | Warning callout |
+| `calloutSuccess` | Success | Success callout |
+| `calloutError` | Error | Error callout |
+| `codeBlock` | Code Block | Fenced-style code block |
+| `divider` | Divider | Horizontal rule + new paragraph |
+
+### Insert
+
+| ID | Title | Notes |
+| --- | --- | --- |
+| `emoji` | Emoji | Opens emoji **picker** (`picker: 'emoji'`) |
+| `icon` | Icon | Opens icon **picker** (`picker: 'icon'`) |
+
+### AI
+
+| ID | Title | Notes |
+| --- | --- | --- |
+| `ai` | AI assistant | Opens your AI flow (handled in React/Vue `SlashMenu`) |
+
+### Lists
+
+| ID | Title | Notes |
+| --- | --- | --- |
+| `bulletList` | Bullet List | Unordered list |
+| `orderedList` | Numbered List | Ordered list |
+| `checklist` | To-do list | Interactive checklist items |
+
+### Layout
+
+| ID | Title | Notes |
+| --- | --- | --- |
+| `columns2` | 2 Columns | Equal two-column layout |
+| `columns3` | 3 Columns | Three-column layout |
+| `columnsSidebar` | Sidebar Left | Narrow sidebar + main column |
+| `table` | Table | 3×3 table |
+| `table2x2` | Table 2x2 | 2×2 table |
+| `table4x4` | Table 4x4 | 4×4 table |
+
+### Media
+
+| ID | Title | Notes |
+| --- | --- | --- |
+| `image` | Image | Image block |
+| `embed` | Embed | Generic embed |
+| `youtube` | YouTube | YouTube embed preset |
+
+### Customizing the menu
+
+- **`customItems`** — append commands (including AI or app-specific blocks).
+- **`hideItems`** — pass item IDs to remove defaults (e.g. `youtube`, `columnsSidebar`).
+- **`itemOrder`** — control which default items appear and in what order; IDs not listed are typically hidden — see package READMEs.
+
+Custom blocks can register their own slash entries via **`createReactBlockSpec`** / **`createVueBlockSpec`**.
 
 ## Examples
 
@@ -147,8 +275,10 @@ The examples are intentionally dense and show:
 - tables and table actions
 - charts
 - images and embeds
-- slash menu commands
-- bubble formatting
+- full slash menu (including **AI assistant**, emoji/icon pickers, and layout tables)
+- bubble formatting and **AI** / **comment** actions
+- **AIModal** with OpenAI-compatible or custom API wiring (`examples/shared/ai.ts`)
+- **CommentModal** with threads and reactions
 - inline icons and emojis
 - links and colors
 
@@ -242,7 +372,12 @@ See the full guide in [`docs/custom-blocks.md`](docs/custom-blocks.md).
 - `examples/basic` - vanilla example
 - `examples/vite-vue` - Vite + Vue showcase
 - `examples/nuxt-vue` - Nuxt + Vue showcase
+- `examples/shared` - shared demo helpers (AI message building, OpenAI client)
 - `docs` - integration and customization guides
+
+## GitHub social preview image
+
+The showcase image used at the top of this README is committed as [`.github/beakblock-vue-showcase.png`](.github/beakblock-vue-showcase.png). To use it as the repository **Social preview** card on GitHub, open **Settings → General → Social preview** for the repo and upload that file (or the same asset from your machine). GitHub does not read the README image automatically for the social card.
 
 ## Development
 
