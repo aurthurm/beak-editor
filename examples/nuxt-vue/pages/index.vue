@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import {
   AIModal,
   CommentModal,
+  CommentRail,
   BubbleMenu,
   createChartBlockSpec,
   MediaMenu,
@@ -98,7 +99,9 @@ const customSlashItems = useCustomSlashMenuItems(editor, customBlocks);
     <main class="layout">
       <section class="editor-stage">
         <ClientOnly>
-          <BeakBlockView :editor="editor" class-name="editor-view" />
+          <CommentRail :editor="editor" :store="commentStore" current-user-id="aurthurm">
+            <BeakBlockView :editor="editor" class-name="editor-view" />
+          </CommentRail>
           <SlashMenu :editor="editor" :custom-items="customSlashItems" @ai="() => openAiModal('slash')" />
           <BubbleMenu :editor="editor" @comment="openCommentModal" @ai="() => openAiModal('bubble')" />
           <TableMenu :editor="editor" />

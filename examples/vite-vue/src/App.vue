@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import {
   AIModal,
   CommentModal,
+  CommentRail,
   BubbleMenu,
   createChartBlockSpec,
   MediaMenu,
@@ -94,7 +95,9 @@ const applyDemoAI = async ({ output }: { output: string }) => {
 
     <main class="layout">
       <section class="editor-stage">
-        <BeakBlockView :editor="editor" class-name="editor-view" />
+        <CommentRail :editor="editor" :store="commentStore" current-user-id="aurthurm">
+          <BeakBlockView :editor="editor" class-name="editor-view" />
+        </CommentRail>
         <SlashMenu
           :editor="editor"
           :custom-items="customSlashItems"

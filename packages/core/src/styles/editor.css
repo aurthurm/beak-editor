@@ -2704,6 +2704,228 @@ th .ob-side-menu,
   opacity: 0.7;
 }
 
+.beakblock-comment-shell {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.beakblock-comment-shell__editor {
+  width: 100%;
+  position: relative;
+}
+
+.beakblock-comment-shell--has-comments .beakblock-comment-shell__editor {
+  padding-right: 2.75rem;
+}
+
+.beakblock-comment-rail__peek {
+  position: absolute;
+  top: 0.65rem;
+  right: 0;
+  z-index: 24;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.55rem;
+  border: 1px solid hsl(var(--ob-border));
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  background: hsl(var(--ob-background));
+  color: hsl(var(--ob-foreground));
+  cursor: pointer;
+  box-shadow: -2px 2px 14px rgba(15, 23, 42, 0.08);
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.beakblock-comment-rail__peek:hover {
+  background: hsl(var(--ob-muted) / 0.35);
+  box-shadow: -2px 4px 18px rgba(15, 23, 42, 0.1);
+}
+
+.beakblock-comment-rail__peek-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.beakblock-comment-rail__peek-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: hsl(221 83% 53% / 0.14);
+  color: hsl(221 83% 34%);
+}
+
+.beakblock-comment-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  margin-left: 10px;
+  width: min(360px, calc(100vw - 32px));
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: 0 14px 14px 0;
+  background: hsl(var(--ob-muted) / 0.2);
+  min-height: 0;
+  z-index: 25;
+  box-shadow: -6px 0 28px rgba(15, 23, 42, 0.07);
+  overflow: hidden;
+}
+
+.beakblock-comment-rail__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid hsl(var(--ob-border));
+  background: hsl(var(--ob-background));
+  flex-shrink: 0;
+}
+
+.beakblock-comment-rail__head-main {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.beakblock-comment-rail__collapse {
+  flex-shrink: 0;
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: hsl(var(--ob-background));
+  color: hsl(var(--ob-muted-foreground));
+  cursor: pointer;
+}
+
+.beakblock-comment-rail__collapse:hover {
+  background: hsl(var(--ob-muted) / 0.4);
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-comment-rail__title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+}
+
+.beakblock-comment-rail__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: hsl(221 83% 53% / 0.12);
+  color: hsl(221 83% 36%);
+}
+
+.beakblock-comment-rail__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.beakblock-comment-rail__track {
+  flex: 0 0 48px;
+  position: relative;
+  border-right: 1px solid hsl(var(--ob-border) / 0.65);
+  background: hsl(var(--ob-muted) / 0.12);
+}
+
+.beakblock-comment-rail__bubble {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.35rem;
+  border: 1px solid hsl(221 83% 53% / 0.35);
+  border-radius: 999px;
+  background: hsl(var(--ob-background));
+  color: hsl(var(--ob-foreground));
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease,
+    transform 0.12s ease;
+}
+
+.beakblock-comment-rail__bubble:hover {
+  border-color: hsl(221 83% 53% / 0.55);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.beakblock-comment-rail__bubble--active {
+  border-color: hsl(221 83% 53%);
+  box-shadow: 0 0 0 2px hsl(221 83% 53% / 0.15);
+}
+
+.beakblock-comment-rail__bubble--resolved {
+  opacity: 0.72;
+  border-color: hsl(142 71% 36% / 0.35);
+  background: hsl(142 71% 45% / 0.08);
+}
+
+.beakblock-comment-rail__bubble-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.beakblock-comment-rail__bubble-n {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: hsl(221 83% 38%);
+  min-width: 0.65rem;
+  text-align: center;
+}
+
+.beakblock-comment-rail__bubble--resolved .beakblock-comment-rail__bubble-n {
+  color: hsl(142 71% 30%);
+}
+
+.beakblock-comment-rail__detail {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: 0.55rem 0.65rem 0.75rem;
+}
+
+.beakblock-comment-rail__hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: hsl(var(--ob-muted-foreground));
+}
+
 .beakblock-modal-overlay {
   /* Teleported modals sit under document.body; re-establish --ob-* so hsl(var(--ob-foreground)) etc. resolve. */
   --ob-foreground: var(--foreground, 25 5% 22%);

@@ -10,6 +10,8 @@ import {
 } from 'vue';
 import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@aurthurm/beakblock-core';
 
+import { formatCommentDate, QUICK_REACTIONS, threadRangeLabel } from './commentCommon';
+
 export interface CommentModalProps {
   open: boolean;
   editor: BeakBlockEditor | null;
@@ -22,22 +24,6 @@ export interface CommentModalProps {
 
 type SelectionAnchor = { from: number; to: number; text: string };
 type ChatDrafts = Record<string, string>;
-
-const QUICK_REACTIONS = ['👍', '❤️', '😂', '🎉'];
-
-function formatDate(date: Date | undefined): string {
-  if (!date) return '';
-  return new Date(date).toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-}
-
-function threadRangeLabel(thread: CommentThread): string {
-  return `Range ${thread.from} - ${thread.to}`;
-}
 
 export const CommentModal = defineComponent({
   name: 'CommentModal',
@@ -208,7 +194,7 @@ export const CommentModal = defineComponent({
                               h('header', { class: 'beakblock-comment-thread__header' }, [
                                 h('div', [
                                   h('strong', thread.resolved ? 'Resolved thread' : 'Open thread'),
-                                  h('div', { class: 'beakblock-comment-thread__meta' }, `${threadRangeLabel(thread)} · ${formatDate(thread.createdAt)}`),
+                                  h('div', { class: 'beakblock-comment-thread__meta' }, `${threadRangeLabel(thread)} · ${formatCommentDate(thread.createdAt)}`),
                                 ]),
                                 h('div', { class: 'beakblock-comment-thread__header-actions' }, [
                                   h(
@@ -241,7 +227,7 @@ export const CommentModal = defineComponent({
                                   h('div', { key: comment.id, class: 'beakblock-comment-thread__comment' }, [
                                     h('div', { class: 'beakblock-comment-thread__comment-meta' }, [
                                       h('strong', comment.authorId),
-                                      h('span', formatDate(comment.updatedAt)),
+                                      h('span', formatCommentDate(comment.updatedAt)),
                                     ]),
                                     editingCommentId.value === comment.id
                                       ? [
