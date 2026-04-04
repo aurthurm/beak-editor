@@ -334,9 +334,16 @@ export function createBubbleMenuPlugin(config: BubbleMenuConfig = {}): Plugin {
         const state = BUBBLE_MENU_PLUGIN_KEY.getState(editorView.state);
         if (!state?.visible) return;
 
-        // Calculate position at the start of selection
+        // Calculate position at the start of selection.
+        // jsdom does not implement layout geometry, so skip positioning when unavailable.
         const { from } = editorView.state.selection;
-        const start = editorView.coordsAtPos(from);
+        let start: { left: number; top: number; bottom: number } | null = null;
+        try {
+          start = editorView.coordsAtPos(from);
+        } catch {
+          start = null;
+        }
+        if (!start) return;
 
         // Position above selection, aligned to start
         const left = start.left;

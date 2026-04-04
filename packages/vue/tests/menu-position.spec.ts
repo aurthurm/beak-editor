@@ -563,4 +563,53 @@ describe('Vue menu positioning', () => {
 
     wrapper.unmount();
   });
+
+  it('renders icons for the main slash command variants', async () => {
+    const { editor, host } = createStubEditor();
+    mockRect(host, { left: 100, top: 200, width: 640, height: 480, right: 740, bottom: 680 });
+
+    vi.spyOn(SLASH_MENU_PLUGIN_KEY, 'getState').mockReturnValue({
+      active: true,
+      query: '',
+      triggerPos: 5,
+      coords: { left: 180, top: 260, bottom: 284 },
+    } as ReturnType<typeof SLASH_MENU_PLUGIN_KEY.getState>);
+
+    const items = [
+      { id: 'callout', title: 'Callout', icon: 'callout', action: vi.fn() },
+      { id: 'warning', title: 'Warning', icon: 'alertTriangle', action: vi.fn() },
+      { id: 'success', title: 'Success', icon: 'checkCircle', action: vi.fn() },
+      { id: 'error', title: 'Error', icon: 'xCircle', action: vi.fn() },
+      { id: 'columns2', title: '2 Columns', icon: 'columns', action: vi.fn() },
+      { id: 'columns3', title: '3 Columns', icon: 'columns', action: vi.fn() },
+      { id: 'columnsSidebar', title: 'Sidebar Left', icon: 'columns', action: vi.fn() },
+      { id: 'table', title: 'Table', icon: 'table', action: vi.fn() },
+      { id: 'table2x2', title: 'Table 2x2', icon: 'table', action: vi.fn() },
+      { id: 'table4x4', title: 'Table 4x4', icon: 'table', action: vi.fn() },
+      { id: 'embed', title: 'Embed', icon: 'embed', action: vi.fn() },
+      { id: 'youtube', title: 'YouTube', icon: 'youtube', action: vi.fn() },
+      { id: 'chart', title: 'Chart', icon: 'chart', action: vi.fn() },
+    ] as const;
+
+    const wrapper = mount(
+      defineComponent({
+        setup: () =>
+          () =>
+            h(SlashMenu, {
+              editor,
+              items: items as unknown as typeof items[number][],
+            }),
+      }),
+      { attachTo: document.body }
+    );
+
+    await nextTick();
+
+    const iconWrappers = host.querySelectorAll('.ob-slash-menu-item-icon');
+    expect(iconWrappers.length).toBeGreaterThanOrEqual(8);
+    expect(host.textContent).toContain('Callout');
+    expect(host.textContent).toContain('Chart');
+
+    wrapper.unmount();
+  });
 });

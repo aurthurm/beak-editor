@@ -217,7 +217,13 @@ export function createSlashMenuPlugin(config: SlashMenuConfig = {}): Plugin {
           const state = SLASH_MENU_PLUGIN_KEY.getState(view.state);
           if (state?.active && !state.coords) {
             // Calculate coordinates for menu positioning
-            const coords = view.coordsAtPos(state.triggerPos);
+            let coords: { left: number; top: number; bottom: number } | null = null;
+            try {
+              coords = view.coordsAtPos(state.triggerPos);
+            } catch {
+              coords = null;
+            }
+            if (!coords) return;
             view.dispatch(
               view.state.tr.setMeta(SLASH_MENU_PLUGIN_KEY, {
                 coords: { left: coords.left, top: coords.top, bottom: coords.bottom },
@@ -412,6 +418,18 @@ export function getDefaultSlashMenuItems(schema: EditorState['schema']): SlashMe
       },
     }
   );
+
+  items.push({
+    id: 'ai',
+    title: 'AI assistant',
+    description: 'Open the AI prompt modal',
+    icon: 'sparkles',
+    keywords: ['ai', 'assistant', 'chat', 'generate', 'rewrite'],
+    group: 'AI',
+    action: () => {
+      // The framework adapters intercept this item and open the AI modal.
+    },
+  });
 
   // Lists
   if (schema.nodes.bulletList && schema.nodes.listItem) {

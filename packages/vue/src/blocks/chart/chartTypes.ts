@@ -15,7 +15,16 @@ export interface ChartData {
   datasets: ChartDataset[];
 }
 
+/** Matches `.ob-chart-block__canvas-wrapper` default `min-height` in editor styles. */
+export const DEFAULT_CHART_CANVAS_MIN_HEIGHT_PX = 240;
+
 export interface ChartOptions {
+  /** Fixed canvas wrapper width in CSS pixels. Omit for full width of the block column. */
+  width?: number;
+  /** Fixed canvas wrapper height in CSS pixels. Omit to size by `minHeight` only. */
+  height?: number;
+  /** Minimum wrapper height in CSS pixels when `height` is omitted. Omit to use stylesheet default (see {@link DEFAULT_CHART_CANVAS_MIN_HEIGHT_PX}). */
+  minHeight?: number;
   colorScheme?: {
     mode: ChartColorMode;
   };

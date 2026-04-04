@@ -146,6 +146,11 @@ export interface SlashMenuProps {
   hideItems?: string[];
 
   /**
+   * Open the AI assistant for the current slash command.
+   */
+  onAI?: () => void;
+
+  /**
    * Custom render function for menu items.
    */
   renderItem?: (item: SlashMenuItem, isSelected: boolean) => React.ReactNode;
@@ -228,6 +233,38 @@ const Icons: Record<string, React.FC<{ className?: string }>> = {
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   ),
+  info: ({ className }) => (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 10v6" />
+      <path d="M12 7h.01" />
+    </svg>
+  ),
+  alertTriangle: ({ className }) => (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3l-8.47-14.14a2 2 0 0 0-3.42 0z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </svg>
+  ),
+  checkCircle: ({ className }) => (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="9 12 11 14 15 10" />
+    </svg>
+  ),
+  xCircle: ({ className }) => (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M15 9l-6 6M9 9l6 6" />
+    </svg>
+  ),
+  columns: ({ className }) => (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="4" width="7" height="16" rx="1.5" />
+      <rect x="14" y="4" width="7" height="16" rx="1.5" />
+    </svg>
+  ),
   table: ({ className }) => (
     <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -250,7 +287,36 @@ const Icons: Record<string, React.FC<{ className?: string }>> = {
       <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
     </svg>
   ),
+  chart: ({ className }) => (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 3v18h18" />
+      <rect x="6" y="13" width="3" height="5" rx="0.5" />
+      <rect x="11" y="9" width="3" height="9" rx="0.5" />
+      <rect x="16" y="5" width="3" height="13" rx="0.5" />
+    </svg>
+  ),
 };
+
+const FALLBACK_ICON_BY_ID: Record<string, string> = {
+  calloutInfo: 'info',
+  calloutWarning: 'alertTriangle',
+  calloutSuccess: 'checkCircle',
+  calloutError: 'xCircle',
+  columns2: 'columns',
+  columns3: 'columns',
+  columnsSidebar: 'columns',
+  table: 'table',
+  table2x2: 'table',
+  table4x4: 'table',
+  embed: 'embed',
+  youtube: 'youtube',
+  chart: 'chart',
+};
+
+function resolveItemIcon(item: SlashMenuItem) {
+  const iconKey = item.icon || FALLBACK_ICON_BY_ID[item.id];
+  return iconKey ? Icons[iconKey] ?? null : null;
+}
 
 /**
  * SlashMenu component.
@@ -263,6 +329,7 @@ export function SlashMenu({
   customItems,
   itemOrder,
   hideItems,
+  onAI,
   renderItem,
   className,
 }: SlashMenuProps): React.ReactElement | null {
@@ -372,10 +439,17 @@ export function SlashMenu({
   const handleSelect = useCallback(
     (item: SlashMenuItem) => {
       if (!editor || editor.isDestroyed || !menuState) return;
+      if (item.id === 'ai' && onAI) {
+        executeSlashCommand(editor.pm.view, menuState, () => {
+          onAI();
+        });
+        editor.pm.view.focus();
+        return;
+      }
       executeSlashCommand(editor.pm.view, menuState, item.action);
       editor.pm.view.focus();
     },
-    [editor, menuState]
+    [editor, menuState, onAI]
   );
 
   // Determine if menu should open upward based on available space
@@ -419,9 +493,13 @@ export function SlashMenu({
       ) : (
         filteredItems.map((item, index) => {
           const isSelected = index === selectedIndex;
-          const Icon = item.icon ? Icons[item.icon] : null;
+      const Icon = resolveItemIcon(item);
 
-          if (renderItem) {
+      if (item.id === 'ai' && !onAI) {
+        return null;
+      }
+
+      if (renderItem) {
             return (
               <div
                 key={item.id}

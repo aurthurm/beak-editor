@@ -11,7 +11,7 @@ import type { Chart } from 'chart.js';
 import { useUpdateBlock } from '../createVueBlockSpec';
 import { ChartEditorModal } from './ChartEditorModal';
 import { createCategoryColorPalette } from './chartTypes';
-import type { ChartBlockType, ChartNodeData } from './chartTypes';
+import type { ChartBlockType, ChartNodeData, ChartOptions } from './chartTypes';
 
 export interface ChartBlockRenderProps {
   block: {
@@ -42,6 +42,22 @@ function supportsCategoryPalette(type: ChartBlockType): boolean {
 
 function cloneDataset<T extends Record<string, unknown>>(dataset: T): T {
   return JSON.parse(JSON.stringify(dataset)) as T;
+}
+
+function canvasWrapperStyle(options: ChartOptions | undefined): Record<string, string> | undefined {
+  if (!options) return undefined;
+  const style: Record<string, string> = {};
+  if (typeof options.width === 'number' && Number.isFinite(options.width) && options.width > 0) {
+    style.width = `${options.width}px`;
+    style.maxWidth = '100%';
+  }
+  if (typeof options.height === 'number' && Number.isFinite(options.height) && options.height > 0) {
+    style.height = `${options.height}px`;
+  }
+  if (typeof options.minHeight === 'number' && Number.isFinite(options.minHeight) && options.minHeight > 0) {
+    style.minHeight = `${options.minHeight}px`;
+  }
+  return Object.keys(style).length ? style : undefined;
 }
 
 export const ChartBlock = defineComponent<ChartBlockRenderProps>({
@@ -137,27 +153,34 @@ export const ChartBlock = defineComponent<ChartBlockRenderProps>({
             }
           : undefined;
 
+        const {
+          width: _layoutW,
+          height: _layoutH,
+          minHeight: _layoutMinH,
+          ...optionsForChartJs
+        } = chartData.value.options ?? {};
+
         const chartOptions = {
-          ...chartData.value.options,
+          ...optionsForChartJs,
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            ...chartData.value.options?.plugins,
+            ...optionsForChartJs.plugins,
             legend: {
-              display: chartData.value.options?.plugins?.legend?.display ?? true,
-              position: chartData.value.options?.plugins?.legend?.position ?? 'top',
-              ...(chartData.value.options?.plugins?.legend?.labels
+              display: optionsForChartJs.plugins?.legend?.display ?? true,
+              position: optionsForChartJs.plugins?.legend?.position ?? 'top',
+              ...(optionsForChartJs.plugins?.legend?.labels
                 ? {
                     labels: {
-                      ...chartData.value.options.plugins.legend.labels,
+                      ...optionsForChartJs.plugins.legend.labels,
                       color: textColor,
                     },
                   }
                 : { labels: { color: textColor } }),
             },
-            title: chartData.value.options?.plugins?.title
+            title: optionsForChartJs.plugins?.title
               ? {
-                  ...chartData.value.options.plugins.title,
+                  ...optionsForChartJs.plugins.title,
                   color: textColor,
                 }
               : undefined,
@@ -202,12 +225,11 @@ export const ChartBlock = defineComponent<ChartBlockRenderProps>({
         return h('div', { class: 'ob-chart-block ob-chart-block--invalid' }, 'Invalid chart data');
       }
 
-      const height = (chartData.value.options as Record<string, unknown> | undefined)?.height as number | undefined;
-      const minHeight = (chartData.value.options as Record<string, unknown> | undefined)?.minHeight as number | undefined;
+      const wrapperStyle = canvasWrapperStyle(chartData.value.options);
 
       return h('div', { class: 'ob-chart-block', 'data-selected': 'false' }, [
         h('div', { ref: containerRef, class: 'ob-chart-block__container' }, [
-          h('div', { class: 'ob-chart-block__canvas-wrapper', style: { height: height ? `${height}px` : undefined, minHeight: minHeight ? `${minHeight}px` : undefined } }, [
+          h('div', { class: 'ob-chart-block__canvas-wrapper', style: wrapperStyle }, [
             h('canvas', { ref: canvasRef, class: 'ob-chart-block__canvas' }),
           ]),
           editable.value

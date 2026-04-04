@@ -33,6 +33,8 @@ export interface BubbleMenuProps {
   customItems?: BubbleMenuItem[];
   itemOrder?: string[];
   hideItems?: string[];
+  onComment?: () => void;
+  onAI?: () => void;
   children?: (props: { editor: BeakBlockEditor; state: BubbleMenuState }) => VNodeChild;
   className?: string;
 }
@@ -56,6 +58,8 @@ const Icons: Record<string, VNodeChild> = {
   alignLeft: svg([h('path', { d: 'M4 6h16M4 12h10M4 18h14' })]),
   alignCenter: svg([h('path', { d: 'M4 6h16M7 12h10M5 18h14' })]),
   alignRight: svg([h('path', { d: 'M4 6h16M10 12h10M6 18h14' })]),
+  messageSquare: svg([h('path', { d: 'M21 15a2 2 0 0 1-2 2H8l-5 5V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z' })]),
+  sparkles: svg([h('path', { d: 'M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2z' }), h('path', { d: 'M19 14l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6-2.6-.9 2.6-.9L19 14z' })]),
 };
 
 const BLOCK_TYPE_OPTIONS: Array<{ type: string; label: string; props?: Record<string, unknown>; icon: VNodeChild }> = [
@@ -203,19 +207,22 @@ export const BUBBLE_MENU_ITEMS: Record<string, BubbleMenuItem> = {
   alignRight: { id: 'alignRight', label: 'Align right', icon: Icons.alignRight, isActive: (state) => state.textAlign === 'right', action: (editor) => { editor.setTextAlign('right'); editor.pm.view.focus(); } },
 };
 
-export const DEFAULT_BUBBLE_MENU_ORDER: string[] = ['blockType', '---', 'alignLeft', 'alignCenter', 'alignRight', '---', 'bold', 'italic', 'underline', 'strikethrough', '---', 'code', 'link', '---', 'color'];
+export const DEFAULT_BUBBLE_MENU_ORDER: string[] = ['blockType', '---', 'alignLeft', 'alignCenter', 'alignRight', '---', 'bold', 'italic', 'underline', 'strikethrough', '---', 'code', 'link', '---', 'color', '---', 'comment', 'ai'];
 
 export const BubbleMenu = defineComponent({
   name: 'BubbleMenu',
+  emits: ['comment', 'ai'],
   props: {
     editor: { type: Object as PropType<BeakBlockEditor | null>, default: null },
     customItems: { type: Array as PropType<BubbleMenuItem[]>, default: () => [] },
     itemOrder: { type: Array as PropType<string[]>, default: undefined },
     hideItems: { type: Array as PropType<string[]>, default: () => [] },
+    onComment: { type: Function as PropType<() => void>, default: undefined },
+    onAI: { type: Function as PropType<() => void>, default: undefined },
     children: { type: Function as PropType<(props: { editor: BeakBlockEditor; state: BubbleMenuState }) => VNodeChild>, default: undefined },
     className: { type: String, default: '' },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const menuState = ref<BubbleMenuState | null>(null);
     const showLinkPopover = ref(false);
     const linkButtonRef = ref<HTMLButtonElement | null>(null);
@@ -343,6 +350,40 @@ export const BubbleMenu = defineComponent({
               currentTextColor: state.activeMarks.textColor,
               currentBackgroundColor: state.activeMarks.backgroundColor,
             });
+          }
+          if (itemId === 'comment') {
+            return h(
+              'button',
+              {
+                key: 'comment',
+                type: 'button',
+                class: 'ob-bubble-menu-btn',
+                title: 'Add comment',
+                onClick: () => {
+                  props.onComment?.();
+                  emit('comment');
+                },
+                onMousedown: (e: MouseEvent) => e.preventDefault(),
+              },
+              [Icons.messageSquare]
+            );
+          }
+          if (itemId === 'ai') {
+            return h(
+              'button',
+              {
+                key: 'ai',
+                type: 'button',
+                class: 'ob-bubble-menu-btn',
+                title: 'Open AI assistant',
+                onClick: () => {
+                  props.onAI?.();
+                  emit('ai');
+                },
+                onMousedown: (e: MouseEvent) => e.preventDefault(),
+              },
+              [Icons.sparkles]
+            );
           }
           const item = allItems.value.find((entry) => entry.id === itemId);
           if (!item) return null;

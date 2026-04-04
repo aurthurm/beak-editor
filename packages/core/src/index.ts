@@ -220,6 +220,29 @@ export { createListEnterPlugin } from './plugins';
 // Link click handling
 export { createLinkClickPlugin } from './plugins';
 
+// Comments
+export { createCommentPlugin, COMMENT_PLUGIN_KEY, InMemoryCommentStore } from './comments';
+export type {
+  CommentReaction,
+  CommentEntry,
+  CommentThread,
+  CommentReactionInput,
+  CommentStore,
+  CommentStoreSnapshot,
+  CommentStoreListener,
+} from './comments';
+
+// AI
+export { buildAIContext, BUBBLE_AI_PRESETS, SLASH_AI_PRESETS, getAIPresets } from './ai';
+export type {
+  AIContext,
+  AIEntryMode,
+  AIPreset,
+  AISelectionContext,
+  AIDocumentContext,
+  AIRequest,
+} from './ai';
+
 // Media menu plugin
 export {
   createMediaMenuPlugin,

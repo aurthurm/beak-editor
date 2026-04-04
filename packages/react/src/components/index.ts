@@ -7,6 +7,12 @@ export type { SlashMenuProps, SlashMenuItem } from './SlashMenu';
 export { BubbleMenu, BUBBLE_MENU_ITEMS, DEFAULT_BUBBLE_MENU_ORDER } from './BubbleMenu';
 export type { BubbleMenuProps, BubbleMenuItem } from './BubbleMenu';
 
+export { AIModal } from './AIModal';
+export type { AIModalProps } from './AIModal';
+
+export { CommentModal } from './CommentModal';
+export type { CommentModalProps } from './CommentModal';
+
 export { LinkPopover } from './LinkPopover';
 export type { LinkPopoverProps } from './LinkPopover';
 

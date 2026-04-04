@@ -2066,20 +2066,23 @@ th .ob-side-menu,
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.78);
+  padding: 0.65rem;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
 }
 
 .ob-chart-modal__panel {
-  width: min(780px, 100%);
+  width: min(720px, 100%);
   max-height: 92vh;
   overflow: hidden;
-  border: 1px solid hsl(var(--ob-border));
-  border-radius: 20px;
+  border: 1px solid hsl(var(--ob-border) / 0.85);
+  border-radius: 12px;
   background-color: #fff;
   background-image: none;
   opacity: 1;
-  box-shadow: 0 30px 86px rgba(15, 23, 42, 0.32);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 24px 64px rgba(15, 23, 42, 0.22);
   isolation: isolate;
 }
 
@@ -2087,176 +2090,950 @@ th .ob-side-menu,
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid hsl(var(--ob-border));
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem 0.6rem;
+  border-bottom: 1px solid hsl(var(--ob-border) / 0.7);
+  background: #fff;
 }
 
 .ob-chart-modal__title {
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
+  color: hsl(var(--ob-foreground));
 }
 
 .ob-chart-modal__subtitle {
-  margin: 0.25rem 0 0;
+  margin: 0.1rem 0 0;
   color: hsl(var(--ob-muted-foreground));
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
 }
 
 .ob-chart-modal__close {
-  width: 34px;
-  height: 34px;
-  border: 1px solid hsl(var(--ob-border));
-  border-radius: 999px;
-  background: hsl(var(--ob-background));
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin: -0.15rem -0.15rem 0 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
   color: hsl(var(--ob-muted-foreground));
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  line-height: 1;
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.ob-chart-modal__close:hover {
+  background: hsl(var(--ob-muted) / 0.45);
+  color: hsl(var(--ob-foreground));
 }
 
 .ob-chart-modal__body {
-  display: grid;
-  gap: 0.9rem;
-  padding: 1rem 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.55rem 0.75rem 0.65rem;
   overflow: auto;
-  max-height: calc(92vh - 128px);
+  max-height: calc(92vh - 108px);
   background: #fff;
+}
+
+.ob-chart-modal__section {
+  margin: 0;
+  padding: 0.55rem 0.65rem 0.6rem;
+  border: 1px solid hsl(var(--ob-border) / 0.65);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.ob-chart-modal__section-title {
+  margin: 0 0 0.4rem;
+  padding: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+}
+
+.ob-chart-modal__section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ob-chart-modal__chart-row {
+  display: grid;
+  grid-template-columns: minmax(132px, 180px) minmax(0, 1fr);
+  gap: 0.45rem 0.75rem;
+  align-items: end;
+}
+
+@media (max-width: 520px) {
+  .ob-chart-modal__chart-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ob-chart-modal__size-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem 0.75rem;
+  align-items: end;
+}
+
+@media (max-width: 520px) {
+  .ob-chart-modal__size-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ob-chart-modal__field,
 .ob-chart-modal__datasets,
-.ob-chart-modal__dataset {
+.ob-chart-modal__dataset,
+.ob-chart-modal__subfield {
   display: grid;
-  gap: 0.55rem;
-}
-
-.ob-chart-modal__field {
-  padding: 0.75rem 0.85rem 0.8rem;
-  border: 1px solid hsl(var(--ob-border) / 0.95);
-  border-radius: 10px;
-  background: #fcfcfb;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  gap: 0.25rem;
+  margin: 0;
 }
 
 .ob-chart-modal__datasets {
-  gap: 0.75rem;
+  gap: 0.4rem;
+  padding-top: 0.1rem;
 }
 
 .ob-chart-modal__label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  letter-spacing: 0;
   color: hsl(var(--ob-foreground));
+}
+
+.ob-chart-modal__label--inline {
+  flex-shrink: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.ob-chart-modal__field--legend-position {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.ob-chart-modal__field--legend-position .ob-chart-modal__select {
+  width: auto;
+  min-width: 8.5rem;
+  flex: 1 1 8.5rem;
+  max-width: 12rem;
 }
 
 .ob-chart-modal__hint {
-  margin: 0;
-  font-size: 0.75rem;
-  line-height: 1.45;
+  margin: 0.05rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.4;
   color: hsl(var(--ob-muted-foreground));
 }
 
+/* Explicit border/fill so fields stay visible when --ob-* vars are faint (e.g. teleported under body). */
 .ob-chart-modal__input,
 .ob-chart-modal__select {
   width: 100%;
-  min-height: 36px;
-  padding: 0.48rem 0.75rem;
-  border-radius: 6px;
-  background: #fff;
-  color: hsl(var(--ob-foreground));
-  box-shadow: none;
+  min-height: 34px;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid hsl(220 13% 70%);
+  border-radius: 8px;
+  background-color: hsl(210 24% 97%);
+  color: hsl(var(--ob-foreground, 222 47% 11%));
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
   font-size: 0.875rem;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.ob-chart-modal__select {
+  cursor: pointer;
+  appearance: none;
+  background-color: hsl(210 24% 97%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  padding-right: 1.85rem;
 }
 
 .ob-chart-modal__input::placeholder {
-  color: hsl(var(--ob-muted-foreground));
+  color: hsl(var(--ob-muted-foreground, 215 16% 47%));
+  opacity: 1;
+}
+
+.ob-chart-modal__input:hover,
+.ob-chart-modal__select:hover {
+  border-color: hsl(220 13% 58%);
+  background-color: hsl(210 24% 99%);
 }
 
 .ob-chart-modal__input:focus,
 .ob-chart-modal__select:focus {
   outline: none;
-  border-color: hsl(var(--ob-primary) / 0.55);
-  box-shadow: 0 0 0 3px hsl(var(--ob-primary) / 0.1);
+  border-color: hsl(221 83% 53%);
+  background-color: #fff;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.04),
+    0 0 0 3px hsl(221 83% 53% / 0.2);
 }
 
-.ob-chart-modal__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.9rem;
-  align-items: start;
+.ob-chart-modal__legend-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.45rem 0.75rem;
 }
 
 .ob-chart-modal__checkbox-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: hsl(var(--ob-foreground));
+  cursor: pointer;
+  user-select: none;
+}
+
+.ob-chart-modal__checkbox {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  border-radius: 4px;
+  accent-color: hsl(var(--ob-primary));
+  cursor: pointer;
 }
 
 .ob-chart-modal__datasets-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0;
+  gap: 0.5rem;
+}
+
+.ob-chart-modal__datasets-heading {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+}
+
+.ob-chart-modal__sublabel {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: hsl(var(--ob-muted-foreground));
 }
 
 .ob-chart-modal__dataset {
-  padding: 0.85rem;
-  border: 1px solid hsl(var(--ob-border) / 0.95);
-  border-radius: 10px;
-  background: #f8f8f7;
+  padding: 0.5rem 0.55rem;
+  border: 1px solid hsl(var(--ob-border) / 0.55);
+  border-radius: 8px;
+  background: hsl(var(--ob-muted) / 0.2);
+}
+
+.ob-chart-modal__dataset-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.ob-chart-modal__dataset-index {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--ob-foreground));
 }
 
 .ob-chart-modal__dataset-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.65rem;
+  gap: 0.45rem 0.65rem;
+}
+
+@media (max-width: 520px) {
+  .ob-chart-modal__dataset-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ob-chart-modal__footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  gap: 0.75rem;
-  min-height: 64px;
-  padding: 0.9rem 1rem 1rem;
-  border-top: 1px solid hsl(var(--ob-border));
-  background: linear-gradient(180deg, #fff, #fbfbfa);
+  gap: 0.45rem;
+  min-height: 48px;
+  padding: 0.5rem 0.75rem 0.55rem;
+  border-top: 1px solid hsl(var(--ob-border) / 0.7);
+  background: #fff;
   position: sticky;
   bottom: 0;
-  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
+/* Fixed contrast: teleported modal often inherits --primary as a light tint; white label then disappears. */
 .ob-chart-modal__button {
-  min-height: 42px;
-  min-width: 96px;
-  padding: 0.6rem 1rem;
-  border: 1px solid hsl(var(--ob-primary));
-  border-radius: 12px;
-  background: hsl(var(--ob-primary));
-  color: white;
+  min-height: 34px;
+  min-width: 4.75rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid hsl(221 83% 45%);
+  border-radius: 8px;
+  background: hsl(221 83% 53%);
+  color: #fff;
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 600;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.ob-chart-modal__button:hover {
+  background: hsl(221 83% 48%);
+  border-color: hsl(221 83% 40%);
 }
 
 .ob-chart-modal__button--secondary {
-  border-color: hsl(var(--ob-border));
-  background: hsl(var(--ob-background));
-  color: hsl(var(--ob-foreground));
+  border-color: hsl(220 13% 70%);
+  background: #fff;
+  color: hsl(222 47% 11%);
   box-shadow: none;
+}
+
+.ob-chart-modal__button--secondary:hover {
+  background: hsl(210 24% 97%);
+  border-color: hsl(220 13% 58%);
+}
+
+.ob-chart-modal__button--ghost {
+  min-height: auto;
+  min-width: unset;
+  padding: 0.2rem 0.4rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: hsl(221 83% 45%);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.ob-chart-modal__button--ghost:hover {
+  background: hsl(221 83% 53% / 0.12);
+}
+
+.ob-chart-modal__button--text-danger {
+  min-height: auto;
+  min-width: unset;
+  padding: 0.25rem 0.45rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: hsl(0 72% 42%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.ob-chart-modal__button--text-danger:hover {
+  filter: none;
+  background: hsl(0 84% 60% / 0.1);
 }
 
 .ob-chart-modal__button--danger {
   border-color: hsl(0 84% 60% / 0.4);
   background: hsl(0 84% 60% / 0.08);
   color: hsl(0 84% 45%);
+}
+
+/* Comments + AI overlays */
+.beakblock-comment-annotation {
+  background: hsl(221 83% 53% / 0.08);
+  border-radius: 0.2em;
+  box-shadow: inset 0 -1px 0 hsl(221 83% 53% / 0.28);
+}
+
+.beakblock-comment-annotation--resolved {
+  background: hsl(142 71% 45% / 0.08);
+  box-shadow: inset 0 -1px 0 hsl(142 71% 45% / 0.28);
+  opacity: 0.7;
+}
+
+.beakblock-modal-overlay {
+  /* Teleported modals sit under document.body; re-establish --ob-* so hsl(var(--ob-foreground)) etc. resolve. */
+  --ob-foreground: var(--foreground, 25 5% 22%);
+  --ob-background: var(--background, 0 0% 100%);
+  --ob-muted: var(--muted, 40 6% 96%);
+  --ob-muted-foreground: var(--muted-foreground, 25 2% 57%);
+  --ob-border: var(--border, 40 6% 90%);
+  --ob-primary: var(--primary, 25 5% 22%);
+  --ob-radius: var(--radius, 0.25rem);
+  --ob-card: var(--card, 0 0% 100%);
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.42);
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.beakblock-ai-modal,
+.beakblock-comment-modal {
+  width: min(1100px, calc(100vw - 24px));
+  max-height: min(90vh, 960px);
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid hsl(var(--ob-border));
+  background: #fff;
+  color: hsl(var(--ob-foreground));
+  box-shadow: 0 40px 80px rgba(15, 23, 42, 0.22);
+  display: flex;
+  flex-direction: column;
+}
+
+.beakblock-ai-modal {
+  position: relative;
+}
+
+.beakblock-comment-modal {
+  width: min(1040px, calc(100vw - 24px));
+}
+
+.beakblock-modal-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-modal-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.beakblock-modal-header p {
+  margin: 0.3rem 0 0;
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.925rem;
+  line-height: 1.5;
+}
+
+.beakblock-modal-kicker {
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+  margin-bottom: 0.25rem;
+}
+
+.beakblock-modal-close {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--ob-border));
+  background: #fff;
+  color: hsl(var(--ob-muted-foreground));
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.beakblock-modal-close:hover {
+  background: hsl(var(--ob-muted));
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-modal-section-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+  margin-bottom: 0.6rem;
+}
+
+.beakblock-modal-secondary,
+.beakblock-modal-primary,
+.beakblock-comment-thread__chip,
+.beakblock-comment-thread__reaction {
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: 999px;
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  background: #fff;
+  color: hsl(var(--ob-foreground));
+  cursor: pointer;
+}
+
+.beakblock-modal-primary {
+  background: hsl(var(--ob-foreground));
+  border-color: hsl(var(--ob-foreground));
+  color: #fff;
+}
+
+.beakblock-modal-secondary:hover,
+.beakblock-comment-thread__chip:hover,
+.beakblock-comment-thread__reaction:hover {
+  background: hsl(var(--ob-muted));
+}
+
+.beakblock-modal-primary:disabled,
+.beakblock-modal-secondary:disabled,
+.beakblock-comment-thread__chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.beakblock-ai-modal__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: min(52vh, 420px);
+}
+
+.beakblock-ai-modal__body,
+.beakblock-comment-modal__body {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  overflow: auto;
+}
+
+.beakblock-ai-modal__prompt-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid hsl(var(--ob-border));
+  background: hsl(var(--ob-muted) / 0.18);
+}
+
+.beakblock-ai-modal__prompt-collapsed-inner {
+  min-width: 0;
+  flex: 1;
+}
+
+.beakblock-ai-modal__prompt-collapsed-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+}
+
+.beakblock-ai-modal__prompt-collapsed-text {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: hsl(var(--ob-foreground));
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.beakblock-ai-modal__prompt-collapsed-edit {
+  flex-shrink: 0;
+}
+
+.beakblock-ai-modal__busy-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: hsl(0 0% 100% / 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.beakblock-ai-modal__busy-spinner {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 3px solid hsl(var(--ob-border));
+  border-top-color: hsl(221 83% 53%);
+  animation: beakblock-ai-spin 0.85s linear infinite;
+}
+
+.beakblock-ai-modal__busy-label {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(var(--ob-foreground));
+  text-align: center;
+}
+
+.beakblock-ai-modal__chat {
+  border-top: 1px solid hsl(var(--ob-border));
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: hsl(var(--ob-muted) / 0.25);
+  min-height: 0;
+}
+
+.beakblock-ai-modal__chat--prominent {
+  flex: 1;
+  padding: 1.15rem 1.25rem 1.35rem;
+  background: hsl(var(--ob-muted) / 0.38);
+}
+
+.beakblock-ai-modal--results-focus .beakblock-ai-modal__chat {
+  flex: 1;
+}
+
+.beakblock-ai-modal__chat-head .beakblock-modal-section-title {
+  margin-bottom: 0.2rem;
+}
+
+.beakblock-ai-modal__chat-lede {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  color: hsl(var(--ob-muted-foreground));
+  line-height: 1.45;
+}
+
+.beakblock-ai-modal__messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+  min-height: 8rem;
+  max-height: min(42vh, 360px);
+  overflow: auto;
+  padding-right: 0.15rem;
+}
+
+.beakblock-ai-modal__chat--prominent .beakblock-ai-modal__messages {
+  max-height: min(52vh, 480px);
+}
+
+.beakblock-ai-modal__preset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
+  gap: 0.65rem;
+}
+
+.beakblock-ai-modal__preset {
+  text-align: left;
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  border: 1px solid hsl(var(--ob-border));
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.beakblock-ai-modal__preset--active {
+  border-color: hsl(221 83% 53% / 0.4);
+  box-shadow: 0 0 0 2px hsl(221 83% 53% / 0.08) inset;
+}
+
+.beakblock-ai-modal__preset-title {
+  font-weight: 600;
+}
+
+.beakblock-ai-modal__preset-description {
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.beakblock-ai-modal__textarea,
+.beakblock-comment-modal__textarea {
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  border: 1px solid hsl(var(--ob-border));
+  background: #fff;
+  color: hsl(var(--ob-foreground));
+  font: inherit;
+  line-height: 1.55;
+}
+
+.beakblock-ai-modal__textarea:focus,
+.beakblock-comment-modal__textarea:focus {
+  outline: none;
+  border-color: hsl(221 83% 53% / 0.6);
+  box-shadow: 0 0 0 4px hsl(221 83% 53% / 0.1);
+}
+
+.beakblock-ai-modal__context-card,
+.beakblock-comment-modal__selection,
+.beakblock-comment-thread {
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: 20px;
+  background: hsl(var(--ob-muted) / 0.18);
+  padding: 0.9rem 1rem;
+}
+
+.beakblock-ai-modal__context-card strong {
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.beakblock-ai-modal__context-card p,
+.beakblock-comment-modal__selection {
+  margin: 0;
+  color: hsl(var(--ob-muted-foreground));
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.beakblock-ai-modal__details summary {
+  cursor: pointer;
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.92rem;
+}
+
+.beakblock-ai-modal__details pre {
+  margin: 0.65rem 0 0;
+  max-height: 180px;
+  overflow: auto;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  background: #fff;
+  padding: 0.8rem;
+  border-radius: 14px;
+  border: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-ai-modal__message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 16px;
+  max-width: 80%;
+  line-height: 1.55;
+}
+
+.beakblock-ai-modal__message-role {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+}
+
+.beakblock-ai-modal__message-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.beakblock-ai-modal__message--user {
+  align-self: flex-end;
+  background: hsl(221 83% 53% / 0.12);
+}
+
+.beakblock-ai-modal__message--user .beakblock-ai-modal__message-role {
+  text-align: right;
+  color: hsl(221 83% 40%);
+}
+
+.beakblock-ai-modal__message--assistant {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-ai-modal--results-focus .beakblock-ai-modal__message--assistant {
+  max-width: 100%;
+}
+
+.beakblock-ai-modal__message--pending {
+  position: relative;
+  padding-right: 2.25rem;
+}
+
+.beakblock-ai-modal__message--pending::after {
+  content: '';
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-top: -0.325rem;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  animation: beakblock-ai-spin 0.85s linear infinite;
+  opacity: 0.7;
+}
+
+.beakblock-ai-modal__empty,
+.beakblock-comment-modal__empty {
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.95rem;
+  padding: 0.75rem 0;
+}
+
+.beakblock-comment-modal__body {
+  grid-template-columns: 0.9fr 1.1fr;
+}
+
+.beakblock-comment-modal__actions,
+.beakblock-comment-thread__row-actions,
+.beakblock-comment-thread__header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.beakblock-comment-thread {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.beakblock-comment-thread--resolved {
+  opacity: 0.82;
+}
+
+.beakblock-comment-thread__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.beakblock-comment-thread__meta {
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.84rem;
+  margin-top: 0.2rem;
+}
+
+.beakblock-comment-thread__comments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.beakblock-comment-thread__comment {
+  border-top: 1px solid hsl(var(--ob-border));
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.beakblock-comment-thread__comment-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.85rem;
+}
+
+.beakblock-comment-thread__body {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.55;
+}
+
+.beakblock-comment-thread__reactions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.beakblock-comment-thread__reaction {
+  min-height: 1.95rem;
+  padding: 0 0.7rem;
+  font-size: 0.88rem;
+}
+
+.beakblock-comment-thread__chip {
+  min-height: 1.95rem;
+  padding: 0 0.75rem;
+  font-size: 0.88rem;
+}
+
+.beakblock-comment-thread__reply {
+  border-top: 1px solid hsl(var(--ob-border));
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.beakblock-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid hsl(var(--ob-border));
+  background: linear-gradient(180deg, hsl(var(--ob-card) / 0) 0%, hsl(var(--ob-muted) / 0.12) 100%);
+}
+
+.beakblock-ai-modal__result-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-right: auto;
+}
+
+.beakblock-ai-modal__result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid hsl(221 83% 53% / 0.18);
+  background: hsl(221 83% 53% / 0.08);
+  color: hsl(221 83% 31%);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.beakblock-ai-modal__result-badge svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+@keyframes beakblock-ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 `; 
 

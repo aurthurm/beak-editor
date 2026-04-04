@@ -107,6 +107,7 @@ export class BeakBlockEditor {
   private _createEditor(): void {
     const doc = blocksToDoc(this._schema, this._config.initialContent);
     this._historyEnabled = this._config.history !== false;
+    const { plugins: _viewPlugins, ...viewConfig } = this._config.prosemirror ?? {};
 
     // Create the history plugin separately so we can toggle it at runtime
     this._historyPlugin = this._historyEnabled ? createHistoryPlugin() : null;
@@ -133,7 +134,7 @@ export class BeakBlockEditor {
         role: 'textbox',
         'aria-multiline': 'true',
       },
-      ...this._config.prosemirror,
+      ...viewConfig,
     });
   }
 

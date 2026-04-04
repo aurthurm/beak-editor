@@ -3,12 +3,30 @@ import {
   createChartBlockSpec,
   createCategoryColorPalette,
   createDefaultChartData,
+  DEFAULT_CHART_CANVAS_MIN_HEIGHT_PX,
   DEFAULT_CHART_OPTIONS,
   DEFAULT_BORDER_COLORS,
   DEFAULT_CHART_COLORS,
 } from '@aurthurm/beakblock-vue';
 
 describe('@aurthurm/beakblock-vue chart block', () => {
+  it('exposes the default canvas min-height constant aligned with editor styles', () => {
+    expect(DEFAULT_CHART_CANVAS_MIN_HEIGHT_PX).toBe(240);
+  });
+
+  it('allows optional canvas width and height on chart options for uniform layouts', () => {
+    const chart = createDefaultChartData('bar');
+    chart.options = {
+      ...chart.options,
+      width: 400,
+      height: 280,
+      minHeight: 200,
+    };
+    expect(chart.options?.width).toBe(400);
+    expect(chart.options?.height).toBe(280);
+    expect(chart.options?.minHeight).toBe(200);
+  });
+
   it('creates default chart data with the expected shape', () => {
     const chart = createDefaultChartData('bar');
 

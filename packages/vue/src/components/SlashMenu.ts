@@ -61,7 +61,56 @@ const Icons: Record<string, VNodeChild> = {
   ]),
   checkSquare: svg('M9 11 12 14 22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11'),
   callout: svg('M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'),
+  info: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('circle', { cx: '12', cy: '12', r: '10', strokeWidth: '2' }),
+    h('path', { d: 'M12 10v6', strokeWidth: '2' }),
+    h('path', { d: 'M12 7h.01', strokeWidth: '2' }),
+  ]),
+  alertTriangle: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('path', { d: 'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z', strokeWidth: '2' }),
+    h('path', { d: 'M12 9v4', strokeWidth: '2' }),
+    h('path', { d: 'M12 17h.01', strokeWidth: '2' }),
+  ]),
+  checkCircle: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('circle', { cx: '12', cy: '12', r: '10', strokeWidth: '2' }),
+    h('polyline', { points: '9 12 11 14 15 10', strokeWidth: '2' }),
+  ]),
+  xCircle: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('circle', { cx: '12', cy: '12', r: '10', strokeWidth: '2' }),
+    h('path', { d: 'M15 9l-6 6M9 9l6 6', strokeWidth: '2' }),
+  ]),
+  columns: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('rect', { x: '3', y: '4', width: '7', height: '16', rx: '1.5', strokeWidth: '2' }),
+    h('rect', { x: '14', y: '4', width: '7', height: '16', rx: '1.5', strokeWidth: '2' }),
+  ]),
+  chart: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('path', { d: 'M3 3v18h18', strokeWidth: '2' }),
+    h('rect', { x: '6', y: '13', width: '3', height: '5', rx: '0.5', strokeWidth: '2' }),
+    h('rect', { x: '11', y: '9', width: '3', height: '9', rx: '0.5', strokeWidth: '2' }),
+    h('rect', { x: '16', y: '5', width: '3', height: '13', rx: '0.5', strokeWidth: '2' }),
+  ]),
 };
+
+const FALLBACK_ICON_BY_ID: Record<string, string> = {
+  calloutInfo: 'info',
+  calloutWarning: 'alertTriangle',
+  calloutSuccess: 'checkCircle',
+  calloutError: 'xCircle',
+  columns2: 'columns',
+  columns3: 'columns',
+  columnsSidebar: 'columns',
+  table: 'table',
+  table2x2: 'table',
+  table4x4: 'table',
+  embed: 'embed',
+  youtube: 'youtube',
+  chart: 'chart',
+};
+
+function resolveItemIcon(item: SlashMenuItem) {
+  const iconKey = item.icon || FALLBACK_ICON_BY_ID[item.id];
+  return iconKey ? Icons[iconKey] ?? null : null;
+}
 
 const SearchIcon = svg('M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm5.25-1.25L21 22');
 
@@ -112,16 +161,18 @@ const ICON_OPTIONS: IconOption[] = [
 
 export const SlashMenu = defineComponent({
   name: 'SlashMenu',
+  emits: ['ai'],
   props: {
     editor: { type: Object as PropType<BeakBlockEditor | null>, default: null },
     items: { type: Array as PropType<SlashMenuItem[]>, default: undefined },
     customItems: { type: Array as PropType<SlashMenuItem[]>, default: () => [] },
     itemOrder: { type: Array as PropType<string[]>, default: undefined },
     hideItems: { type: Array as PropType<string[]>, default: () => [] },
+    onAI: { type: Function as PropType<() => void>, default: undefined },
     renderItem: { type: Function as PropType<(item: SlashMenuItem, isSelected: boolean) => VNodeChild>, default: undefined },
     className: { type: String, default: '' },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const menuState = ref<SlashMenuState | null>(null);
     const selectedIndex = ref(0);
     const openUpward = ref(false);
@@ -217,6 +268,16 @@ export const SlashMenu = defineComponent({
     const handleSelect = (item: SlashMenuItem) => {
       if (!props.editor || props.editor.isDestroyed || !menuState.value) return;
       const currentMenuState = menuState.value;
+      if (item.id === 'ai') {
+        executeSlashCommand(props.editor.pm.view, currentMenuState, () => {
+          props.onAI?.();
+        });
+        emit('ai');
+        activePicker.value = null;
+        pickerAnchor.value = null;
+        props.editor.pm.view.focus();
+        return;
+      }
       if (item.picker) {
         executeSlashCommand(props.editor.pm.view, currentMenuState, () => {
           pickerAnchor.value = { ...currentMenuState };
@@ -348,8 +409,8 @@ export const SlashMenu = defineComponent({
               filteredItems.value.length === 0
                 ? h('div', { class: 'ob-slash-menu-empty' }, 'No results')
                 : filteredItems.value.map((item, index) => {
-                    const isSelected = index === selectedIndex.value;
-                    const icon = item.icon ? Icons[item.icon] ?? null : null;
+                  const isSelected = index === selectedIndex.value;
+                  const icon = resolveItemIcon(item);
                     if (props.renderItem) {
                       return h(
                         'div',

@@ -198,6 +198,16 @@ export interface BubbleMenuProps {
   hideItems?: string[];
 
   /**
+   * Open the comments composer for the current selection.
+   */
+  onComment?: () => void;
+
+  /**
+   * Open the AI assistant for the current selection.
+   */
+  onAI?: () => void;
+
+  /**
    * Custom render function for the menu content.
    * If provided, replaces the default formatting buttons entirely.
    * Note: customItems, itemOrder, and hideItems are ignored when using children.
@@ -267,6 +277,17 @@ const Icons = {
   alignRight: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M4 6h16M10 12h10M6 18h14" />
+    </svg>
+  ),
+  messageSquare: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M21 15a2 2 0 0 1-2 2H8l-5 5V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  ),
+  sparkles: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8L12 2z" />
+      <path d="M19 14l.9 2.6L22.5 18l-2.6.9L19 21.5l-.9-2.6-2.6-.9 2.6-.9L19 14z" />
     </svg>
   ),
 };
@@ -383,6 +404,9 @@ export const DEFAULT_BUBBLE_MENU_ORDER: string[] = [
   'link',
   '---',
   'color',
+  '---',
+  'comment',
+  'ai',
 ];
 
 // ============================================================================
@@ -680,6 +704,8 @@ export function BubbleMenu({
   customItems = [],
   itemOrder,
   hideItems = [],
+  onComment,
+  onAI,
   children,
   className,
 }: BubbleMenuProps): React.ReactElement | null {
@@ -796,6 +822,38 @@ export function BubbleMenu({
           currentTextColor={activeMarks.textColor}
           currentBackgroundColor={activeMarks.backgroundColor}
         />
+      );
+    }
+
+    if (itemId === 'comment') {
+      if (!onComment) return null;
+      return (
+        <button
+          key="comment"
+          type="button"
+          className="ob-bubble-menu-btn"
+          onClick={onComment}
+          onMouseDown={(e) => e.preventDefault()}
+          title="Add comment"
+        >
+          {Icons.messageSquare}
+        </button>
+      );
+    }
+
+    if (itemId === 'ai') {
+      if (!onAI) return null;
+      return (
+        <button
+          key="ai"
+          type="button"
+          className="ob-bubble-menu-btn"
+          onClick={onAI}
+          onMouseDown={(e) => e.preventDefault()}
+          title="Open AI assistant"
+        >
+          {Icons.sparkles}
+        </button>
       );
     }
 
