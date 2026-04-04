@@ -155,7 +155,8 @@ watchEffect((onCleanup) => {
 
 <template>
   <div class="page-shell">
-    <header class="hero">
+    <div class="page-shell__mesh" aria-hidden="true" />
+    <header class="hero hero--enter">
       <div class="hero-copy">
         <p class="eyebrow">Nuxt + Vue example</p>
         <h1>Almost every block in one editorial page.</h1>
@@ -165,7 +166,7 @@ watchEffect((onCleanup) => {
         </p>
       </div>
 
-      <aside class="hero-panel">
+      <aside class="hero-panel hero-panel--enter">
         <div class="hero-stat">
           <span class="hero-stat-label">Package</span>
           <span class="hero-stat-value">@aurthurm/beakblock-vue</span>
@@ -182,7 +183,7 @@ watchEffect((onCleanup) => {
     </header>
 
     <main class="layout layout--with-sidebar">
-      <aside class="sample-sidebar" aria-label="Sample documents">
+      <aside class="sample-sidebar sample-sidebar--enter" aria-label="Sample documents">
         <p class="sample-sidebar__title">Samples</p>
         <nav class="sample-sidebar__nav">
           <button
@@ -210,7 +211,8 @@ watchEffect((onCleanup) => {
       </aside>
 
       <div class="layout__main">
-        <section class="editor-stage">
+        <section class="editor-stage editor-stage--enter">
+          <div :key="viewMode" class="editor-stage__sheen" aria-hidden="true" />
           <ClientOnly>
             <ExampleEditorPanel
               v-for="tab in documentTabs"
@@ -259,32 +261,36 @@ watchEffect((onCleanup) => {
             </div>
 
             <Teleport to="body">
-              <div v-if="previewOpen" class="doc-preview-backdrop" @click.self="closeDocumentPreview">
-                <div class="doc-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="doc-preview-title">
-                  <header class="doc-preview-dialog__head">
-                    <div>
-                      <p id="doc-preview-title" class="doc-preview-dialog__title">Gram stain SOP — merged preview</p>
-                      <p class="doc-preview-dialog__sub">Read-only — all controlled sections and reference images combined with section headings.</p>
+              <Transition name="modal-dim">
+                <div v-if="previewOpen" class="doc-preview-backdrop" @click.self="closeDocumentPreview">
+                  <div class="doc-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="doc-preview-title">
+                    <header class="doc-preview-dialog__head">
+                      <div>
+                        <p id="doc-preview-title" class="doc-preview-dialog__title">Gram stain SOP — merged preview</p>
+                        <p class="doc-preview-dialog__sub">Read-only — all controlled sections and reference images combined with section headings.</p>
+                      </div>
+                      <button type="button" class="doc-preview-dialog__close" @click="closeDocumentPreview">Close</button>
+                    </header>
+                    <div class="doc-preview-dialog__body">
+                      <BeakBlockView :editor="previewEditor" class-name="editor-view doc-preview-dialog__editor" />
                     </div>
-                    <button type="button" class="doc-preview-dialog__close" @click="closeDocumentPreview">Close</button>
-                  </header>
-                  <div class="doc-preview-dialog__body">
-                    <BeakBlockView :editor="previewEditor" class-name="editor-view doc-preview-dialog__editor" />
                   </div>
                 </div>
-              </div>
+              </Transition>
             </Teleport>
           </ClientOnly>
         </section>
 
-        <section class="inspector">
+        <section class="inspector inspector--enter">
           <p class="section-label">Document readout</p>
           <h2>Document JSON</h2>
           <p class="inspector__lede">
             <template v-if="viewMode === 'compliance'">Live merge of every controlled section (same payload as Preview document).</template>
             <template v-else>Serialized blocks for the active sample tab.</template>
           </p>
-          <pre>{{ JSON.stringify(inspectorBlocks, null, 2) }}</pre>
+          <Transition name="inspector-snap" mode="out-in">
+            <pre :key="viewMode" class="inspector__pre">{{ JSON.stringify(inspectorBlocks, null, 2) }}</pre>
+          </Transition>
         </section>
       </div>
     </main>
