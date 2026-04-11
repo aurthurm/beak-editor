@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-export { useBeakBlock, useEditorContent, useEditorSelection, useEditorFocus } from './composables';
+export { useBeakBlock, useEditorContent, useEditorSelection, useEditorFocus, useDocumentVersions } from './composables';
 export { useCustomSlashMenuItems } from './composables';
 export type { UseBeakBlockOptions } from './composables';
 
@@ -82,6 +82,7 @@ export type {
   TextStyles,
   StyledText,
   IconContent,
+  HardBreakContent,
   InlineContent,
   SlashMenuItem,
 } from '@aurthurm/beakblock-core';

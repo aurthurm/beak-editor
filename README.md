@@ -238,7 +238,7 @@ Default **`SlashMenuItem` `id` values** (for `hideItems`, `itemOrder`, or custom
 | --- | --- | --- |
 | `columns2` | 2 Columns | Equal two-column layout |
 | `columns3` | 3 Columns | Three-column layout |
-| `columnsSidebar` | Sidebar Left | Narrow sidebar + main column |
+| `tableOfContents` | Table of contents | Auto outline of headings; click to jump |
 | `table` | Table | 3×3 table |
 | `table2x2` | Table 2x2 | 2×2 table |
 | `table4x4` | Table 4x4 | 4×4 table |
@@ -254,7 +254,7 @@ Default **`SlashMenuItem` `id` values** (for `hideItems`, `itemOrder`, or custom
 ### Customizing the menu
 
 - **`customItems`** — append commands (including AI or app-specific blocks).
-- **`hideItems`** — pass item IDs to remove defaults (e.g. `youtube`, `columnsSidebar`).
+- **`hideItems`** — pass item IDs to remove defaults (e.g. `youtube`, `tableOfContents`).
 - **`itemOrder`** — control which default items appear and in what order; IDs not listed are typically hidden — see package READMEs.
 
 Custom blocks can register their own slash entries via **`createReactBlockSpec`** / **`createVueBlockSpec`**.

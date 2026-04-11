@@ -34,9 +34,13 @@
     "build": "vite build && cp -r src/styles dist/",
     "dev": "vite build --watch",
     "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "mdast-util-gfm": "^3.1.0",
+    "mdast-util-to-markdown": "^2.1.2",
     "prosemirror-commands": "^1.6.2",
     "prosemirror-dropcursor": "^1.8.1",
     "prosemirror-gapcursor": "^1.3.2",
@@ -48,21 +52,31 @@
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.2",
     "prosemirror-view": "^1.37.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5",
     "uuid": "^11.0.5"
   },
   "devDependencies": {
+    "@types/mdast": "^4.0.4",
     "@types/uuid": "^10.0.0",
+    "jsdom": "^25.0.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
-    "vite-plugin-dts": "^4.4.0"
+    "vite-plugin-dts": "^4.4.0",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
-    "yjs": "^13.0.0",
-    "y-prosemirror": "^1.0.0"
+    "y-prosemirror": "^1.0.0",
+    "yjs": "^13.0.0"
   },
   "peerDependenciesMeta": {
-    "yjs": { "optional": true },
-    "y-prosemirror": { "optional": true }
+    "yjs": {
+      "optional": true
+    },
+    "y-prosemirror": {
+      "optional": true
+    }
   },
   "sideEffects": [
     "*.css"

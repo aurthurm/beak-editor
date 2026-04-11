@@ -32,9 +32,18 @@ export {
   checkListNode,
   checkListItemNode,
   embedNode,
+  tableOfContentsNode,
+  getEmbedIframeSrc,
+  normalizeEmbedAttrsFromUrl,
   parseEmbedUrl,
 } from './nodes';
-export type { TextAlignment, CalloutType, ImageAlignment, EmbedProvider } from './nodes';
+export type {
+  TextAlignment,
+  CalloutType,
+  ImageAlignment,
+  EmbedProvider,
+  TocHeadingItem,
+} from './nodes';
 
 // Re-export individual mark specs for extension authors
 export {

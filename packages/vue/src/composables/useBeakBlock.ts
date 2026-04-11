@@ -1,6 +1,9 @@
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, unref, watch, type ComputedRef, type MaybeRef, type Ref } from 'vue';
 import {
   BeakBlockEditor,
+  codeBlockNodeView,
+  embedNodeView,
+  tableOfContentsNodeView,
   type Block,
   type EditorConfig,
   type SlashMenuItem,
@@ -45,13 +48,24 @@ export function useBeakBlock(options: UseBeakBlockOptions = {}): Ref<BeakBlockEd
 
     editorRef.value = newEditor;
 
-    if (Object.keys(nodeViews).length > 0) {
-      newEditor.pm.view.setProps({
-        nodeViews: {
-          ...editorOptions.prosemirror?.nodeViews,
-          ...nodeViews,
-        },
-      });
+    const tocViews: Record<string, NodeViewConstructor> = newEditor.pm.state.schema.nodes.tableOfContents
+      ? { tableOfContents: tableOfContentsNodeView }
+      : {};
+    const embedViews: Record<string, NodeViewConstructor> = newEditor.pm.state.schema.nodes.embed
+      ? { embed: embedNodeView }
+      : {};
+    const codeBlockViews: Record<string, NodeViewConstructor> = newEditor.pm.state.schema.nodes.codeBlock
+      ? { codeBlock: codeBlockNodeView }
+      : {};
+    const mergedNodeViews = {
+      ...tocViews,
+      ...embedViews,
+      ...codeBlockViews,
+      ...(editorOptions.prosemirror?.nodeViews ?? {}),
+      ...nodeViews,
+    };
+    if (Object.keys(mergedNodeViews).length > 0) {
+      newEditor.pm.view.setProps({ nodeViews: mergedNodeViews });
     }
 
     editor.value = newEditor;

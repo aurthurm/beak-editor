@@ -29,6 +29,7 @@ import {
   deleteMediaNode,
   ImageAttrs,
   EmbedAttrs,
+  normalizeEmbedAttrsFromUrl,
 } from '@aurthurm/beakblock-core';
 
 /**
@@ -271,7 +272,11 @@ export function MediaMenu({ editor, className }: MediaMenuProps): React.ReactEle
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       // Don't hide if clicking inside the menu or popovers
-      if (target.closest('.ob-media-menu') || target.closest('.ob-media-url-popover')) {
+      if (
+        target.closest('.ob-media-menu') ||
+        target.closest('.ob-media-url-popover') ||
+        target.closest('.beakblock-embed__dropdown')
+      ) {
         return;
       }
       // Don't hide if clicking on the media element itself
@@ -314,7 +319,7 @@ export function MediaMenu({ editor, className }: MediaMenuProps): React.ReactEle
       if (state.mediaType === 'image') {
         updateMediaAttrs(editor.pm.view, state.nodePos, { src: url });
       } else {
-        updateMediaAttrs(editor.pm.view, state.nodePos, { url });
+        updateMediaAttrs(editor.pm.view, state.nodePos, normalizeEmbedAttrsFromUrl(url));
       }
       setShowUrlEdit(false);
       editor.pm.view.focus();

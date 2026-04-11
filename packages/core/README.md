@@ -8,6 +8,11 @@ Framework-agnostic core for the BeakBlock rich text editor.
 - **Block-based** - JSON document format similar to BlockNote
 - **Extensible** - Add custom blocks, marks, and plugins
 - **TypeScript** - Full type safety
+- **Markdown** - `markdownToBlocks` / `blocksToMarkdown`, optional GFM, and clipboard paste (see **[docs/markdown](../../docs/markdown.md)**)
+
+## Block reference
+
+Every built-in block type (`paragraph`, `heading`, `table`, …) is documented with JSON examples and props in **[docs/blocks](../../docs/blocks/README.md)**. Start at the index, or open **[inline content](../../docs/blocks/inline-content.md)** for `text` / `link` / `icon` inside blocks.
 
 ## Installation
 
@@ -133,6 +138,18 @@ editor.enableCollaboration({ plugins }): void
 editor.disableCollaboration(): void
 editor.isCollaborating: boolean
 
+// Versioning (configure versioning.adapter)
+editor.saveVersion(options?): Promise<DocumentVersion>
+editor.listVersions(): Promise<DocumentVersion[]>
+editor.getVersion(id): Promise<DocumentVersion | null>
+editor.restoreVersion(id): Promise<boolean>
+
+// Track changes
+editor.enableTrackChanges({ authorId? }): void
+editor.disableTrackChanges(): void
+editor.isTrackChangesEnabled: boolean
+editor.getPendingTrackChanges(): TrackedChangeRecord[]
+
 // Lifecycle
 editor.mount(element): void
 editor.destroy(): void
@@ -178,6 +195,22 @@ editor.disableCollaboration();
 ```
 
 See the [Collaboration guide](../../docs/collaboration.md) for full documentation.
+
+## Comments
+
+- Use a **`CommentStore`** (`InMemoryCommentStore` or your own) plus **`createCommentPlugin(store)`** in `EditorConfig.prosemirror.plugins`.
+- On every **`transaction`** with **`docChanged`**, call **`store.mapAnchors(transaction.mapping)`** so thread anchors stay aligned with the document.
+- Vue: **`CommentRail`**, **`CommentModal`**, and **`BubbleMenu`** `@comment` — see `@aurthurm/beakblock-vue`.
+- React: **`CommentModal`** and **`BubbleMenu`** — see `@aurthurm/beakblock-react`.
+
+See [Comments](../../docs/comments.md) for the full API, anchoring rules, persistence notes, and troubleshooting.
+
+## Versioning and track changes
+
+- Configure `versioning: { adapter }` and use `saveVersion`, `listVersions`, `getVersion`, and `restoreVersion`.
+- Optional `trackChanges` in config, or `enableTrackChanges` / `disableTrackChanges` at runtime.
+
+See [Versioning and track changes](../../docs/versioning.md) for adapter details, Y.js caveats, and v1 track-changes limits.
 
 ## License
 

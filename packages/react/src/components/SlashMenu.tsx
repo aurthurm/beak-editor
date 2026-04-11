@@ -304,7 +304,7 @@ const FALLBACK_ICON_BY_ID: Record<string, string> = {
   calloutError: 'xCircle',
   columns2: 'columns',
   columns3: 'columns',
-  columnsSidebar: 'columns',
+  tableOfContents: 'list',
   table: 'table',
   table2x2: 'table',
   table4x4: 'table',

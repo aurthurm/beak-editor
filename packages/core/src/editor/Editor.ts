@@ -23,6 +23,7 @@
  */
 
 import { EditorView } from 'prosemirror-view';
+import { CodeBlockNodeView, EmbedNodeView, TableOfContentsNodeView } from '../nodeviews';
 import { EditorState, Transaction, Plugin } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
 import { history as createHistoryPlugin } from 'prosemirror-history';
@@ -31,7 +32,16 @@ import { v4 as uuid } from 'uuid';
 import { ProseMirrorAPI } from '../pm/ProseMirrorAPI';
 import { EditorConfig, defaultConfig, EditorEvents, EventHandler, CollaborationConfig } from './EditorConfig';
 import { createSchema } from '../schema';
-import { createPlugins, undo, redo } from '../plugins';
+import {
+  createPlugins,
+  undo,
+  redo,
+  createTrackChangesPlugin,
+  getTrackChangesState,
+  BEAKBLOCK_META_SKIP_TRACK_CHANGES,
+} from '../plugins';
+import type { DocumentVersion } from '../versioning/types';
+import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
 import { injectStyles } from '../styles/injectStyles';
 import {
   Block,
@@ -80,6 +90,12 @@ export class BeakBlockEditor {
   /** Collaboration plugins currently active */
   private _collaborationPlugins: Plugin[] = [];
 
+  /** Track changes plugin instance when enabled */
+  private _trackChangesPlugin: Plugin | null = null;
+
+  /** Cursor for emitting trackChange events without duplicates */
+  private _trackLogEmitPointer = 0;
+
   /** Destroyed flag */
   private _destroyed = false;
 
@@ -93,6 +109,7 @@ export class BeakBlockEditor {
     }
 
     this._schema = createSchema(this._config.customNodes);
+    this._initTrackChangesFromConfig();
     this._createEditor();
 
     if (this._config.autoFocus) {
@@ -104,10 +121,44 @@ export class BeakBlockEditor {
   // EDITOR LIFECYCLE
   // ===========================================================================
 
+  private _initTrackChangesFromConfig(): void {
+    const tc = this._config.trackChanges;
+    if (tc === true) {
+      this._trackChangesPlugin = createTrackChangesPlugin({});
+    } else if (typeof tc === 'object' && tc !== null && tc.enabled !== false) {
+      this._trackChangesPlugin = createTrackChangesPlugin({ authorId: tc.authorId });
+    } else {
+      this._trackChangesPlugin = null;
+    }
+  }
+
+  private _coreManagedPlugins(): Plugin[] {
+    const core: Plugin[] = [];
+    if (this._historyPlugin) core.push(this._historyPlugin);
+    if (this._trackChangesPlugin) core.push(this._trackChangesPlugin);
+    return core;
+  }
+
+  private _trackChangesInsertIndex(plugins: Plugin[]): number {
+    if (this._historyPlugin) {
+      const i = plugins.indexOf(this._historyPlugin);
+      if (i >= 0) return i + 1;
+    }
+    if (this._collaborationPlugins.length > 0) {
+      const last = this._collaborationPlugins[this._collaborationPlugins.length - 1];
+      if (last) {
+        const i = plugins.indexOf(last);
+        if (i >= 0) return i + 1;
+      }
+    }
+    return 0;
+  }
+
   private _createEditor(): void {
     const doc = blocksToDoc(this._schema, this._config.initialContent);
     this._historyEnabled = this._config.history !== false;
-    const { plugins: _viewPlugins, ...viewConfig } = this._config.prosemirror ?? {};
+    const pmConfig = this._config.prosemirror ?? {};
+    const { plugins: _viewPlugins, nodeViews: userNodeViews, ...viewConfig } = pmConfig;
 
     // Create the history plugin separately so we can toggle it at runtime
     this._historyPlugin = this._historyEnabled ? createHistoryPlugin() : null;
@@ -116,11 +167,9 @@ export class BeakBlockEditor {
       schema: this._schema,
       toggleMark: (name) => this.pm.toggleMark(name),
       inputRules: this._config.inputRules,
+      markdownPaste: this._config.markdownPaste,
       history: false, // We manage history ourselves
-      additionalPlugins: [
-        ...(this._historyPlugin ? [this._historyPlugin] : []),
-        ...(this._config.prosemirror?.plugins ?? []),
-      ],
+      additionalPlugins: [...this._coreManagedPlugins(), ...(this._config.prosemirror?.plugins ?? [])],
     });
 
     const state = EditorState.create({ doc, schema: this._schema, plugins });
@@ -133,6 +182,25 @@ export class BeakBlockEditor {
         class: 'beakblock-editor',
         role: 'textbox',
         'aria-multiline': 'true',
+      },
+      nodeViews: {
+        ...(this._schema.nodes.tableOfContents
+          ? {
+              tableOfContents: (node, view, getPos) =>
+                new TableOfContentsNodeView(node, view, getPos),
+            }
+          : {}),
+        ...(this._schema.nodes.embed
+          ? {
+              embed: (node, view, getPos) => new EmbedNodeView(node, view, getPos),
+            }
+          : {}),
+        ...(this._schema.nodes.codeBlock
+          ? {
+              codeBlock: (node, view, getPos) => new CodeBlockNodeView(node, view, getPos),
+            }
+          : {}),
+        ...(userNodeViews ?? {}),
       },
       ...viewConfig,
     });
@@ -148,6 +216,17 @@ export class BeakBlockEditor {
       const blocks = this.getDocument();
       this._emit('change', { blocks });
       this._config.onUpdate?.(blocks);
+
+      if (this._trackChangesPlugin && !tr.getMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES)) {
+        const st = getTrackChangesState(this._pmView.state);
+        if (st && st.log.length > this._trackLogEmitPointer) {
+          for (let i = this._trackLogEmitPointer; i < st.log.length; i++) {
+            const entry = st.log[i];
+            if (entry) this._emit('trackChange', { entry });
+          }
+          this._trackLogEmitPointer = st.log.length;
+        }
+      }
     }
 
     if (tr.selectionSet) {
@@ -190,8 +269,125 @@ export class BeakBlockEditor {
   setDocument(blocks: Block[]): void {
     const doc = blocksToDoc(this._schema, blocks);
     const tr = this.pm.createTransaction();
+    tr.setMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES, true);
     tr.replaceWith(0, this.pm.doc.content.size, doc.content);
     this.pm.dispatch(tr);
+  }
+
+  // ===========================================================================
+  // VERSIONING (pluggable snapshots)
+  // ===========================================================================
+
+  /**
+   * Save the current document as a new version using the configured adapter.
+   */
+  async saveVersion(options?: {
+    label?: string;
+    meta?: Record<string, unknown>;
+  }): Promise<DocumentVersion> {
+    const adapter = this._config.versioning?.adapter;
+    if (!adapter) {
+      throw new Error('Versioning is not configured. Pass versioning.adapter in EditorConfig.');
+    }
+    const version: DocumentVersion = {
+      id: uuid(),
+      createdAt: new Date().toISOString(),
+      label: options?.label,
+      blocks: structuredClone(this.getDocument()),
+      meta: options?.meta,
+    };
+    await adapter.saveVersion(version);
+    this._emit('versionSaved', { version });
+    return version;
+  }
+
+  /** List saved versions (newest first when using InMemoryVersioningAdapter). */
+  async listVersions(): Promise<DocumentVersion[]> {
+    const adapter = this._config.versioning?.adapter;
+    if (!adapter) {
+      throw new Error('Versioning is not configured. Pass versioning.adapter in EditorConfig.');
+    }
+    return adapter.listVersions();
+  }
+
+  /** Load one version by id without applying it. */
+  async getVersion(id: string): Promise<DocumentVersion | null> {
+    const adapter = this._config.versioning?.adapter;
+    if (!adapter) {
+      throw new Error('Versioning is not configured. Pass versioning.adapter in EditorConfig.');
+    }
+    return adapter.getVersion(id);
+  }
+
+  /**
+   * Replace the editor content with a saved version.
+   * Refreshes the undo stack when history is enabled. Prefer disabling Y.js collaboration first.
+   *
+   * @returns false if the version id was not found
+   */
+  async restoreVersion(id: string): Promise<boolean> {
+    const adapter = this._config.versioning?.adapter;
+    if (!adapter) {
+      throw new Error('Versioning is not configured. Pass versioning.adapter in EditorConfig.');
+    }
+    const version = await adapter.getVersion(id);
+    if (!version) return false;
+
+    this.setDocument(version.blocks);
+
+    if (this._historyEnabled) {
+      this.disableHistory();
+      this.enableHistory();
+    }
+
+    const st = getTrackChangesState(this._pmView.state);
+    this._trackLogEmitPointer = st?.log.length ?? 0;
+
+    this._emit('versionRestored', { version });
+    return true;
+  }
+
+  // ===========================================================================
+  // TRACK CHANGES
+  // ===========================================================================
+
+  /** Whether the track-changes plugin is active. */
+  get isTrackChangesEnabled(): boolean {
+    return this._trackChangesPlugin !== null;
+  }
+
+  /**
+   * Pending track-change records (since the plugin was enabled or state was last reset).
+   */
+  getPendingTrackChanges(): TrackedChangeRecord[] {
+    return getTrackChangesState(this._pmView.state)?.log ?? [];
+  }
+
+  /**
+   * Highlight inserts/deletes and record a change log. Inserts the plugin after history (or after collaboration plugins).
+   */
+  enableTrackChanges(options?: { authorId?: string }): void {
+    if (this._trackChangesPlugin) return;
+
+    this._trackChangesPlugin = createTrackChangesPlugin({ authorId: options?.authorId });
+    const plugins = [...this._pmView.state.plugins];
+    const insertAt = this._trackChangesInsertIndex(plugins);
+    plugins.splice(insertAt, 0, this._trackChangesPlugin);
+    this._pmView.updateState(this._pmView.state.reconfigure({ plugins }));
+    this._trackLogEmitPointer = getTrackChangesState(this._pmView.state)?.log.length ?? 0;
+  }
+
+  /**
+   * Remove track-changes decorations and logging (plugin removed; enable again for a fresh log).
+   */
+  disableTrackChanges(): void {
+    if (!this._trackChangesPlugin) return;
+
+    const tc = this._trackChangesPlugin;
+    this._trackChangesPlugin = null;
+    const plugins = this._pmView.state.plugins.filter((p) => p !== tc);
+    this._pmView.updateState(this._pmView.state.reconfigure({ plugins }));
+    this._trackLogEmitPointer = 0;
   }
 
   /**

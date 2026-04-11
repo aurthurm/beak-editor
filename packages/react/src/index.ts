@@ -29,6 +29,7 @@ export {
   useEditorSelection,
   useEditorFocus,
   useCustomSlashMenuItems,
+  useDocumentVersions,
 } from './hooks';
 export type { UseBeakBlockOptions } from './hooks';
 
@@ -90,6 +91,7 @@ export type {
   BlockPlacement,
   TextStyles,
   StyledText,
+  HardBreakContent,
   InlineContent,
   SlashMenuItem,
 } from '@aurthurm/beakblock-core';

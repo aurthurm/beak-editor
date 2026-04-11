@@ -85,6 +85,14 @@ Track editor focus state.
 const isFocused = useEditorFocus(editor);
 ```
 
+## Comments
+
+Use **`CommentStore`** and **`createCommentPlugin`** from `@aurthurm/beakblock-core`, and **`CommentModal`** from this package. There is no React `CommentRail` yet; use the modal and bubble menu.
+
+Wire **`BubbleMenu`** with `onComment` to open the modal. On every editor transaction with a document change, call **`store.mapAnchors(transaction.mapping)`** so thread anchors match the document.
+
+Full API and patterns: **[Comments guide](../../docs/comments.md)**.
+
 ## Components
 
 ### BeakBlockView

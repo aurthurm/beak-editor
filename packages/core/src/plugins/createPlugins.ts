@@ -24,6 +24,8 @@ import { createChecklistPlugin, ChecklistPluginConfig } from './checklistPlugin'
 import { createListEnterPlugin } from './listEnterPlugin';
 import { createLinkClickPlugin } from './linkClickPlugin';
 import { createMediaMenuPlugin } from './mediaMenuPlugin';
+import { createTableOfContentsPlugin } from './tableOfContentsPlugin';
+import { createMarkdownPastePlugin, type MarkdownPasteMode } from './markdownPastePlugin';
 
 /**
  * Options for creating plugins.
@@ -116,6 +118,12 @@ export interface CreatePluginsOptions {
    * Additional plugins to include.
    */
   additionalPlugins?: Plugin[];
+
+  /**
+   * Paste plain-text Markdown from the clipboard (`text/plain` without `text/html`).
+   * @default 'heuristic' (parse when text looks like Markdown)
+   */
+  markdownPaste?: MarkdownPasteMode;
 }
 
 /**
@@ -149,7 +157,21 @@ export interface CreatePluginsOptions {
  * @returns Array of ProseMirror plugins
  */
 export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
-  const { schema, toggleMark, inputRules, dragDrop, slashMenu, bubbleMenu, multiBlockSelection, table, keyboardShortcuts, checklist, mediaMenu, additionalPlugins = [] } = options;
+  const {
+    schema,
+    toggleMark,
+    inputRules,
+    dragDrop,
+    slashMenu,
+    bubbleMenu,
+    multiBlockSelection,
+    table,
+    keyboardShortcuts,
+    checklist,
+    mediaMenu,
+    additionalPlugins = [],
+    markdownPaste,
+  } = options;
   const includeHistory = options.history !== false;
 
   // Create slash menu plugin early so we can add it before baseKeymap
@@ -182,8 +204,20 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
     // Automatic block ID assignment
     createBlockIdPlugin(),
 
+    // Sync table of contents blocks with heading outline (after IDs exist)
+    ...(schema?.nodes.tableOfContents ? [createTableOfContentsPlugin()] : []),
+
     // Open links in a new tab/window when clicked inside the editor
     createLinkClickPlugin(),
+
+    ...(schema && markdownPaste !== false
+      ? [
+          createMarkdownPastePlugin({
+            schema,
+            mode: markdownPaste === undefined ? 'heuristic' : markdownPaste,
+          }),
+        ]
+      : []),
   ];
 
   // Add keyboard shortcuts plugin (includes formatting, undo/redo, block type shortcuts)

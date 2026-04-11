@@ -77,6 +77,9 @@ export { createListEnterPlugin } from './listEnterPlugin';
 
 export { createLinkClickPlugin } from './linkClickPlugin';
 
+export { createMarkdownPastePlugin } from './markdownPastePlugin';
+export type { MarkdownPasteMode } from './markdownPastePlugin';
+
 export {
   createMediaMenuPlugin,
   MEDIA_MENU_PLUGIN_KEY,
@@ -90,3 +93,24 @@ export type {
   ImageAttrs,
   EmbedAttrs,
 } from './mediaMenuPlugin';
+
+export {
+  buildTableOfContentsRefreshTransaction,
+  collectHeadingTocItems,
+  createTableOfContentsPlugin,
+  refreshAllTableOfContents,
+  TABLE_OF_CONTENTS_PLUGIN_KEY,
+} from './tableOfContentsPlugin';
+
+export { BEAKBLOCK_META_SKIP_TRACK_CHANGES } from './trackChangesMeta';
+export {
+  createTrackChangesPlugin,
+  TRACK_CHANGES_PLUGIN_KEY,
+  getTrackChangesState,
+} from './trackChangesPlugin';
+export type {
+  TrackChangesState,
+  TrackedChangeRecord,
+  TrackChangeKind,
+  CreateTrackChangesPluginOptions,
+} from './trackChangesPlugin';

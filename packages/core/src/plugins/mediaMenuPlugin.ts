@@ -232,8 +232,9 @@ export function createMediaMenuPlugin(): Plugin {
               const activeElement = document.activeElement;
               const isInMediaMenu = activeElement?.closest('.ob-media-menu');
               const isInMediaPopover = activeElement?.closest('.ob-media-url-popover');
+              const isInEmbedDropdown = activeElement?.closest('.beakblock-embed__dropdown');
 
-              if (!view.hasFocus() && !isInMediaMenu && !isInMediaPopover) {
+              if (!view.hasFocus() && !isInMediaMenu && !isInMediaPopover && !isInEmbedDropdown) {
                 view.dispatch(
                   view.state.tr.setMeta(MEDIA_MENU_PLUGIN_KEY, { hide: true })
                 );

@@ -43,7 +43,7 @@ const documentTabs = [
 
 type DocumentTabId = (typeof documentTabs)[number]['id'];
 
-const viewMode = ref<DocumentTabId | 'compliance'>('generic');
+const viewMode = ref<DocumentTabId | 'compliance' | 'collaboration'>('generic');
 const previewOpen = ref(false);
 const complianceWorkspaceRef = ref<{
   getMergedDocument: () => Block[];
@@ -173,7 +173,7 @@ watchEffect((onCleanup) => {
         </div>
         <div class="hero-stat">
           <span class="hero-stat-label">Samples</span>
-          <span class="hero-stat-value">9 scenarios</span>
+          <span class="hero-stat-value">10 scenarios</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-label">Layout</span>
@@ -201,6 +201,15 @@ watchEffect((onCleanup) => {
         <div class="sample-sidebar__divider" role="presentation" />
         <button
           type="button"
+          class="sample-sidebar__btn sample-sidebar__btn--collab"
+          :class="{ 'sample-sidebar__btn--active': viewMode === 'collaboration' }"
+          @click="viewMode = 'collaboration'"
+        >
+          Live collaboration
+          <span class="sample-sidebar__sub">Yjs · awareness cursors</span>
+        </button>
+        <button
+          type="button"
           class="sample-sidebar__btn sample-sidebar__btn--compliance"
           :class="{ 'sample-sidebar__btn--active': viewMode === 'compliance' }"
           @click="viewMode = 'compliance'"
@@ -221,6 +230,13 @@ watchEffect((onCleanup) => {
               :ref="(el) => setPanelRef(tab.id, el)"
               :initial-document="tab.document"
               :class-name="tab.editorClass ?? 'editor-view'"
+              @ai="openAiModal"
+              @comment="openCommentModal"
+            />
+
+            <CollaborativeEditorPanel
+              v-if="viewMode === 'collaboration'"
+              :ref="(el) => setPanelRef('collaboration', el)"
               @ai="openAiModal"
               @comment="openCommentModal"
             />
@@ -286,6 +302,7 @@ watchEffect((onCleanup) => {
           <h2>Document JSON</h2>
           <p class="inspector__lede">
             <template v-if="viewMode === 'compliance'">Live merge of every controlled section (same payload as Preview document).</template>
+            <template v-else-if="viewMode === 'collaboration'">Live Yjs document for this tab — open two clients on the same room to verify sync.</template>
             <template v-else>Serialized blocks for the active sample tab.</template>
           </p>
           <Transition name="inspector-snap" mode="out-in">

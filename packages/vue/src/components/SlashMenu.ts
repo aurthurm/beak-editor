@@ -83,11 +83,30 @@ const Icons: Record<string, VNodeChild> = {
     h('rect', { x: '3', y: '4', width: '7', height: '16', rx: '1.5', strokeWidth: '2' }),
     h('rect', { x: '14', y: '4', width: '7', height: '16', rx: '1.5', strokeWidth: '2' }),
   ]),
+  table: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('rect', { x: '3', y: '3', width: '18', height: '18', rx: '2', ry: '2', strokeWidth: '2' }),
+    h('line', { x1: '3', y1: '9', x2: '21', y2: '9', strokeWidth: '2' }),
+    h('line', { x1: '3', y1: '15', x2: '21', y2: '15', strokeWidth: '2' }),
+    h('line', { x1: '9', y1: '3', x2: '9', y2: '21', strokeWidth: '2' }),
+    h('line', { x1: '15', y1: '3', x2: '15', y2: '21', strokeWidth: '2' }),
+  ]),
   chart: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
     h('path', { d: 'M3 3v18h18', strokeWidth: '2' }),
     h('rect', { x: '6', y: '13', width: '3', height: '5', rx: '0.5', strokeWidth: '2' }),
     h('rect', { x: '11', y: '9', width: '3', height: '9', rx: '0.5', strokeWidth: '2' }),
     h('rect', { x: '16', y: '5', width: '3', height: '13', rx: '0.5', strokeWidth: '2' }),
+  ]),
+  embed: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('rect', { x: '2', y: '3', width: '20', height: '14', rx: '2', ry: '2', strokeWidth: '2' }),
+    h('line', { x1: '8', y1: '21', x2: '16', y2: '21', strokeWidth: '2' }),
+    h('line', { x1: '12', y1: '17', x2: '12', y2: '21', strokeWidth: '2' }),
+  ]),
+  youtube: h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }, [
+    h('path', {
+      d: 'M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z',
+      strokeWidth: '2',
+    }),
+    h('polygon', { points: '9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02', fill: 'currentColor', stroke: 'none' }),
   ]),
 };
 
@@ -98,7 +117,7 @@ const FALLBACK_ICON_BY_ID: Record<string, string> = {
   calloutError: 'xCircle',
   columns2: 'columns',
   columns3: 'columns',
-  columnsSidebar: 'columns',
+  tableOfContents: 'list',
   table: 'table',
   table2x2: 'table',
   table4x4: 'table',

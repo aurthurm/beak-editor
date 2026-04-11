@@ -344,6 +344,53 @@
   padding: 0;
 }
 
+/* Code block with line numbers (node view: pre.beakblock-code-block) */
+.beakblock-editor pre.beakblock-code-block {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 0;
+  margin: 0.75em 0;
+  overflow: hidden;
+  background: hsl(var(--ob-muted) / 0.45);
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: calc(var(--ob-radius) / 2 + 2px);
+}
+
+.beakblock-editor pre.beakblock-code-block .beakblock-code-block__gutter {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-width: 2.75rem;
+  padding: 0.55em 0.45em 0.55em 0.6em;
+  margin: 0;
+  text-align: right;
+  white-space: pre;
+  font-family: var(--ob-font-mono);
+  font-size: 0.9em;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--ob-muted-foreground));
+  background: hsl(var(--ob-muted) / 0.55);
+  border-right: 1px solid hsl(var(--ob-border));
+  user-select: none;
+  pointer-events: none;
+}
+
+.beakblock-editor pre.beakblock-code-block code {
+  flex: 1 1 auto;
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0.55em 0.75em 0.55em 0.65em;
+  overflow-x: auto;
+  white-space: pre;
+  background: transparent;
+  font-family: var(--ob-font-mono);
+  font-size: 0.9em;
+  line-height: 1.55;
+  tab-size: 2;
+}
+
 /* ===========================================================================
  * Divider
  * =========================================================================== */
@@ -2688,6 +2735,225 @@ th .ob-side-menu,
   outline-offset: 2px;
 }
 
+.beakblock-embed__menu-trigger {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 3;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: hsl(var(--ob-muted-foreground));
+  background: hsl(var(--ob-background) / 0.92);
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: calc(var(--ob-radius) * 0.5);
+  cursor: pointer;
+  box-shadow: 0 1px 3px hsl(0 0% 0% / 0.08);
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.beakblock-embed:hover .beakblock-embed__menu-trigger,
+.beakblock-embed:focus-within .beakblock-embed__menu-trigger,
+.beakblock-embed.ProseMirror-selectednode .beakblock-embed__menu-trigger {
+  opacity: 1;
+}
+
+.beakblock-embed__menu-trigger:hover {
+  background: hsl(var(--ob-muted) / 0.85);
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-embed__menu-trigger:focus-visible {
+  opacity: 1;
+  outline: 2px solid hsl(var(--ob-primary));
+  outline-offset: 1px;
+}
+
+.beakblock-embed__dropdown {
+  min-width: 13rem;
+  max-width: min(22rem, calc(100vw - 16px));
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--ob-radius, 0.75rem);
+  border: 1px solid hsl(var(--ob-border));
+  background: hsl(var(--ob-background));
+  background-color: hsl(var(--ob-background));
+  box-shadow: 0 4px 24px hsl(0 0% 0% / 0.12);
+}
+
+.beakblock-embed__dropdown-header {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-foreground));
+  background: hsl(var(--ob-muted));
+  background-color: hsl(var(--ob-muted));
+  border-bottom: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-embed__dropdown-header--sub {
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.beakblock-embed__dropdown-header-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--ob-foreground));
+  background: hsl(var(--ob-muted));
+  background-color: hsl(var(--ob-muted));
+}
+
+.beakblock-embed__dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.45rem 0.75rem;
+  color: hsl(var(--ob-foreground));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.beakblock-embed__dropdown-item:hover {
+  background: hsl(var(--ob-muted) / 0.5);
+}
+
+.beakblock-embed__dropdown-item--compact {
+  padding: 0.32rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.beakblock-embed__dropdown-item--active {
+  font-weight: 600;
+  color: hsl(var(--ob-primary));
+}
+
+.beakblock-embed__dropdown-label {
+  padding: 0.4rem 0.75rem 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-foreground));
+  background: hsl(var(--ob-muted));
+  background-color: hsl(var(--ob-muted));
+  border-top: 1px solid hsl(var(--ob-border));
+  border-bottom: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-embed__dropdown-hint {
+  margin: 0;
+  padding: 0.35rem 0.75rem 0.5rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: hsl(var(--ob-muted-foreground));
+  border-top: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-embed__dropdown-back {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-align: start;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.5rem 0.65rem;
+  color: hsl(var(--ob-foreground));
+  background: hsl(var(--ob-muted));
+  background-color: hsl(var(--ob-muted));
+  border: none;
+  border-right: 1px solid hsl(var(--ob-border));
+  cursor: pointer;
+}
+
+.beakblock-embed__dropdown-back:hover {
+  background: hsl(var(--ob-muted-foreground) / 0.14);
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-embed__dropdown-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-embed__dropdown-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem 0.55rem;
+  font: inherit;
+  font-size: 0.875rem;
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: calc(var(--ob-radius) * 0.5);
+  background: hsl(var(--ob-background));
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-embed__dropdown-input:focus {
+  outline: none;
+  border-color: hsl(var(--ob-primary));
+  box-shadow: 0 0 0 2px hsl(var(--ob-primary) / 0.2);
+}
+
+.beakblock-embed__dropdown-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem 0.6rem;
+}
+
+.beakblock-embed__dropdown-btn {
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: calc(var(--ob-radius) * 0.5);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.beakblock-embed__dropdown-btn--ghost {
+  background: transparent;
+  color: hsl(var(--ob-muted-foreground));
+  border-color: hsl(var(--ob-border));
+}
+
+.beakblock-embed__dropdown-btn--ghost:hover {
+  background: hsl(var(--ob-muted) / 0.45);
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-embed__dropdown-btn--primary {
+  background: hsl(var(--ob-primary));
+  color: hsl(var(--ob-primary-foreground, 0 0% 100%));
+}
+
+.beakblock-embed__dropdown-btn--primary:hover {
+  filter: brightness(1.05);
+}
+
 /* ==========================================================================
    Comments + AI overlays
    ========================================================================== */
@@ -3457,4 +3723,177 @@ th .ob-side-menu,
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ===========================================================================
+ * Track changes (decoration-based)
+ * =========================================================================== */
+
+.beakblock-track-insert {
+  background: hsl(145 65% 92%);
+  border-bottom: 2px solid hsl(145 55% 42%);
+  border-radius: 0.12em;
+}
+
+.beakblock-track-delete {
+  display: inline;
+  text-decoration: line-through;
+  color: hsl(0 55% 38%);
+  background: hsl(0 70% 95%);
+  border-radius: 0.12em;
+  padding: 0 0.06em;
+  font-size: 0.92em;
+  vertical-align: baseline;
+}
+
+/* ===========================================================================
+ * Table of contents block
+ * =========================================================================== */
+
+.beakblock-toc {
+  position: relative;
+  margin: var(--ob-block-spacing, 1em) 0;
+  padding: 0.85rem 1rem;
+  border-radius: var(--ob-radius, 0.75rem);
+  border: 1px solid hsl(var(--ob-border));
+  background: hsl(var(--ob-muted) / 0.35);
+  font-size: 0.92rem;
+}
+
+.beakblock-toc__header {
+  margin-bottom: 0.5rem;
+  padding-right: 2rem;
+}
+
+.beakblock-toc__label {
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-muted-foreground));
+}
+
+.beakblock-toc__menu-trigger {
+  position: absolute;
+  top: 0.85rem;
+  right: 1rem;
+  z-index: 1;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: hsl(var(--ob-muted-foreground));
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--ob-radius) * 0.5);
+  cursor: pointer;
+}
+
+.beakblock-toc__menu-trigger:hover {
+  background: hsl(var(--ob-muted) / 0.55);
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-toc__menu-trigger:focus-visible {
+  outline: 2px solid hsl(var(--ob-primary));
+  outline-offset: 1px;
+}
+
+.beakblock-toc__dropdown {
+  min-width: 12rem;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--ob-radius, 0.75rem);
+  border: 1px solid hsl(var(--ob-border));
+  background: hsl(var(--ob-background));
+  background-color: hsl(var(--ob-background));
+  box-shadow: 0 4px 24px hsl(0 0% 0% / 0.12);
+}
+
+.beakblock-toc__dropdown-header {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--ob-foreground));
+  background: hsl(var(--ob-muted));
+  background-color: hsl(var(--ob-muted));
+  border-bottom: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-toc__dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.45rem 0.75rem;
+  color: hsl(var(--ob-foreground));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.beakblock-toc__dropdown-item:hover {
+  background: hsl(var(--ob-muted) / 0.5);
+}
+
+.beakblock-toc__dropdown-hint {
+  margin: 0;
+  padding: 0.35rem 0.75rem 0.5rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: hsl(var(--ob-muted-foreground));
+  border-top: 1px solid hsl(var(--ob-border));
+}
+
+.beakblock-toc__empty {
+  margin: 0;
+  padding-right: 2rem;
+  font-size: 0.88rem;
+  color: hsl(var(--ob-muted-foreground));
+  font-style: italic;
+}
+
+.beakblock-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.beakblock-toc__item {
+  margin: 0;
+  padding-inline-start: calc((var(--beakblock-toc-level, 1) - 1) * 0.75rem);
+}
+
+.beakblock-toc__link {
+  display: block;
+  width: 100%;
+  text-align: start;
+  font: inherit;
+  color: hsl(var(--ob-primary));
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--ob-radius) * 0.5);
+  padding: 0.28rem 0.4rem;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+.beakblock-toc__link:hover {
+  background: hsl(var(--ob-muted) / 0.6);
+}
+
+.beakblock-toc__link:focus-visible {
+  outline: 2px solid hsl(var(--ob-primary));
+  outline-offset: 1px;
 }

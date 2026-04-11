@@ -30,7 +30,26 @@
 // ===========================================================================
 
 export { BeakBlockEditor, defaultConfig } from './editor';
-export type { EditorConfig, EditorEvents, EventHandler, CollaborationConfig } from './editor';
+export type {
+  EditorConfig,
+  EditorEvents,
+  EventHandler,
+  CollaborationConfig,
+  TrackChangesConfig,
+} from './editor';
+
+// ===========================================================================
+// NODE VIEWS
+// ===========================================================================
+
+export {
+  codeBlockNodeView,
+  CodeBlockNodeView,
+  embedNodeView,
+  EmbedNodeView,
+  tableOfContentsNodeView,
+  TableOfContentsNodeView,
+} from './nodeviews';
 
 // ===========================================================================
 // PROSEMIRROR API - THE KEY DIFFERENTIATOR
@@ -92,9 +111,12 @@ export {
   checkListNode,
   checkListItemNode,
   embedNode,
+  getEmbedIframeSrc,
+  normalizeEmbedAttrsFromUrl,
+  tableOfContentsNode,
   parseEmbedUrl,
 } from './schema';
-export type { CalloutType, ImageAlignment, EmbedProvider } from './schema';
+export type { CalloutType, ImageAlignment, EmbedProvider, TocHeadingItem } from './schema';
 
 // Mark specs
 export {
@@ -121,10 +143,24 @@ export type {
   BlockPlacement,
   TextStyles,
   StyledText,
-  LinkContent,
+   LinkContent,
   IconContent,
+  HardBreakContent,
   InlineContent,
 } from './blocks';
+
+// ===========================================================================
+// MARKDOWN
+// ===========================================================================
+
+export {
+  markdownToBlocks,
+  blocksToMarkdown,
+  blocksToMdastRoot,
+  mdastToBlocks,
+  looksLikeMarkdown,
+} from './markdown';
+export type { MarkdownParseOptions, MarkdownSerializeOptions } from './markdown';
 
 // ===========================================================================
 // COMMANDS
@@ -151,11 +187,28 @@ export {
 export type { TableContext } from './commands';
 
 // ===========================================================================
+// VERSIONING
+// ===========================================================================
+
+export type { DocumentVersion, VersioningAdapter } from './versioning';
+export { InMemoryVersioningAdapter } from './versioning';
+
+// ===========================================================================
 // PLUGINS
 // ===========================================================================
 
-export { createPlugins, createBlockIdPlugin, BLOCK_ID_PLUGIN_KEY } from './plugins';
-export type { CreatePluginsOptions } from './plugins';
+export {
+  createPlugins,
+  createBlockIdPlugin,
+  BLOCK_ID_PLUGIN_KEY,
+  buildTableOfContentsRefreshTransaction,
+  collectHeadingTocItems,
+  createTableOfContentsPlugin,
+  refreshAllTableOfContents,
+  TABLE_OF_CONTENTS_PLUGIN_KEY,
+  createMarkdownPastePlugin,
+} from './plugins';
+export type { CreatePluginsOptions, MarkdownPasteMode } from './plugins';
 
 // Input rules
 export {
@@ -260,6 +313,20 @@ export type {
 
 // History (undo/redo)
 export { undo, redo } from './plugins';
+
+// Track changes
+export {
+  createTrackChangesPlugin,
+  TRACK_CHANGES_PLUGIN_KEY,
+  getTrackChangesState,
+  BEAKBLOCK_META_SKIP_TRACK_CHANGES,
+} from './plugins';
+export type {
+  TrackedChangeRecord,
+  TrackChangeKind,
+  TrackChangesState,
+  CreateTrackChangesPluginOptions,
+} from './plugins';
 
 // ===========================================================================
 // TYPES (additional schema/extension types)

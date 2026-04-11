@@ -18,6 +18,12 @@ export default defineNuxtConfig({
     openaiApiKey: process.env.NUXT_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '',
     beakblockAiModel: process.env.BEAKBLOCK_AI_MODEL || 'gpt-4.1-mini',
     beakblockAiBaseUrl: process.env.BEAKBLOCK_AI_BASE_URL || 'https://api.openai.com',
+    public: {
+      /** WebSocket URL for the Yjs demo (no trailing slash). `pnpm dev` starts the server on 1234. */
+      collabWsUrl: process.env.NUXT_PUBLIC_COLLAB_WS_URL || 'ws://127.0.0.1:1234',
+      /** Default room name for the Live collaboration sample (each tab can override in the UI). */
+      collabRoom: process.env.NUXT_PUBLIC_COLLAB_ROOM || 'beakblock-nuxt-showcase',
+    },
   },
   vite: {
     resolve: {

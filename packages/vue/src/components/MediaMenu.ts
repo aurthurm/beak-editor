@@ -5,6 +5,7 @@ import {
   type EmbedAttrs,
   type ImageAttrs,
   type MediaMenuState,
+  normalizeEmbedAttrsFromUrl,
   updateMediaAttrs,
   type BeakBlockEditor,
 } from '@aurthurm/beakblock-core';
@@ -192,7 +193,14 @@ export const MediaMenu = defineComponent({
 
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest('.ob-media-menu') || target.closest('.ob-media-url-popover') || target.closest('.beakblock-image') || target.closest('.beakblock-embed')) return;
+      if (
+        target.closest('.ob-media-menu') ||
+        target.closest('.ob-media-url-popover') ||
+        target.closest('.beakblock-embed__dropdown') ||
+        target.closest('.beakblock-image') ||
+        target.closest('.beakblock-embed')
+      )
+        return;
       showUrlEdit.value = false;
       showCaptionEdit.value = false;
       lastValidState.value = null;
@@ -223,7 +231,7 @@ export const MediaMenu = defineComponent({
       const state = activeState.value;
       if (!props.editor || !state?.nodePos) return;
       if (state.mediaType === 'image') updateMediaAttrs(props.editor.pm.view, state.nodePos, { src: url });
-      else updateMediaAttrs(props.editor.pm.view, state.nodePos, { url });
+      else updateMediaAttrs(props.editor.pm.view, state.nodePos, normalizeEmbedAttrsFromUrl(url));
       showUrlEdit.value = false;
       props.editor.pm.view.focus();
     };

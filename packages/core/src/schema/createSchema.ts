@@ -32,6 +32,7 @@ import {
   checkListNode,
   checkListItemNode,
   embedNode,
+  tableOfContentsNode,
 } from './nodes';
 import {
   boldMark,
@@ -74,6 +75,7 @@ export const DEFAULT_NODES = {
   checkList: checkListNode,
   checkListItem: checkListItemNode,
   embed: embedNode,
+  tableOfContents: tableOfContentsNode,
 };
 
 /**

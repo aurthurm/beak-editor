@@ -26,6 +26,9 @@ import {
   Block,
   SlashMenuItem,
   NodeViewConstructor,
+  codeBlockNodeView,
+  embedNodeView,
+  tableOfContentsNodeView,
 } from '@aurthurm/beakblock-core';
 import type { ReactBlockSpec, PropSchema } from '../blocks';
 
@@ -84,8 +87,6 @@ export function useBeakBlock(options: UseBeakBlockOptions = {}): BeakBlockEditor
       }
     }
 
-    const hasNodeViews = Object.keys(nodeViews).length > 0;
-
     // Create editor WITHOUT nodeViews first to avoid the race condition:
     // ProseMirror calls nodeView constructors during EditorView construction,
     // but editorRef.current isn't set yet, causing a crash when initialContent
@@ -99,15 +100,24 @@ export function useBeakBlock(options: UseBeakBlockOptions = {}): BeakBlockEditor
     // Now the ref is available for nodeView callbacks
     editorRef.current = newEditor;
 
-    // Apply nodeViews after construction — ProseMirror will re-render
-    // all nodes that need a custom nodeView
-    if (hasNodeViews) {
-      newEditor.pm.view.setProps({
-        nodeViews: {
-          ...editorOptions.prosemirror?.nodeViews,
-          ...nodeViews,
-        },
-      });
+    const tocViews: Record<string, NodeViewConstructor> = newEditor.pm.state.schema.nodes.tableOfContents
+      ? { tableOfContents: tableOfContentsNodeView }
+      : {};
+    const embedViews: Record<string, NodeViewConstructor> = newEditor.pm.state.schema.nodes.embed
+      ? { embed: embedNodeView }
+      : {};
+    const codeBlockViews: Record<string, NodeViewConstructor> = newEditor.pm.state.schema.nodes.codeBlock
+      ? { codeBlock: codeBlockNodeView }
+      : {};
+    const mergedNodeViews = {
+      ...tocViews,
+      ...embedViews,
+      ...codeBlockViews,
+      ...(editorOptions.prosemirror?.nodeViews ?? {}),
+      ...nodeViews,
+    };
+    if (Object.keys(mergedNodeViews).length > 0) {
+      newEditor.pm.view.setProps({ nodeViews: mergedNodeViews });
     }
     setEditor(newEditor);
 

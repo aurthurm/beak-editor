@@ -44,20 +44,27 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
   }
 
   const attrs = {
-    id: block.id || uuid(),
     ...block.props,
+    id: block.id || uuid(),
   };
+
+  // List items: first paragraph from inline `content`, then optional nested blocks
+  if (block.type === 'listItem') {
+    const paraContent =
+      block.content && block.content.length > 0 ? inlineContentToNodes(schema, block.content) : [];
+    const parts: PMNode[] = [schema.node('paragraph', { id: uuid() }, paraContent)];
+    if (block.children && block.children.length > 0) {
+      for (const child of block.children) {
+        parts.push(blockToNode(schema, child));
+      }
+    }
+    return nodeType.create(attrs, parts);
+  }
 
   // Handle container blocks with children (lists, columns, etc.)
   if (block.children && block.children.length > 0) {
     const childNodes = block.children.map((child) => blockToNode(schema, child));
     return nodeType.create(attrs, childNodes);
-  }
-
-  // Handle list items specially - they need a paragraph wrapper for inline content
-  if (block.type === 'listItem' && block.content) {
-    const paragraph = schema.node('paragraph', null, inlineContentToNodes(schema, block.content));
-    return nodeType.create(attrs, [paragraph]);
   }
 
   // Handle check list items - they have inline content directly
@@ -68,6 +75,14 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
   // Handle image blocks - they are atomic and use props for src, alt, etc.
   if (block.type === 'image') {
     return nodeType.create(attrs);
+  }
+
+  if (block.type === 'tableOfContents') {
+    const rawItems = (block.props as { items?: unknown }).items ?? [];
+    return nodeType.create({
+      id: block.id || uuid(),
+      itemsJson: JSON.stringify(rawItems),
+    });
   }
 
   // Handle table cells - they need block content (default to paragraph if only inline content)
@@ -129,6 +144,12 @@ export function inlineContentToNodes(schema: Schema, content: InlineContent[]): 
         symbol: item.symbol,
         size: item.size ?? 36,
       })];
+    }
+
+    if (item.type === 'hardBreak') {
+      const br = schema.nodes.hardBreak;
+      if (!br) return [];
+      return [br.create()];
     }
 
     return [];

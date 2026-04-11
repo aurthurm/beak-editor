@@ -18,6 +18,8 @@ const CONTAINER_TYPES = new Set([
   'listItem',
   'checkList',
   'checkListItem',
+  'columnList',
+  'column',
   'table',
   'tableRow',
   'tableCell',
@@ -44,6 +46,20 @@ const CONTAINER_TYPES = new Set([
  * @returns A Block object
  */
 export function nodeToBlock(node: PMNode): Block {
+  if (node.type.name === 'tableOfContents') {
+    let items: unknown[] = [];
+    try {
+      items = JSON.parse(String(node.attrs.itemsJson ?? '[]')) as unknown[];
+    } catch {
+      items = [];
+    }
+    return {
+      id: String(node.attrs.id || uuid()),
+      type: 'tableOfContents',
+      props: { items },
+    };
+  }
+
   const { id, ...props } = node.attrs;
 
   const block: Block = {
@@ -126,6 +142,12 @@ function nodeContentToInline(node: PMNode): InlineContent[] {
         size: child.attrs.size ? Number(child.attrs.size) : undefined,
       };
       content.push(iconItem);
+      return;
+    }
+
+    if (child.type.name === 'hardBreak') {
+      flushLink();
+      content.push({ type: 'hardBreak' });
       return;
     }
 

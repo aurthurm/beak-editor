@@ -6,3 +6,4 @@ export {
   useCustomSlashMenuItems,
 } from './useBeakBlock';
 export type { UseBeakBlockOptions } from './useBeakBlock';
+export { useDocumentVersions } from './useDocumentVersions';

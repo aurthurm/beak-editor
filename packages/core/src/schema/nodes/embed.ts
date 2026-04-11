@@ -70,7 +70,7 @@ export const embedNode: NodeSpec = {
   ],
   toDOM: (node) => {
     const { url, provider, embedId, caption, width, height, aspectRatio } = node.attrs;
-    const embedUrl = getEmbedUrl(provider, embedId, url);
+    const embedUrl = getEmbedIframeSrc(provider, embedId, url);
 
     const style = width ? `max-width: ${typeof width === 'number' ? `${width}px` : width}` : '';
 
@@ -118,9 +118,28 @@ export const embedNode: NodeSpec = {
 };
 
 /**
- * Gets the embed URL for a given provider and embed ID.
+ * Normalizes pasted/typed URL into embed attrs (provider + embed id + stored URL).
  */
-function getEmbedUrl(provider: EmbedProvider, embedId: string, originalUrl: string): string {
+export function normalizeEmbedAttrsFromUrl(url: string): {
+  url: string;
+  provider: EmbedProvider;
+  embedId: string;
+} {
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return { url: '', provider: 'generic', embedId: '' };
+  }
+  const parsed = parseEmbedUrl(trimmed);
+  if (parsed) {
+    return { url: trimmed, provider: parsed.provider, embedId: parsed.embedId };
+  }
+  return { url: trimmed, provider: 'generic', embedId: trimmed };
+}
+
+/**
+ * Resolved iframe `src` for an embed node (exported for node views and tests).
+ */
+export function getEmbedIframeSrc(provider: EmbedProvider, embedId: string, originalUrl: string): string {
   if (!embedId && !originalUrl) return '';
 
   switch (provider) {

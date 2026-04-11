@@ -619,28 +619,24 @@ export function getDefaultSlashMenuItems(schema: EditorState['schema']): SlashMe
           const columnList = schema.nodes.columnList.create(null, [col1, col2, col3]);
           view.dispatch(view.state.tr.replaceSelectionWith(columnList));
         },
-      },
-      {
-        id: 'columnsSidebar',
-        title: 'Sidebar Left',
-        description: 'Small sidebar with main content',
-        icon: 'columns',
-        keywords: ['col', 'layout', 'sidebar', 'aside'],
-        group: 'Layout',
-        action: (view, _state) => {
-          const sidebar = schema.nodes.column.create(
-            { width: 30 },
-            schema.nodes.paragraph.create()
-          );
-          const main = schema.nodes.column.create(
-            { width: 70 },
-            schema.nodes.paragraph.create()
-          );
-          const columnList = schema.nodes.columnList.create(null, [sidebar, main]);
-          view.dispatch(view.state.tr.replaceSelectionWith(columnList));
-        },
       }
     );
+  }
+
+  if (schema.nodes.tableOfContents) {
+    items.push({
+      id: 'tableOfContents',
+      title: 'Table of contents',
+      description: 'Outline of headings; click to jump',
+      icon: 'list',
+      keywords: ['toc', 'outline', 'headings', 'index', 'contents'],
+      group: 'Layout',
+      action: (view, _state) => {
+        const node = schema.nodes.tableOfContents.create({ itemsJson: '[]' });
+        const tr = view.state.tr.replaceSelectionWith(node);
+        view.dispatch(tr.insert(tr.selection.to, schema.nodes.paragraph.create()));
+      },
+    });
   }
 
   // Tables
@@ -763,34 +759,20 @@ export function getDefaultSlashMenuItems(schema: EditorState['schema']): SlashMe
     });
   }
 
-  // Embed
+  // Embed (single block type: YouTube, Vimeo, and other URLs share one `embed` node)
   if (schema.nodes.embed) {
-    items.push(
-      {
-        id: 'embed',
-        title: 'Embed',
-        description: 'Embed external content (YouTube, etc.)',
-        icon: 'embed',
-        keywords: ['video', 'youtube', 'vimeo', 'iframe', 'external'],
-        group: 'Media',
-        action: (view) => {
-          const node = schema.nodes.embed.create({ url: '', provider: 'generic' });
-          view.dispatch(view.state.tr.replaceSelectionWith(node));
-        },
+    items.push({
+      id: 'embed',
+      title: 'Embed',
+      description: 'Paste a link — YouTube, Vimeo, Figma, or any iframe URL',
+      icon: 'embed',
+      keywords: ['video', 'youtube', 'vimeo', 'iframe', 'figma', 'loom', 'media', 'soundcloud', 'spotify'],
+      group: 'Media',
+      action: (view) => {
+        const node = schema.nodes.embed.create({ url: '', provider: 'generic' });
+        view.dispatch(view.state.tr.replaceSelectionWith(node));
       },
-      {
-        id: 'youtube',
-        title: 'YouTube',
-        description: 'Embed a YouTube video',
-        icon: 'youtube',
-        keywords: ['video', 'embed', 'media'],
-        group: 'Media',
-        action: (view) => {
-          const node = schema.nodes.embed.create({ url: '', provider: 'youtube' });
-          view.dispatch(view.state.tr.replaceSelectionWith(node));
-        },
-      }
-    );
+    });
   }
 
   return items;

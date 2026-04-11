@@ -80,9 +80,16 @@ export interface IconContent {
 }
 
 /**
+ * Hard line break inside a text block (Shift+Enter).
+ */
+export interface HardBreakContent {
+  type: 'hardBreak';
+}
+
+/**
  * Union of all inline content types.
  */
-export type InlineContent = StyledText | LinkContent | IconContent;
+export type InlineContent = StyledText | LinkContent | IconContent | HardBreakContent;
 
 /**
  * A block in the document.

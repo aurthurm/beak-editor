@@ -13,6 +13,7 @@ import {
   TableMenu,
   useBeakBlock,
   useCustomSlashMenuItems,
+  useDocumentVersions,
   useEditorContent,
 } from '@aurthurm/beakblock-vue';
 import {
@@ -20,6 +21,7 @@ import {
   SLASH_AI_PRESETS,
   createCommentPlugin,
   InMemoryCommentStore,
+  InMemoryVersioningAdapter,
 } from '@aurthurm/beakblock-core';
 import type { Block } from '@aurthurm/beakblock-core';
 import { sendAIRequest } from '../../shared/ai';
@@ -63,17 +65,57 @@ const applyDemoAI = async ({ output }: { output: string }) => {
   editor.value?.pm.insertText(output);
 };
 
+const versionAdapter = new InMemoryVersioningAdapter();
 const customBlocks = [createChartBlockSpec()];
 const editor = useBeakBlock({
   initialContent: props.initialBlocks,
   customBlocks,
+  versioning: { adapter: versionAdapter },
   prosemirror: {
     plugins: [createCommentPlugin(commentStore)],
   },
 });
 
+const { versions, saveVersion, restoreVersion } = useDocumentVersions(editor, versionAdapter);
+const trackChangesOn = ref(false);
+const restoreSelect = ref('');
+
 const customSlashItems = useCustomSlashMenuItems(editor, customBlocks);
 const content = useEditorContent(editor);
+
+const syncTrackCheckbox = () => {
+  trackChangesOn.value = editor.value?.isTrackChangesEnabled ?? false;
+};
+
+watch(
+  editor,
+  (ed) => {
+    syncTrackCheckbox();
+  },
+  { immediate: true }
+);
+
+const toggleTrackChanges = () => {
+  const ed = editor.value;
+  if (!ed) return;
+  if (trackChangesOn.value) {
+    ed.enableTrackChanges({ authorId: 'demo-author' });
+  } else {
+    ed.disableTrackChanges();
+  }
+};
+
+const onSaveVersion = async () => {
+  await saveVersion({ label: `Checkpoint · ${props.sectionTitle.slice(0, 48)}` });
+};
+
+const onRestoreSelect = async () => {
+  const id = restoreSelect.value;
+  if (!id) return;
+  await restoreVersion(id);
+  restoreSelect.value = '';
+  emit('update');
+};
 
 watch(
   content,
@@ -97,6 +139,24 @@ defineExpose({
         <span v-else class="compliance-section__badge compliance-section__badge--optional">Controlled · optional</span>
       </div>
       <p class="compliance-section__hint">Content for this heading is authored only in this field.</p>
+      <div class="compliance-section__version-bar" role="group" aria-label="Versioning and track changes">
+        <label class="compliance-section__version-check">
+          <input type="checkbox" v-model="trackChangesOn" @change="toggleTrackChanges" />
+          Track changes
+        </label>
+        <button type="button" class="compliance-section__version-btn" @click="onSaveVersion">Save version</button>
+        <select
+          v-model="restoreSelect"
+          class="compliance-section__version-select"
+          aria-label="Restore saved version"
+          @change="onRestoreSelect"
+        >
+          <option value="">Restore snapshot…</option>
+          <option v-for="v in versions" :key="v.id" :value="v.id">
+            {{ v.label || v.createdAt }}
+          </option>
+        </select>
+      </div>
     </header>
 
     <div class="compliance-section__editor-wrap">

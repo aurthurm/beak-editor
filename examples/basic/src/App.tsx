@@ -1,5 +1,7 @@
 import { useBeakBlock, BeakBlockView, useEditorContent, SlashMenu, BubbleMenu, TableHandles, MediaMenu } from '@aurthurm/beakblock-react';
+import { blocksToMarkdown } from '@aurthurm/beakblock-core';
 import { sampleDocument } from './data';
+import { downloadBlocksAsDocx, printDocumentAsPdf } from './exportOffice';
 // CSS is now auto-injected by BeakBlockEditor (injectStyles: true by default)
 import './styles.css';
 
@@ -48,6 +50,24 @@ export default function App() {
             </button>
             <button onClick={() => editor && console.log(editor.pm.state)} title="Log ProseMirror state" disabled={!editor}>
               Log PM State
+            </button>
+            <span className="separator" />
+            <button
+              onClick={() => editor && console.log(blocksToMarkdown(editor.getDocument()))}
+              title="Log Markdown to console"
+              disabled={!editor}
+            >
+              Log MD
+            </button>
+            <button
+              onClick={() => editor && void downloadBlocksAsDocx(editor.getDocument())}
+              title="Download Word document"
+              disabled={!editor}
+            >
+              .docx
+            </button>
+            <button onClick={() => editor && printDocumentAsPdf(editor.getDocument())} title="Print or save as PDF" disabled={!editor}>
+              PDF
             </button>
           </div>
 

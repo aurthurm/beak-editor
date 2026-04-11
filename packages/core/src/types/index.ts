@@ -13,6 +13,7 @@ export type {
   StyledText,
   LinkContent,
   IconContent,
+  HardBreakContent,
   InlineContent,
   Block,
   PartialBlock,

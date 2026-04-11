@@ -39,8 +39,12 @@ export { imageNode } from './image';
 export type { ImageAlignment } from './image';
 
 // Embed nodes
-export { embedNode, parseEmbedUrl } from './embed';
+export { embedNode, getEmbedIframeSrc, normalizeEmbedAttrsFromUrl, parseEmbedUrl } from './embed';
 export type { EmbedProvider } from './embed';
 
 // Check list nodes
 export { checkListNode, checkListItemNode } from './checkList';
+
+// Table of contents
+export { tableOfContentsNode } from './tableOfContents';
+export type { TocHeadingItem } from './tableOfContents';

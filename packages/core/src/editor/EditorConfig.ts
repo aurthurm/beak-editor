@@ -11,6 +11,8 @@ import type { NodeViewConstructor } from 'prosemirror-view';
 import type { NodeSpec } from 'prosemirror-model';
 import type { Block } from '../blocks/types';
 import type { InputRulesConfig } from '../plugins/inputRules';
+import type { DocumentVersion, VersioningAdapter } from '../versioning/types';
+import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
 
 /**
  * Configuration for enabling real-time collaboration.
@@ -50,7 +52,24 @@ export interface EditorEvents {
   blur: undefined;
   /** Transaction applied */
   transaction: { transaction: unknown };
+  /** A version snapshot was saved */
+  versionSaved: { version: DocumentVersion };
+  /** Document was restored from a saved version */
+  versionRestored: { version: DocumentVersion };
+  /** Track changes recorded an edit (only when track changes is enabled) */
+  trackChange: { entry: TrackedChangeRecord };
 }
+
+/**
+ * Optional track-changes mode at initialization.
+ */
+export type TrackChangesConfig =
+  | boolean
+  | {
+      /** @default true when an object is passed */
+      enabled?: boolean;
+      authorId?: string;
+    };
 
 /**
  * Event handler type.
@@ -115,6 +134,20 @@ export interface EditorConfig {
   history?: boolean;
 
   /**
+   * Pluggable document versioning (snapshots and restore).
+   * When set, use editor.saveVersion(), listVersions(), getVersion(), restoreVersion().
+   */
+  versioning?: {
+    adapter: VersioningAdapter;
+  };
+
+  /**
+   * Enable track changes when the editor is created.
+   * Toggle at runtime with editor.enableTrackChanges() / editor.disableTrackChanges().
+   */
+  trackChanges?: TrackChangesConfig;
+
+  /**
    * Configuration for input rules (markdown-style shortcuts).
    *
    * Enable/disable specific shortcuts like:
@@ -138,6 +171,14 @@ export interface EditorConfig {
    * ```
    */
   inputRules?: InputRulesConfig | false;
+
+  /**
+   * When the clipboard has `text/plain` but no `text/html`, treat the paste as Markdown.
+   * - `'heuristic'` (default): only when the text looks like Markdown (`looksLikeMarkdown`)
+   * - `true`: always parse plain text as Markdown
+   * - `false`: disable (browser default)
+   */
+  markdownPaste?: boolean | 'heuristic';
 
   /**
    * Whether to auto-inject CSS styles into the document head.

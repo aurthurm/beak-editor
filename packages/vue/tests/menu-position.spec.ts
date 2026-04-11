@@ -582,7 +582,7 @@ describe('Vue menu positioning', () => {
       { id: 'error', title: 'Error', icon: 'xCircle', action: vi.fn() },
       { id: 'columns2', title: '2 Columns', icon: 'columns', action: vi.fn() },
       { id: 'columns3', title: '3 Columns', icon: 'columns', action: vi.fn() },
-      { id: 'columnsSidebar', title: 'Sidebar Left', icon: 'columns', action: vi.fn() },
+      { id: 'tableOfContents', title: 'Table of contents', icon: 'list', action: vi.fn() },
       { id: 'table', title: 'Table', icon: 'table', action: vi.fn() },
       { id: 'table2x2', title: 'Table 2x2', icon: 'table', action: vi.fn() },
       { id: 'table4x4', title: 'Table 4x4', icon: 'table', action: vi.fn() },

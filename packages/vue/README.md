@@ -88,6 +88,19 @@ Build slash menu items from custom Vue blocks.
 const customSlashItems = useCustomSlashMenuItems(editor, customBlocks);
 ```
 
+## Comments
+
+Inline comments use **`CommentStore`** and **`createCommentPlugin`** from `@aurthurm/beakblock-core`, plus Vue components:
+
+- **`CommentRail`** — marker rail and flyouts around the editor (wraps `BeakBlockView` in the default slot).
+- **`CommentModal`** — modal to add a thread from the current selection and manage overlapping threads.
+
+Hook **`BubbleMenu`** with `@comment` to open the modal. On every editor transaction with a document change, call **`store.mapAnchors(transaction.mapping)`** so highlights stay aligned (see guide).
+
+Full API, anchoring, persistence, and troubleshooting: **[Comments guide](../../docs/comments.md)**.
+
+Example: [`examples/nuxt-vue/components/ComplianceSectionEditor.vue`](../examples/nuxt-vue/components/ComplianceSectionEditor.vue).
+
 ## Components
 
 ### `BeakBlockView`
