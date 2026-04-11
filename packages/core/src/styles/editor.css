@@ -2716,144 +2716,36 @@ th .ob-side-menu,
   position: relative;
 }
 
-.beakblock-comment-rail__peek {
-  position: absolute;
-  top: 0.65rem;
-  right: 10px;
-  z-index: 24;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.4rem 0.55rem;
-  border: 1px solid hsl(var(--ob-border));
-  border-radius: 999px;
-  background: hsl(var(--ob-background));
-  color: hsl(var(--ob-foreground));
-  cursor: pointer;
-  box-shadow: 0 2px 14px rgba(15, 23, 42, 0.1);
-  pointer-events: auto;
-  transition:
-    background 0.12s ease,
-    box-shadow 0.12s ease;
-}
-
-.beakblock-comment-rail__peek:hover {
-  background: hsl(var(--ob-muted) / 0.35);
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
-}
-
-.beakblock-comment-rail__peek-icon {
-  font-size: 0.9rem;
-  line-height: 1;
-}
-
-.beakblock-comment-rail__peek-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.3rem;
-  border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  background: hsl(221 83% 53% / 0.14);
-  color: hsl(221 83% 34%);
-}
-
-.beakblock-comment-rail {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 100%;
-  margin-left: 10px;
-  width: min(360px, calc(100vw - 32px));
-  max-width: 400px;
+/* Document column + fixed marker column (after the editable, including centered/max-width editors). */
+.beakblock-comment-shell__row {
   display: flex;
-  flex-direction: column;
-  border: 1px solid hsl(var(--ob-border));
-  border-radius: 0 14px 14px 0;
-  background: hsl(var(--ob-muted) / 0.2);
-  min-height: 0;
-  z-index: 25;
-  box-shadow: -6px 0 28px rgba(15, 23, 42, 0.07);
-  overflow: hidden;
-}
-
-.beakblock-comment-rail__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.55rem 0.7rem;
-  border-bottom: 1px solid hsl(var(--ob-border));
-  background: hsl(var(--ob-background));
-  flex-shrink: 0;
-}
-
-.beakblock-comment-rail__head-main {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
   min-width: 0;
 }
 
-.beakblock-comment-rail__collapse {
-  flex-shrink: 0;
-  border: 1px solid hsl(var(--ob-border));
-  border-radius: 999px;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: hsl(var(--ob-background));
-  color: hsl(var(--ob-muted-foreground));
-  cursor: pointer;
-}
-
-.beakblock-comment-rail__collapse:hover {
-  background: hsl(var(--ob-muted) / 0.4);
-  color: hsl(var(--ob-foreground));
-}
-
-.beakblock-comment-rail__title {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: hsl(var(--ob-muted-foreground));
-}
-
-.beakblock-comment-rail__count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.5rem;
-  height: 1.5rem;
-  padding: 0 0.35rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: hsl(221 83% 53% / 0.12);
-  color: hsl(221 83% 36%);
-}
-
-.beakblock-comment-rail__body {
-  display: flex;
+.beakblock-comment-shell__doc {
   flex: 1;
-  min-height: 0;
   min-width: 0;
 }
 
-.beakblock-comment-rail__track {
-  flex: 0 0 48px;
+.beakblock-comment-shell__marker-rail {
+  flex: 0 0 calc(var(--ob-content-padding, 1.125rem) + 44px);
   position: relative;
-  border-right: 1px solid hsl(var(--ob-border) / 0.65);
-  background: hsl(var(--ob-muted) / 0.12);
+  min-width: 0;
+  pointer-events: none;
+  z-index: 22;
 }
 
-.beakblock-comment-rail__bubble {
+.beakblock-comment-markers__track {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  pointer-events: auto;
+}
+
+.beakblock-comment-marker__bubble {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -2875,28 +2767,28 @@ th .ob-side-menu,
     transform 0.12s ease;
 }
 
-.beakblock-comment-rail__bubble:hover {
+.beakblock-comment-marker__bubble:hover {
   border-color: hsl(221 83% 53% / 0.55);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
 }
 
-.beakblock-comment-rail__bubble--active {
+.beakblock-comment-marker__bubble--active {
   border-color: hsl(221 83% 53%);
   box-shadow: 0 0 0 2px hsl(221 83% 53% / 0.15);
 }
 
-.beakblock-comment-rail__bubble--resolved {
+.beakblock-comment-marker__bubble--resolved {
   opacity: 0.72;
   border-color: hsl(142 71% 36% / 0.35);
   background: hsl(142 71% 45% / 0.08);
 }
 
-.beakblock-comment-rail__bubble-icon {
+.beakblock-comment-marker__bubble-icon {
   font-size: 0.85rem;
   line-height: 1;
 }
 
-.beakblock-comment-rail__bubble-n {
+.beakblock-comment-marker__bubble-n {
   font-size: 0.7rem;
   font-weight: 700;
   color: hsl(221 83% 38%);
@@ -2904,22 +2796,95 @@ th .ob-side-menu,
   text-align: center;
 }
 
-.beakblock-comment-rail__bubble--resolved .beakblock-comment-rail__bubble-n {
+.beakblock-comment-marker__bubble--resolved .beakblock-comment-marker__bubble-n {
   color: hsl(142 71% 30%);
 }
 
-.beakblock-comment-rail__detail {
-  flex: 1;
-  min-width: 0;
+/* Past the doc + marker rail; horizontal offset from measured shell width (see CommentRail layout). */
+.beakblock-comment-flyout {
+  position: absolute;
+  left: var(--beakblock-comment-flyout-left, calc(100% + 20px));
+  right: auto;
+  /* Top aligns with marker bubble top (bubble vertical center in --beakblock-comment-flyout-top; bubble height 2rem). */
+  top: max(0px, calc(var(--beakblock-comment-flyout-top, 1rem) - 1rem));
+  width: min(340px, calc(100vw - 32px));
+  max-height: min(480px, 72vh);
   overflow: auto;
-  padding: 0.55rem 0.65rem 0.75rem;
+  z-index: 26;
+  isolation: isolate;
+  border: 1px solid hsl(var(--ob-border));
+  border-radius: 14px;
+  background-color: hsl(var(--ob-background, 0 0% 100%));
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.14);
 }
 
-.beakblock-comment-rail__hint {
-  margin: 0.5rem 0 0;
-  font-size: 0.88rem;
-  line-height: 1.5;
+/* Elbow path (SVG): up from highlight top-right, then across above the text — see CommentRail layout. */
+.beakblock-comment-flyout-connector {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 24;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.beakblock-comment-flyout-connector__path {
+  fill: none;
+  stroke: hsl(221 83% 53% / 0.58);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.beakblock-comment-flyout__close {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  z-index: 1;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  line-height: 1;
   color: hsl(var(--ob-muted-foreground));
+  background: transparent;
+  cursor: pointer;
+}
+
+.beakblock-comment-flyout__close:hover {
+  background: hsl(var(--ob-muted) / 0.45);
+  color: hsl(var(--ob-foreground));
+}
+
+.beakblock-comment-flyout__inner {
+  padding: 0.55rem 2rem 0.65rem 0.65rem;
+  background-color: hsl(var(--ob-background, 0 0% 100%));
+}
+
+.beakblock-comment-flyout__inner .beakblock-comment-thread {
+  border: none;
+  border-radius: 0;
+  background-color: hsl(var(--ob-background, 0 0% 100%));
+  padding: 0;
+}
+
+.beakblock-comment-flyout__inner .beakblock-comment-modal__textarea {
+  border: 1px solid hsl(var(--ob-border));
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
+  background-color: hsl(var(--ob-background, 0 0% 100%));
+}
+
+.beakblock-comment-flyout__inner .beakblock-comment-modal__textarea::placeholder {
+  color: hsl(var(--ob-muted-foreground));
+  opacity: 0.85;
 }
 
 .beakblock-modal-overlay {
@@ -3402,6 +3367,14 @@ th .ob-side-menu,
   gap: 0.6rem;
 }
 
+.beakblock-comment-thread__comment:not(:first-child) {
+  margin-inline-start: 0.55rem;
+  padding: 0.55rem 0.65rem 0.55rem 0.95rem;
+  border-inline-start: 3px solid hsl(221 83% 53% / 0.42);
+  border-radius: 0 12px 12px 0;
+  background: hsl(var(--ob-muted) / 0.42);
+}
+
 .beakblock-comment-thread__comment-meta {
   display: flex;
   gap: 0.5rem;
@@ -3437,6 +3410,9 @@ th .ob-side-menu,
 .beakblock-comment-thread__reply {
   border-top: 1px solid hsl(var(--ob-border));
   padding-top: 0.75rem;
+  margin-inline-start: 0.5rem;
+  padding-inline-start: 0.85rem;
+  border-inline-start: 2px solid hsl(var(--ob-border));
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
