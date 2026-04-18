@@ -46,7 +46,7 @@ These steps assume the **public npm registry** (`https://registry.npmjs.org`). E
 
 ## Publish order (manual)
 
-Run from the **repository root**. Use `**--access public`** for scoped packages. `**--no-git-checks**` skips pnpm’s check that the working tree is clean—only use it if you intentionally publish from a state pnpm would otherwise reject (prefer a clean tagged tree).
+Run from the **repository root**. Use `**--access public`** for scoped packages. `**--no-git-checks`** skips pnpm’s check that the working tree is clean—only use it if you intentionally publish from a state pnpm would otherwise reject (prefer a clean tagged tree).
 
 ### 1. Core
 
