@@ -28,8 +28,8 @@ export default defineNuxtConfig({
   vite: {
     resolve: {
       alias: {
-        '@aurthurm/beakblock-core': resolve(__dirname, '../../packages/core/src'),
-        '@aurthurm/beakblock-vue': resolve(__dirname, '../../packages/vue/src'),
+        '@amusendame/beakblock-core': resolve(__dirname, '../../packages/core/src'),
+        '@amusendame/beakblock-vue': resolve(__dirname, '../../packages/vue/src'),
         // Vite 7 still analyzes `import("#app-manifest")` in nuxt’s manifest composable during
         // pre-transform; map it so import-analysis succeeds (Nuxt’s own alias runs too late).
         '#app-manifest': resolve(__dirname, 'stubs/app-manifest.mjs'),

@@ -1,5 +1,5 @@
 import { defineComponent, h, onBeforeUnmount, ref, Teleport, watch, type PropType } from 'vue';
-import { BeakBlockEditor, addColumnAtIndex, addRowAtIndex, deleteColumnAtIndex, deleteRowAtIndex } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor, addColumnAtIndex, addRowAtIndex, deleteColumnAtIndex, deleteRowAtIndex } from '@amusendame/beakblock-core';
 
 export interface TableHandlesProps {
   editor: BeakBlockEditor | null;

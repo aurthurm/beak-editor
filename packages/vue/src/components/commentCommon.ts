@@ -1,4 +1,4 @@
-import type { CommentThread } from '@aurthurm/beakblock-core';
+import type { CommentThread } from '@amusendame/beakblock-core';
 
 export const QUICK_REACTIONS = ['👍', '❤️', '😂', '🎉'];
 

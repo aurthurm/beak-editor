@@ -13,6 +13,7 @@ import type { Block } from '../blocks/types';
 import type { InputRulesConfig } from '../plugins/inputRules';
 import type { DocumentVersion, VersioningAdapter } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
+import type { ComplianceLockPluginOptions } from '../plugins/complianceLockPlugin';
 
 /**
  * Configuration for enabling real-time collaboration.
@@ -146,6 +147,13 @@ export interface EditorConfig {
    * Toggle at runtime with editor.enableTrackChanges() / editor.disableTrackChanges().
    */
   trackChanges?: TrackChangesConfig;
+
+  /**
+   * Compliance locks for blocks that declare `attrs.locked` (e.g. required headings).
+   * Set to `false` to disable. When enabled, optional `allowReorder` controls drag
+   * between locked sections; see {@link ComplianceLockPluginOptions}.
+   */
+  complianceLock?: false | ComplianceLockPluginOptions;
 
   /**
    * Configuration for input rules (markdown-style shortcuts).

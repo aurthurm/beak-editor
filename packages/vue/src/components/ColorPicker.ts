@@ -9,7 +9,7 @@ import {
   type CSSProperties,
   type PropType,
 } from 'vue';
-import { BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
 
 export interface ColorOption {
   value: string;

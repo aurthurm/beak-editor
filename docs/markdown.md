@@ -17,7 +17,7 @@ import {
   BeakBlockEditor,
   markdownToBlocks,
   blocksToMarkdown,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 // Load Markdown into the editor
 const blocks = markdownToBlocks(`# Title\n\nHello **world**.`);
@@ -46,7 +46,7 @@ const md = blocksToMarkdown(editor.getDocument());
 | `mdastToBlocks(root)` | Advanced: existing mdast `root` → `Block[]` (skip `remark` if you already parsed elsewhere). |
 | `createMarkdownPastePlugin({ schema, mode })` | Build the paste plugin yourself when not using `createPlugins` / `BeakBlockEditor` defaults. |
 
-Types are exported from `@aurthurm/beakblock-core` (`MarkdownParseOptions`, `MarkdownSerializeOptions`, `MarkdownPasteMode`, etc.).
+Types are exported from `@amusendame/beakblock-core` (`MarkdownParseOptions`, `MarkdownSerializeOptions`, `MarkdownPasteMode`, etc.).
 
 ---
 
@@ -185,7 +185,7 @@ Reuse or adapt that module in your app; fidelity is intentionally simple (headin
 [`packages/core/src/markdown/markdown.test.ts`](../packages/core/src/markdown/markdown.test.ts) covers parsing, export, and `looksLikeMarkdown`. Run from the core package:
 
 ```bash
-pnpm --filter @aurthurm/beakblock-core test
+pnpm --filter @amusendame/beakblock-core test
 ```
 
 ---

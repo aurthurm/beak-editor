@@ -1,9 +1,9 @@
 /**
  * App-level export helpers (Word via `docx`, PDF via print + Markdown HTML).
- * Not part of `@aurthurm/beakblock-core`.
+ * Not part of `@amusendame/beakblock-core`.
  */
 
-import { blocksToMarkdown, type Block, type InlineContent } from '@aurthurm/beakblock-core';
+import { blocksToMarkdown, type Block, type InlineContent } from '@amusendame/beakblock-core';
 import {
   Document,
   ExternalHyperlink,

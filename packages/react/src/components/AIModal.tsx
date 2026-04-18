@@ -6,7 +6,7 @@ import {
   type AIEntryMode,
   buildAIContext,
   type BeakBlockEditor,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; pending?: boolean };
 

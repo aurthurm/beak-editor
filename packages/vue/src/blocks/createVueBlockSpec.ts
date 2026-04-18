@@ -16,7 +16,7 @@ import {
   type NodeView,
   type NodeViewConstructor,
   type BeakBlockEditor,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 export interface PropSchema {
   [key: string]: {

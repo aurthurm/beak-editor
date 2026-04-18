@@ -23,6 +23,28 @@ import { phrasingToInlineContent } from './phrasing';
 
 const CALLOUT_RE = /^\[(info|warning|success|error|note)\]\s*(.*)$/i;
 
+function tryParseBeakblockLockComment(value: string): { lockReason?: string | null; lockId?: string | null } | null {
+  const trimmed = value.trim();
+  const m = trimmed.match(/<!--\s*beakblock-lock\s*([\s\S]*?)-->/i);
+  if (!m) return null;
+  const inner = (m[1] || '').trim();
+  if (!inner) return {};
+  let lockReason: string | null = null;
+  let lockId: string | null = null;
+  for (const part of inner.split(/\s+/)) {
+    const eq = part.indexOf('=');
+    if (eq <= 0) continue;
+    const key = part.slice(0, eq).toLowerCase();
+    let v = part.slice(eq + 1);
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+      v = v.slice(1, -1);
+    }
+    if (key === 'reason') lockReason = v;
+    if (key === 'lockid') lockId = v;
+  }
+  return { lockReason, lockId };
+}
+
 function newId(): string {
   return uuid();
 }
@@ -32,10 +54,36 @@ function newId(): string {
  */
 export function mdastToBlocks(root: Root): Block[] {
   const blocks: Block[] = [];
+  let pendingLock: { lockReason?: string | null; lockId?: string | null } | null = null;
+
   for (const child of root.children) {
     if (child.type === 'yaml') continue;
-    blocks.push(...flowToBlocks(child));
+
+    if (child.type === 'html') {
+      const parsed = tryParseBeakblockLockComment(child.value || '');
+      if (parsed) {
+        pendingLock = parsed;
+        continue;
+      }
+    }
+
+    const produced = flowToBlocks(child);
+    if (pendingLock) {
+      const head = produced[0];
+      if (head && head.type === 'heading') {
+        head.props = {
+          ...head.props,
+          locked: true,
+          ...(pendingLock.lockReason != null ? { lockReason: pendingLock.lockReason } : {}),
+          ...(pendingLock.lockId != null ? { lockId: pendingLock.lockId } : {}),
+        };
+      }
+      pendingLock = null;
+    }
+
+    blocks.push(...produced);
   }
+
   return blocks;
 }
 

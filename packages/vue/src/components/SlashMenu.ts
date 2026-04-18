@@ -22,7 +22,7 @@ import {
   type BeakBlockEditor,
   type SlashMenuItem,
   type SlashMenuState,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 export interface SlashMenuProps {
   editor: BeakBlockEditor | null;

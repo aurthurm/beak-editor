@@ -5,6 +5,18 @@ import { markdownToBlocks } from './parse';
 import { looksLikeMarkdown } from './heuristic';
 
 describe('markdownToBlocks', () => {
+  it('parses beakblock-lock HTML comment before a heading', () => {
+    const md = '<!-- beakblock-lock reason="policy" lockId="x" -->\n\n# Title\n\n';
+    const blocks = markdownToBlocks(md);
+    expect(blocks[0]?.type).toBe('heading');
+    expect(blocks[0]?.props).toMatchObject({
+      level: 1,
+      locked: true,
+      lockReason: 'policy',
+      lockId: 'x',
+    });
+  });
+
   it('parses headings and paragraphs', () => {
     const blocks = markdownToBlocks('# Title\n\nHello **world**.');
     expect(blocks[0]?.type).toBe('heading');
@@ -25,6 +37,23 @@ describe('markdownToBlocks', () => {
 });
 
 describe('blocksToMarkdown', () => {
+  it('emits lock comment before locked headings', () => {
+    const md = blocksToMarkdown([
+      {
+        id: 'h',
+        type: 'heading',
+        props: { level: 1, locked: true, lockReason: 'r1' },
+        content: [{ type: 'text', text: 'T', styles: {} }],
+      },
+    ]);
+    expect(md).toContain('<!-- beakblock-lock');
+    expect(md).toContain('beakblock-lock');
+    expect(md).toContain('# T');
+    const back = markdownToBlocks(md);
+    expect(back[0]?.props?.locked).toBe(true);
+    expect(back[0]?.props?.lockReason).toBe('r1');
+  });
+
   it('round-trips a simple document', () => {
     const md = '# Hi\n\n- a\n- b\n';
     const back = blocksToMarkdown(markdownToBlocks(md));

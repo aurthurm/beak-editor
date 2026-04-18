@@ -1,4 +1,4 @@
-import type { AIRequest } from '@aurthurm/beakblock-core';
+import type { AIRequest } from '@amusendame/beakblock-core';
 
 export type AICompletionEnv = {
   OPENAI_API_KEY?: string;

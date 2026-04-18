@@ -59,28 +59,30 @@ editor.pm.setNodeAttrs(pos, attrs)
 
 ## Installation
 
-BeakBlock packages are published under the `@aurthurm` scope.
-
-Add the GitHub Packages registry to your project `.npmrc`:
-
-```ini
-@aurthurm:registry=https://npm.pkg.github.com
-```
+BeakBlock packages are published under the `@amusendame` scope on the **public npm registry** (default for `npm` / `pnpm` / `yarn`).
 
 Install the packages you need:
 
 ```bash
-pnpm add @aurthurm/beakblock-core @aurthurm/beakblock-react @aurthurm/beakblock-vue
+pnpm add @amusendame/beakblock-core @amusendame/beakblock-react @amusendame/beakblock-vue
 ```
 
 If you only want a single binding layer, install just the package you need.
+
+**GitHub Packages:** Older or duplicate builds may be published to `https://npm.pkg.github.com`. To consume those, add to `.npmrc`:
+
+```ini
+@amusendame:registry=https://npm.pkg.github.com
+```
+
+and authenticate per [GitHub’s npm docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
 
 ## Quick Start
 
 ### React
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu, TableHandles } from '@aurthurm/beakblock-react';
+import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu, TableHandles } from '@amusendame/beakblock-react';
 
 function Editor() {
   const editor = useBeakBlock({
@@ -109,7 +111,7 @@ function Editor() {
 
 ```vue
 <script setup lang="ts">
-import { useBeakBlock, BeakBlockView } from '@aurthurm/beakblock-vue';
+import { useBeakBlock, BeakBlockView } from '@amusendame/beakblock-vue';
 
 const editor = useBeakBlock({
   initialContent: [
@@ -133,7 +135,7 @@ Wire **SlashMenu**, **BubbleMenu**, **AIModal**, and **CommentModal** the same w
 ### Vanilla JavaScript
 
 ```ts
-import { BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
 
 const editor = new BeakBlockEditor({
   initialContent: [],
@@ -159,7 +161,7 @@ The default slash item is a no-op at the ProseMirror layer on purpose; **React**
 
 ### Core helpers and presets
 
-From `@aurthurm/beakblock-core`:
+From `@amusendame/beakblock-core`:
 
 - **`buildAIContext(editor, mode, preset?, instruction?)`** — builds `AIContext` with document blocks, derived markdown, and selection metadata when the selection is non-empty.
 - **`BUBBLE_AI_PRESETS`** / **`SLASH_AI_PRESETS`** — opinionated starter prompts (titles, descriptions, and underlying instructions).
@@ -171,7 +173,7 @@ From `@aurthurm/beakblock-core`:
 
 ### `AIModal` (React and Vue)
 
-Use **`AIModal`** from `@aurthurm/beakblock-react` or `@aurthurm/beakblock-vue`. Typical props:
+Use **`AIModal`** from `@amusendame/beakblock-react` or `@amusendame/beakblock-vue`. Typical props:
 
 - **`open`**, **`onClose`** — visibility
 - **`editor`** — `BeakBlockEditor` instance
@@ -264,8 +266,8 @@ Custom blocks can register their own slash entries via **`createReactBlockSpec`*
 The workspace includes two BeakBlock Vue demos:
 
 ```bash
-pnpm --filter @aurthurm/beakblock-example-vite-vue dev
-pnpm --filter @aurthurm/beakblock-example-nuxt-vue dev
+pnpm --filter @amusendame/beakblock-example-vite-vue dev
+pnpm --filter @amusendame/beakblock-example-nuxt-vue dev
 ```
 
 The examples are intentionally dense and show:
@@ -359,15 +361,16 @@ See the full guide in [`docs/custom-blocks.md`](docs/custom-blocks.md).
 | [`docs/collaboration.md`](docs/collaboration.md) | Use collaborative editing with Y.js |
 | [`docs/versioning.md`](docs/versioning.md) | Snapshots, restore, and track changes |
 | [`docs/comments.md`](docs/comments.md) | Comment threads, stores, and Vue/React modals |
+| [`docs/compliance-lock.md`](docs/compliance-lock.md) | Read-only compliance blocks, `EditorConfig.complianceLock`, bypass meta, lock UI |
 | [`docs/compliance-demo.md`](docs/compliance-demo.md) | Nuxt example: approvals, audit trail, document release, export |
 
 ## Packages
 
 | Package | Description |
 | --- | --- |
-| [`@aurthurm/beakblock-core`](packages/core) | Framework-agnostic editor core |
-| [`@aurthurm/beakblock-react`](packages/react) | React bindings and components |
-| [`@aurthurm/beakblock-vue`](packages/vue) | Vue bindings and components |
+| [`@amusendame/beakblock-core`](packages/core) | Framework-agnostic editor core |
+| [`@amusendame/beakblock-react`](packages/react) | React bindings and components |
+| [`@amusendame/beakblock-vue`](packages/vue) | Vue bindings and components |
 
 ## Repository Layout
 
@@ -398,7 +401,7 @@ pnpm dev
 - CSS is auto-injected by default in the editor core.
 - The document model is block-based and serializable.
 - React and Vue bindings are thin wrappers over the same ProseMirror core.
-- The repository uses GitHub Packages for published artifacts.
+- Releases are published to **npm** (`@amusendame/*`); GitHub Releases may also publish copies to GitHub Packages.
 
 ## License
 

@@ -1,6 +1,6 @@
 {
-  "name": "@aurthurm/beakblock-example-vite-vue",
-  "version": "0.1.0",
+  "name": "@amusendame/beakblock-example-vite-vue",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@aurthurm/beakblock-core": "workspace:*",
-    "@aurthurm/beakblock-vue": "workspace:*",
+    "@amusendame/beakblock-core": "workspace:*",
+    "@amusendame/beakblock-vue": "workspace:*",
     "vue": "^3.5.26"
   },
   "devDependencies": {

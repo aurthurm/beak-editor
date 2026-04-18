@@ -8,6 +8,13 @@
 export { undo, redo } from 'prosemirror-history';
 
 export { createBlockIdPlugin, BLOCK_ID_PLUGIN_KEY } from './blockIdPlugin';
+export {
+  createComplianceLockPlugin,
+  COMPLIANCE_LOCK_BYPASS_META,
+  nodeIsComplianceLocked,
+  lockedBlockIdOrder,
+} from './complianceLockPlugin';
+export type { ComplianceLockPluginOptions } from './complianceLockPlugin';
 export { createPlugins } from './createPlugins';
 export type { CreatePluginsOptions } from './createPlugins';
 
@@ -54,6 +61,7 @@ export {
   BUBBLE_MENU_PLUGIN_KEY,
   hideBubbleMenu,
   isMarkActive,
+  selectionTouchesComplianceLocked,
 } from './bubbleMenuPlugin';
 export type { BubbleMenuConfig, BubbleMenuState, BlockTypeInfo, TextAlign } from './bubbleMenuPlugin';
 

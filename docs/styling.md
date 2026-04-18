@@ -21,7 +21,7 @@ This is the simplest option and requires no CSS imports.
 For more control, disable auto-injection and import the CSS file:
 
 ```typescript
-import '@aurthurm/beakblock-core/styles/editor.css';
+import '@amusendame/beakblock-core/styles/editor.css';
 
 const editor = new BeakBlockEditor({
   injectStyles: false,
@@ -414,6 +414,15 @@ module.exports = {
   },
 };
 ```
+
+## Compliance lock affordances
+
+When **[Compliance lock](./compliance-lock.md)** is enabled and headings use `props.locked`, default styles add:
+
+- A **padlock** at the **start** of locked headings (`h1`–`h6` with `data-beakblock-locked="true"`), implemented with a `::before` mask and `padding-inline-start`.
+- A **`.ob-block-lock-badge`** icon in the **block side menu** (`.ob-side-menu`) on hover, with tooltip text from `lockReason` when set.
+
+Override these selectors in your stylesheet if you replace or extend the default `editor.css` / injected bundle.
 
 ## Tips
 

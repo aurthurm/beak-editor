@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-04-18
+
+### Changed
+
+- **Workspace** — all publishable and example `package.json` versions set to **0.1.1** to match git tag `v0.1.1`.
+- **npm scope** — published packages use **`@amusendame/*`** instead of `@aurthurm/*` (install paths and imports updated across the workspace).
+
+### Added
+
+#### Core (`@amusendame/beakblock-core`)
+
+- **Compliance lock** — Optional **`EditorConfig.complianceLock`** with **`createComplianceLockPlugin`**: headings can set **`attrs.locked`** (plus optional **`lockReason`**, **`lockId`**). Blocks are read-only for normal edits; reordering vs other locked blocks is gated by **`allowReorder`**. Trusted code may set transaction meta **`COMPLIANCE_LOCK_BYPASS_META`** to apply changes. Integrates with drag-and-drop (handle visibility), bubble menu hiding, multi-block delete, and markdown/HTML round-trip via `data-beakblock-*` attributes.
+- **Lock UI** — Default CSS shows a **padlock** at the **start** of locked headings and a **`.ob-block-lock-badge`** in the **hover side menu** (tooltip from **`lockReason`** when present).
+
+#### Documentation
+
+- **[Compliance lock](docs/compliance-lock.md)** — Configuration, policy matrix, bypass, helpers, DOM/CSS hooks, and collaboration notes. Linked from [Plugins](docs/plugins.md), [Heading block](docs/blocks/heading.md), [Styling](docs/styling.md), [Compliance demo](docs/compliance-demo.md), and the root [README](README.md).
+
 ## [0.1.0] - 2026-04-18
 
 ### Changed
@@ -23,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-#### Core Editor (`@aurthurm/beakblock-core`)
+#### Core Editor (`@amusendame/beakblock-core`)
 - **Public ProseMirror API** - Full access to ProseMirror internals via `editor.pm.*`
 - **Block-based JSON document format** - Notion-like structure with full TypeScript support
 - **Schema System**
@@ -46,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **History Support** - Undo/redo via ProseMirror history
 - **CSS Auto-injection** - Automatic style injection with opt-out support
 
-#### React Package (`@aurthurm/beakblock-react`)
+#### React Package (`@amusendame/beakblock-react`)
 - **Hooks**
   - `useBeakBlock` - Create and manage editor instances
   - `useEditorContent` - Subscribe to document changes

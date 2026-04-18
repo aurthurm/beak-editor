@@ -10,6 +10,8 @@
 import { Plugin, PluginKey, EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
+import { nodeIsComplianceLocked } from './complianceLockPlugin';
+
 /**
  * Plugin key for accessing bubble menu state.
  */
@@ -105,6 +107,9 @@ function getBlockType(state: EditorState): BlockTypeInfo {
       // Extract relevant props based on block type
       if (type === 'heading') {
         props.level = node.attrs.level;
+        if (node.attrs.locked) {
+          props.locked = node.attrs.locked;
+        }
       }
 
       return { type, props };
@@ -182,6 +187,27 @@ function getActiveMarks(state: EditorState): BubbleMenuState['activeMarks'] {
 }
 
 /**
+ * True when the selection is inside (or covers) a compliance-locked block.
+ */
+export function selectionTouchesComplianceLocked(state: EditorState): boolean {
+  const { from, to, $from } = state.selection;
+  for (let d = $from.depth; d > 0; d--) {
+    if (nodeIsComplianceLocked($from.node(d))) {
+      return true;
+    }
+  }
+  let hit = false;
+  state.doc.nodesBetween(from, to, (node) => {
+    if (nodeIsComplianceLocked(node)) {
+      hit = true;
+      return false;
+    }
+    return true;
+  });
+  return hit;
+}
+
+/**
  * Check if selection should show bubble menu.
  */
 function shouldShowMenu(
@@ -191,6 +217,10 @@ function shouldShowMenu(
   const { selection } = state;
   const { empty, from, to } = selection;
   const { minSelectionLength = 1, showOnNodeSelection = false } = config;
+
+  if (selectionTouchesComplianceLocked(state)) {
+    return false;
+  }
 
   // Don't show on empty selection
   if (empty) return false;

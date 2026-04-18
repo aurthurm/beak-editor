@@ -15,20 +15,20 @@ Threads are **not** blocks in `getDocument()`. Persist threads separately (API, 
 
 ## Core exports
 
-From `@aurthurm/beakblock-core` (or `@beakblock/core` depending on publish name):
+From `@amusendame/beakblock-core` (or `@beakblock/core` depending on publish name):
 
 ```typescript
 import {
   createCommentPlugin,
   COMMENT_PLUGIN_KEY,
   InMemoryCommentStore,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 import type {
   CommentStore,
   CommentThread,
   CommentEntry,
   CommentStoreSnapshot,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 ```
 
 - **`CommentStore`** — Interface your app implements for production (or use `InMemoryCommentStore`).
@@ -42,8 +42,8 @@ Full method list: [`packages/core/src/comments/types.ts`](../packages/core/src/c
 Pass the plugin through **`prosemirror.plugins`** so it loads with the editor state:
 
 ```typescript
-import { BeakBlockEditor } from '@aurthurm/beakblock-core';
-import { createCommentPlugin, InMemoryCommentStore } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
+import { createCommentPlugin, InMemoryCommentStore } from '@amusendame/beakblock-core';
 
 const commentStore = new InMemoryCommentStore();
 
@@ -125,7 +125,7 @@ Vue **`CommentRail`** adds rail markers, flyouts, and connectors using classes s
 
 ## Vue: `CommentRail` and `CommentModal`
 
-Package: `@aurthurm/beakblock-vue`.
+Package: `@amusendame/beakblock-vue`.
 
 ### `CommentRail`
 
@@ -174,7 +174,7 @@ See [`examples/nuxt-vue/components/ComplianceSectionEditor.vue`](../examples/nux
 
 ## React: `CommentModal`
 
-Package: `@aurthurm/beakblock-react`.
+Package: `@amusendame/beakblock-react`.
 
 There is **no `CommentRail` in React** yet; use **`CommentModal`** with the same props pattern as Vue (`open`, `editor`, `store`, `currentUserId`, `title`, `subtitle`, `onClose`).
 

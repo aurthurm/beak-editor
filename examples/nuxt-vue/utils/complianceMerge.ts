@@ -1,4 +1,4 @@
-import type { Block } from '@aurthurm/beakblock-core';
+import type { Block } from '@amusendame/beakblock-core';
 
 function remapBlockTreeIds(blocks: Block[]): Block[] {
   const clone = JSON.parse(JSON.stringify(blocks)) as Block[];
@@ -12,7 +12,8 @@ function remapBlockTreeIds(blocks: Block[]): Block[] {
   return clone;
 }
 
-function collectBlockIds(blocks: Block[]): string[] {
+/** Collect every block id in a tree (for manifests / provenance). */
+export function collectBlockIds(blocks: Block[]): string[] {
   const ids: string[] = [];
   const walk = (list: Block[]) => {
     for (const b of list) {

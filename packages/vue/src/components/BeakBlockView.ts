@@ -8,7 +8,7 @@ import {
   type PropType,
   type CSSProperties,
 } from 'vue';
-import { BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
 
 export interface BeakBlockViewProps {
   editor: BeakBlockEditor | null;

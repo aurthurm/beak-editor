@@ -11,6 +11,8 @@ import { Plugin, PluginKey, EditorState } from 'prosemirror-state';
 import { EditorView, Decoration, DecorationSet } from 'prosemirror-view';
 import { Node as PMNode } from 'prosemirror-model';
 
+import { nodeIsComplianceLocked } from './complianceLockPlugin';
+
 /**
  * State for multi-block selection.
  */
@@ -326,7 +328,7 @@ function deleteSelectedBlocks(view: EditorView): void {
 
   for (const pos of positions) {
     const node = tr.doc.nodeAt(pos);
-    if (node) {
+    if (node && !nodeIsComplianceLocked(node)) {
       tr = tr.delete(pos, pos + node.nodeSize);
     }
   }

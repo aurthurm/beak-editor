@@ -29,7 +29,7 @@ import {
   codeBlockNodeView,
   embedNodeView,
   tableOfContentsNodeView,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 import type { ReactBlockSpec, PropSchema } from '../blocks';
 
 /**

@@ -202,8 +202,8 @@ See the [Collaboration guide](../../docs/collaboration.md) for full documentatio
 
 - Use a **`CommentStore`** (`InMemoryCommentStore` or your own) plus **`createCommentPlugin(store)`** in `EditorConfig.prosemirror.plugins`.
 - On every **`transaction`** with **`docChanged`**, call **`store.mapAnchors(transaction.mapping)`** so thread anchors stay aligned with the document.
-- Vue: **`CommentRail`**, **`CommentModal`**, and **`BubbleMenu`** `@comment` — see `@aurthurm/beakblock-vue`.
-- React: **`CommentModal`** and **`BubbleMenu`** — see `@aurthurm/beakblock-react`.
+- Vue: **`CommentRail`**, **`CommentModal`**, and **`BubbleMenu`** `@comment` — see `@amusendame/beakblock-vue`.
+- React: **`CommentModal`** and **`BubbleMenu`** — see `@amusendame/beakblock-react`.
 
 See [Comments](../../docs/comments.md) for the full API, anchoring rules, persistence notes, and troubleshooting.
 

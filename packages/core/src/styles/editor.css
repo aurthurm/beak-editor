@@ -191,6 +191,36 @@
   color: hsl(var(--ob-muted-foreground));
 }
 
+/* Compliance-locked headings: lock icon at start of block */
+.beakblock-editor h1[data-beakblock-locked='true'],
+.beakblock-editor h2[data-beakblock-locked='true'],
+.beakblock-editor h3[data-beakblock-locked='true'],
+.beakblock-editor h4[data-beakblock-locked='true'],
+.beakblock-editor h5[data-beakblock-locked='true'],
+.beakblock-editor h6[data-beakblock-locked='true'] {
+  padding-inline-start: 1.2em;
+}
+
+.beakblock-editor h1[data-beakblock-locked='true']::before,
+.beakblock-editor h2[data-beakblock-locked='true']::before,
+.beakblock-editor h3[data-beakblock-locked='true']::before,
+.beakblock-editor h4[data-beakblock-locked='true']::before,
+.beakblock-editor h5[data-beakblock-locked='true']::before,
+.beakblock-editor h6[data-beakblock-locked='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.06em;
+  width: 0.82em;
+  height: 0.82em;
+  opacity: 0.5;
+  background-color: hsl(var(--ob-muted-foreground));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M18 10h-1V6a5 5 0 0 0-10 0v4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-8 0V6a4 4 0 0 1 8 0v4H10z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M18 10h-1V6a5 5 0 0 0-10 0v4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-8 0V6a4 4 0 0 1 8 0v4H10z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
 /* ===========================================================================
  * Inline Formatting
  * =========================================================================== */
@@ -424,6 +454,22 @@
 .ob-side-menu--visible {
   opacity: 1;
   pointer-events: auto;
+}
+
+.ob-block-lock-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 24px;
+  flex-shrink: 0;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.ob-block-lock-badge svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* Add button (+) */

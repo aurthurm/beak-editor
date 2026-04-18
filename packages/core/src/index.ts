@@ -1,12 +1,12 @@
 /**
- * @aurthurm/beakblock-core
+ * @amusendame/beakblock-core
  *
  * A fully open-source, framework-agnostic rich text editor built on ProseMirror.
  * All APIs are PUBLIC - this is a core principle of BeakBlock.
  *
  * @example
  * ```typescript
- * import { BeakBlockEditor } from '@aurthurm/beakblock-core';
+ * import { BeakBlockEditor } from '@amusendame/beakblock-core';
  *
  * const editor = new BeakBlockEditor({
  *   element: document.getElementById('editor'),
@@ -36,6 +36,7 @@ export type {
   EventHandler,
   CollaborationConfig,
   TrackChangesConfig,
+  ComplianceLockPluginOptions,
 } from './editor';
 
 // ===========================================================================
@@ -202,6 +203,10 @@ export {
   createPlugins,
   createBlockIdPlugin,
   BLOCK_ID_PLUGIN_KEY,
+  createComplianceLockPlugin,
+  COMPLIANCE_LOCK_BYPASS_META,
+  nodeIsComplianceLocked,
+  lockedBlockIdOrder,
   buildTableOfContentsRefreshTransaction,
   collectHeadingTocItems,
   createTableOfContentsPlugin,
@@ -253,6 +258,7 @@ export {
   BUBBLE_MENU_PLUGIN_KEY,
   hideBubbleMenu,
   isMarkActive,
+  selectionTouchesComplianceLocked,
 } from './plugins';
 export type { BubbleMenuConfig, BubbleMenuState, BlockTypeInfo, TextAlign } from './plugins';
 

@@ -44,7 +44,10 @@ BeakBlock includes these plugins by default:
 | `slashMenuPlugin` | Slash command menu |
 | `bubbleMenuPlugin` | Formatting toolbar |
 | `dragDropPlugin` | Block drag and drop |
+| `complianceLockPlugin` | Read-only “compliance” blocks (`attrs.locked`); optional reorder policy; pairs with drag/bubble/multi-select behavior |
 | `tablePlugin` | Table functionality |
+
+For configuration, heading attributes, bypass meta, and UI (side-menu padlock, heading gutter icon), see **[Compliance lock](./compliance-lock.md)**.
 
 ### Disabling the History Plugin
 
@@ -412,7 +415,7 @@ const editor = new BeakBlockEditor({
 Extend the built-in plugin creator:
 
 ```typescript
-import { createPlugins } from '@aurthurm/beakblock-core';
+import { createPlugins } from '@amusendame/beakblock-core';
 
 const plugins = createPlugins({
   schema: mySchema,

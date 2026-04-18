@@ -1,8 +1,8 @@
 import { defineComponent, h, nextTick, type Ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { EditorView, TextSelection, type BeakBlockEditor, type Block } from '@aurthurm/beakblock-core';
-import { BeakBlockView, useBeakBlock } from '@aurthurm/beakblock-vue';
+import { EditorView, TextSelection, type BeakBlockEditor, type Block } from '@amusendame/beakblock-core';
+import { BeakBlockView, useBeakBlock } from '@amusendame/beakblock-vue';
 
 const bulletContent: Block[] = [
   {
@@ -62,7 +62,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('@aurthurm/beakblock-vue list enter behavior', () => {
+describe('@amusendame/beakblock-vue list enter behavior', () => {
   it.each([
     ['bullet list', bulletContent, 'bulletList'],
     ['ordered list', orderedContent, 'orderedList'],

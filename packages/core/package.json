@@ -1,6 +1,6 @@
 {
-  "name": "@aurthurm/beakblock-core",
-  "version": "0.1.0",
+  "name": "@amusendame/beakblock-core",
+  "version": "0.1.1",
   "description": "Framework-agnostic core for BeakBlock editor",
   "license": "Apache-2.0",
   "type": "module",
@@ -84,7 +84,8 @@
     "*.css"
   ],
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "repository": {
     "type": "git",

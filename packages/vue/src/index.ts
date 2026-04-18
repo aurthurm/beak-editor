@@ -1,5 +1,5 @@
 /**
- * @aurthurm/beakblock-vue
+ * @amusendame/beakblock-vue
  *
  * Vue bindings for BeakBlock editor.
  *
@@ -85,4 +85,4 @@ export type {
   HardBreakContent,
   InlineContent,
   SlashMenuItem,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';

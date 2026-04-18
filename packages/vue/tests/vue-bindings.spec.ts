@@ -1,8 +1,8 @@
 import { defineComponent, h, nextTick, ref, type Ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { BeakBlockView, createVueBlockSpec, useCustomSlashMenuItems, useEditorContent, useEditorFocus, useEditorSelection, useBeakBlock, useUpdateBlock } from '@aurthurm/beakblock-vue';
-import type { Block, BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BeakBlockView, createVueBlockSpec, useCustomSlashMenuItems, useEditorContent, useEditorFocus, useEditorSelection, useBeakBlock, useUpdateBlock } from '@amusendame/beakblock-vue';
+import type { Block, BeakBlockEditor } from '@amusendame/beakblock-core';
 
 const initialContent: Block[] = [
   {
@@ -13,7 +13,7 @@ const initialContent: Block[] = [
   },
 ];
 
-describe('@aurthurm/beakblock-vue', () => {
+describe('@amusendame/beakblock-vue', () => {
   it('mounts the editor view and exposes reactive editor state', async () => {
     let captured: {
       editor: Ref<BeakBlockEditor | null>;

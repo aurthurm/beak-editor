@@ -1,4 +1,4 @@
-import type { Block } from '@aurthurm/beakblock-core';
+import type { Block } from '@amusendame/beakblock-core';
 
 export type BlockDiffLine = { path: string; kind: 'changed' | 'added' | 'removed'; summary: string };
 

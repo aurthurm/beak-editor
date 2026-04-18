@@ -6,9 +6,9 @@ import {
   SLASH_AI_PRESETS,
   buildAIContext,
   getDefaultSlashMenuItems,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
-describe('@aurthurm/beakblock-ai + comments', () => {
+describe('@amusendame/beakblock-ai + comments', () => {
   it('supports comment thread lifecycle actions', () => {
     const store = new InMemoryCommentStore();
     const thread = store.createThread({

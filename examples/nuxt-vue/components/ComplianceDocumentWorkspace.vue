@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue';
-import type { Block, CommentThread } from '@aurthurm/beakblock-core';
+import type { Block, CommentThread } from '@amusendame/beakblock-core';
 import type { ComplianceSectionDefinition } from '~/data';
 import {
-  mergeComplianceSectionsWithManifest,
-  type ComplianceMergeManifest,
-} from '~/utils/complianceMerge';
+  buildComplianceFullDocumentBlocks,
+  buildMergeManifestFromFullDoc,
+  sliceComplianceFullDocument,
+} from '~/utils/complianceFullDocument';
+import type { ComplianceMergeManifest } from '~/utils/complianceMerge';
 import {
   validateComplianceSectionBlocks,
   type SectionValidationResult,
@@ -29,7 +31,8 @@ import {
   type DocumentReleaseRecord,
 } from '~/utils/complianceDocumentRelease';
 import { COMPLIANCE_DEMO_USER, COMPLIANCE_SECOND_APPROVER } from '~/utils/complianceIdentity';
-import ComplianceSectionEditor from './ComplianceSectionEditor.vue';
+import ComplianceFullDocumentEditor from './ComplianceFullDocumentEditor.vue';
+import ComplianceSectionApprovalPanel from './ComplianceSectionApprovalPanel.vue';
 
 const props = defineProps<{
   sections: ComplianceSectionDefinition[];
@@ -39,10 +42,13 @@ const props = defineProps<{
 
 const mergedBlocks = defineModel<Block[]>('mergedBlocks', { default: () => [] });
 
-type SectionInst = InstanceType<typeof ComplianceSectionEditor>;
-const sectionRefs = ref<Record<string, SectionInst | undefined>>({});
+const fullDocRef = ref<InstanceType<typeof ComplianceFullDocumentEditor> | null>(null);
 
 const previewWaiverReason = ref('');
+
+const DOC_TITLE = 'Gram stain — standard operating procedure (controlled)';
+
+const fullDocInitialBlocks = computed(() => buildComplianceFullDocumentBlocks(props.sections, DOC_TITLE));
 
 const approvals = ref<Record<string, SectionApprovalRecord>>({});
 const requireApprovalToPublish = ref(false);
@@ -52,29 +58,12 @@ const documentReleaseNote = ref('');
 
 const lastManifest = ref<ComplianceMergeManifest | null>(null);
 
-function setSectionRef(id: string, el: unknown) {
-  if (el && typeof el === 'object' && 'editor' in el) {
-    sectionRefs.value[id] = el as SectionInst;
-  } else {
-    delete sectionRefs.value[id];
-  }
-}
-
 function getMergedDocument(): Block[] {
-  const sources = props.sections.map((def) => {
-    const inst = sectionRefs.value[def.id];
-    const doc = inst?.editor?.getDocument();
-    return {
-      sectionId: def.id,
-      title: def.title,
-      blocks: doc && doc.length ? doc : def.initialBlocks,
-    };
-  });
-  const { blocks, manifest } = mergeComplianceSectionsWithManifest(sources, {
-    documentTitle: 'Gram stain — standard operating procedure (preview)',
-    sectionHeadingLevel: 2,
-  });
-  lastManifest.value = manifest;
+  const inst = fullDocRef.value;
+  const ed = inst?.editor;
+  const live = ed && !ed.isDestroyed ? ed.getDocument() : [];
+  const blocks = live.length > 0 ? live : fullDocInitialBlocks.value;
+  lastManifest.value = buildMergeManifestFromFullDoc(blocks, props.sections, 'Gram stain — standard operating procedure (preview)');
   return blocks;
 }
 
@@ -91,21 +80,25 @@ const validationOptions = {
 };
 
 const sectionValidations = computed((): SectionValidationResult[] => {
-  return props.sections.map((def) => {
-    const inst = sectionRefs.value[def.id];
-    const doc = inst?.editor?.getDocument();
-    const blocks = doc && doc.length ? doc : def.initialBlocks;
+  const inst = fullDocRef.value;
+  const ed = inst?.editor;
+  const doc = ed && !ed.isDestroyed ? ed.getDocument() : fullDocInitialBlocks.value;
+  const sliced = sliceComplianceFullDocument(doc, props.sections);
+  const globalPending = inst?.getPendingTrackGroupCount?.() ?? 0;
+  return props.sections.map((def, idx) => {
+    const blocks = sliced[idx]?.blocks ?? [];
     const { ok: contentOk, issues: contentIssues } = validateComplianceSectionBlocks(
       def.required,
       blocks,
       validationOptions
     );
-    const ur = inst?.getUnresolvedCount?.() ?? 0;
-    const pt = inst?.getPendingTrackGroupCount?.() ?? 0;
+    const ur = inst?.countUnresolvedInSection?.(def.id) ?? 0;
     const issues = [...contentIssues];
-    if (ur > 0) issues.push(`${ur} unresolved comment thread(s).`);
-    if (pt > 0) issues.push(`${pt} pending track change group(s).`);
-    const ok = contentOk && ur === 0 && pt === 0;
+    if (ur > 0) issues.push(`${ur} unresolved comment thread(s) in this section.`);
+    if (globalPending > 0 && idx === 0) {
+      issues.push(`${globalPending} pending track change group(s) in the document.`);
+    }
+    const ok = contentOk && ur === 0 && globalPending === 0;
     return {
       sectionId: def.id,
       title: def.title,
@@ -113,7 +106,7 @@ const sectionValidations = computed((): SectionValidationResult[] => {
       ok,
       issues,
       unresolvedComments: ur,
-      pendingTrackGroups: pt,
+      pendingTrackGroups: globalPending,
     };
   });
 });
@@ -215,11 +208,13 @@ function revokeDocumentRelease() {
 async function exportComplianceBundle() {
   const blocks = getMergedDocument();
   const manifest = lastManifest.value;
+  const commentsSnapshot = fullDocRef.value?.getCommentSnapshot?.() ?? [];
   const commentsBySection: Record<string, CommentThread[]> = {};
   const sectionTitles: Record<string, string> = {};
   for (const def of props.sections) {
-    const inst = sectionRefs.value[def.id];
-    commentsBySection[def.id] = inst?.getCommentSnapshot?.() ?? [];
+    commentsBySection[def.id] = commentsSnapshot.filter(
+      (t) => String(t.metadata?.complianceSectionId ?? '') === def.id
+    );
     sectionTitles[def.id] = def.title;
   }
   await downloadComplianceExports({
@@ -261,7 +256,7 @@ defineExpose({
   <div class="compliance-workspace">
     <div class="compliance-workspace__banner" role="note">
       <strong>Controlled authoring mode.</strong>
-      Live multi-user collaboration (Yjs) is not used here — each section is a single editor instance. Use
+      The Gram stain SOP is one continuous document: numbered <strong>section headings are locked</strong> (not editable or reorderable); body content under each heading is editable. Live multi-user collaboration (Yjs) is not used here. Use
       <strong>Reviewer view</strong>
       in the toolbar for read-only review with comments.
     </div>
@@ -284,8 +279,10 @@ defineExpose({
           <span v-if="row.unresolvedComments > 0" class="compliance-workspace__status-comments"
             >{{ row.unresolvedComments }} open comments</span
           >
-          <span v-if="row.pendingTrackGroups > 0" class="compliance-workspace__status-tracks"
-            >{{ row.pendingTrackGroups }} track group(s)</span
+          <span
+            v-if="row.pendingTrackGroups > 0 && row.sectionId === sections[0]?.id"
+            class="compliance-workspace__status-tracks"
+            >{{ row.pendingTrackGroups }} document track group(s)</span
           >
           <span
             class="compliance-workspace__status-approval"
@@ -403,27 +400,39 @@ defineExpose({
     </div>
 
     <p class="compliance-workspace__lede">
-      This sample is a <strong>Gram stain</strong> standard operating procedure. Each block below is a controlled section; authors
-      edit only inside that field. Figures must use allowlisted hosts with caption and alt text. Authors
-      <strong>submit for review</strong>; reviewers <strong>sign off</strong> (optional gate above). Use
+      This sample is a <strong>Gram stain</strong> standard operating procedure in a <strong>single full editor</strong> with slash menu, bubble menu, tables, media, comments, versions, and track changes. Section titles are fixed; authors edit body content under each heading. Figures must use allowlisted hosts with caption and alt text. Use the
+      <strong>per-section approval cards</strong> below the editor to submit and sign off. Use
       <strong>Preview document</strong>
-      to merge sections; use <strong>Export bundle</strong> for JSON, Markdown, HTML, checksum, section approvals (with history), and document release.
+      to open the merged readout; use <strong>Export bundle</strong> for JSON, Markdown, HTML, checksum, section approvals (with history), and document release.
     </p>
-    <div class="compliance-workspace__sections">
-      <ComplianceSectionEditor
-        v-for="def in sections"
-        :key="def.id"
-        :ref="(el) => setSectionRef(def.id, el)"
-        :section-id="def.id"
-        :section-title="def.title"
-        :required="def.required"
-        :initial-blocks="def.initialBlocks"
-        :reviewer-only="reviewerOnly"
-        :ai-governance-mode="aiGovernanceMode ?? 'governed'"
-        :approval="approvals[def.id] ?? draftApprovalRecord(def.id)"
-        @update="refreshMerged"
-        @update:approval="onApprovalUpdate"
-      />
+
+    <ComplianceFullDocumentEditor
+      ref="fullDocRef"
+      :sections="sections"
+      :initial-blocks="fullDocInitialBlocks"
+      :reviewer-only="reviewerOnly"
+      :ai-governance-mode="aiGovernanceMode ?? 'governed'"
+      @update="refreshMerged"
+    />
+
+    <div class="compliance-workspace__approval-grid">
+      <h2 class="compliance-workspace__approval-grid-title">Section approvals</h2>
+      <p class="compliance-workspace__approval-grid-lede">
+        Validation uses the content under each numbered heading. Comment threads are attributed to a section when you start them with the cursor in that section.
+      </p>
+      <div class="compliance-workspace__approval-grid-list">
+        <ComplianceSectionApprovalPanel
+          v-for="def in sections"
+          :key="def.id"
+          :section-id="def.id"
+          :section-title="def.title"
+          :required="def.required"
+          :reviewer-only="reviewerOnly"
+          :approval="approvals[def.id] ?? draftApprovalRecord(def.id)"
+          :section-ready="sectionValidations.find((r) => r.sectionId === def.id)?.ok ?? false"
+          @update:approval="onApprovalUpdate"
+        />
+      </div>
     </div>
   </div>
 </template>

@@ -6,7 +6,7 @@
  *
  * @example
  * ```tsx
- * import { createReactBlockSpec } from '@aurthurm/beakblock-react';
+ * import { createReactBlockSpec } from '@amusendame/beakblock-react';
  *
  * const MyCustomBlock = createReactBlockSpec({
  *   type: 'myBlock',
@@ -35,7 +35,7 @@ import {
   type NodeViewConstructor,
   Node as PMNode,
   EditorView,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 /**
  * Property schema definition for a block

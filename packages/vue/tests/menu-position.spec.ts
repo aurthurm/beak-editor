@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, defineComponent, h } from 'vue';
-import { BubbleMenu, ColorPicker, MediaMenu, SlashMenu, TableHandles, TableMenu } from '@aurthurm/beakblock-vue';
-import * as core from '@aurthurm/beakblock-core';
-import { BUBBLE_MENU_PLUGIN_KEY, MEDIA_MENU_PLUGIN_KEY, SLASH_MENU_PLUGIN_KEY, type BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BubbleMenu, ColorPicker, MediaMenu, SlashMenu, TableHandles, TableMenu } from '@amusendame/beakblock-vue';
+import * as core from '@amusendame/beakblock-core';
+import { BUBBLE_MENU_PLUGIN_KEY, MEDIA_MENU_PLUGIN_KEY, SLASH_MENU_PLUGIN_KEY, type BeakBlockEditor } from '@amusendame/beakblock-core';
 
 type StubEditor = Pick<BeakBlockEditor, 'on' | 'isDestroyed' | 'pm'> & {
   insertEmoji: (emoji: string) => void;

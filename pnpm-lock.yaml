@@ -26,10 +26,10 @@ importers:
 
   examples/basic:
     dependencies:
-      '@aurthurm/beakblock-core':
+      '@amusendame/beakblock-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@aurthurm/beakblock-react':
+      '@amusendame/beakblock-react':
         specifier: workspace:*
         version: link:../../packages/react
       docx:
@@ -66,10 +66,10 @@ importers:
       '@ai-sdk/openai':
         specifier: ^3.0.50
         version: 3.0.50(zod@4.3.6)
-      '@aurthurm/beakblock-core':
+      '@amusendame/beakblock-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@aurthurm/beakblock-vue':
+      '@amusendame/beakblock-vue':
         specifier: workspace:*
         version: link:../../packages/vue
       ai:
@@ -103,10 +103,10 @@ importers:
 
   examples/vite-vue:
     dependencies:
-      '@aurthurm/beakblock-core':
+      '@amusendame/beakblock-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@aurthurm/beakblock-vue':
+      '@amusendame/beakblock-vue':
         specifier: workspace:*
         version: link:../../packages/vue
       vue:
@@ -213,7 +213,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@aurthurm/beakblock-core':
+      '@amusendame/beakblock-core':
         specifier: workspace:*
         version: link:../core
       react:
@@ -241,7 +241,7 @@ importers:
 
   packages/vue:
     dependencies:
-      '@aurthurm/beakblock-core':
+      '@amusendame/beakblock-core':
         specifier: workspace:*
         version: link:../core
       '@emoji-mart/data':

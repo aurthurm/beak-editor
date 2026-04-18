@@ -38,7 +38,7 @@ There is **one** `embed` node type for every supported provider (YouTube, Vimeo,
 
 ## URLs and parsing
 
-Use **`parseEmbedUrl(url)`** from `@aurthurm/beakblock-core` / `@beakblock/core` to derive `provider` and `embedId` from a user URL.
+Use **`parseEmbedUrl(url)`** from `@amusendame/beakblock-core` / `@beakblock/core` to derive `provider` and `embedId` from a user URL.
 
 When the **editor** updates an embed URL (slash placeholder, **MediaMenu**, or the block’s **options menu**), it uses **`normalizeEmbedAttrsFromUrl(url)`**, which returns `{ url, provider, embedId }` so the iframe `src` stays in sync. **`getEmbedIframeSrc(provider, embedId, url)`** is the resolved iframe URL used for rendering.
 

@@ -25,8 +25,8 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm --filter @aurthurm/beakblock-core build && pnpm --filter @aurthurm/beakblock-react build
-      - run: pnpm --filter @aurthurm/beakblock-example-basic build
+      - run: pnpm --filter @amusendame/beakblock-core build && pnpm --filter @amusendame/beakblock-react build
+      - run: pnpm --filter @amusendame/beakblock-example-basic build
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:

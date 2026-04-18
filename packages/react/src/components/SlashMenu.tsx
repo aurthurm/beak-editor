@@ -106,10 +106,10 @@ import {
   filterSlashMenuItems,
   executeSlashCommand,
   closeSlashMenu,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 // Re-export SlashMenuItem for convenience
-export type { SlashMenuItem } from '@aurthurm/beakblock-core';
+export type { SlashMenuItem } from '@amusendame/beakblock-core';
 
 /**
  * Props for SlashMenu component.

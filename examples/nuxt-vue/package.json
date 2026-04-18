@@ -1,6 +1,6 @@
 {
-  "name": "@aurthurm/beakblock-example-nuxt-vue",
-  "version": "0.1.0",
+  "name": "@amusendame/beakblock-example-nuxt-vue",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.50",
-    "@aurthurm/beakblock-core": "workspace:*",
-    "@aurthurm/beakblock-vue": "workspace:*",
+    "@amusendame/beakblock-core": "workspace:*",
+    "@amusendame/beakblock-vue": "workspace:*",
     "ai": "^6.0.146",
     "dotenv": "^17.4.0",
     "nuxt": "^3.16.0",

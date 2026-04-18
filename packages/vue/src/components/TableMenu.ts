@@ -12,7 +12,7 @@ import {
   deleteTable,
   getTableInfo,
   isInTable,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 export interface TableMenuProps {
   editor: BeakBlockEditor | null;

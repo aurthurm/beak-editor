@@ -38,4 +38,4 @@ Vue and React `useBeakBlock` merge **`tableOfContentsNodeView`** with your custo
 ## Related
 
 - [Heading](./heading.md)
-- Plugin: `createTableOfContentsPlugin` in `@aurthurm/beakblock-core`
+- Plugin: `createTableOfContentsPlugin` in `@amusendame/beakblock-core`

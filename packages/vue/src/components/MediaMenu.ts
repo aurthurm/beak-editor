@@ -8,7 +8,7 @@ import {
   normalizeEmbedAttrsFromUrl,
   updateMediaAttrs,
   type BeakBlockEditor,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 export interface MediaMenuProps {
   editor: BeakBlockEditor | null;

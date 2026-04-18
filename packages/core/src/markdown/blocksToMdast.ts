@@ -101,6 +101,20 @@ function blockToMdast(block: Block): RootContent[] {
         depth: level,
         children: inlineToPhrasing(block.content),
       };
+      if (block.props?.locked) {
+        const parts: string[] = ['<!-- beakblock-lock'];
+        const reason = block.props.lockReason;
+        const lockId = block.props.lockId;
+        if (reason != null && String(reason) !== '') {
+          parts.push(` reason=${JSON.stringify(String(reason))}`);
+        }
+        if (lockId != null && String(lockId) !== '') {
+          parts.push(` lockId=${JSON.stringify(String(lockId))}`);
+        }
+        parts.push(' -->');
+        const comment: RootContent = { type: 'html', value: parts.join('') };
+        return [comment, h];
+      }
       return [h];
     }
     case 'paragraph': {

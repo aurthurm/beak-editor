@@ -1,6 +1,6 @@
 {
-  "name": "@aurthurm/beakblock-react",
-  "version": "0.1.0",
+  "name": "@amusendame/beakblock-react",
+  "version": "0.1.1",
   "description": "React bindings for BeakBlock editor",
   "license": "Apache-2.0",
   "type": "module",
@@ -35,7 +35,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@aurthurm/beakblock-core": "workspace:*"
+    "@amusendame/beakblock-core": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
@@ -50,7 +50,8 @@
   },
   "sideEffects": false,
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "repository": {
     "type": "git",

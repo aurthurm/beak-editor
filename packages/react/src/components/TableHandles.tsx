@@ -29,7 +29,7 @@ import {
   addColumnAtIndex,
   deleteRowAtIndex,
   deleteColumnAtIndex,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 /**
  * Props for TableHandles component.

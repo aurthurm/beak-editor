@@ -13,6 +13,26 @@ import { blocksToDoc, docToBlocks } from './index';
 const schema = createSchema();
 
 describe('docToBlocks / blocksToDoc round-trip', () => {
+  it('preserves compliance lock attrs on headings', () => {
+    const blocks: Block[] = [
+      {
+        id: 'h-1',
+        type: 'heading',
+        props: { level: 2, locked: true, lockReason: 'policy', lockId: 'sec-1', textAlign: 'left' },
+        content: [{ type: 'text', text: 'Required', styles: {} }],
+      },
+      {
+        id: 'p-1',
+        type: 'paragraph',
+        props: { textAlign: 'left' },
+        content: [{ type: 'text', text: 'Body', styles: {} }],
+      },
+    ];
+
+    const doc = blocksToDoc(schema, blocks);
+    expect(docToBlocks(doc)).toEqual(blocks);
+  });
+
   it('preserves columnList gap and nested columns with blocks', () => {
     const blocks: Block[] = [
       {

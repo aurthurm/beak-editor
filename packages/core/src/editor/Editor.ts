@@ -170,6 +170,7 @@ export class BeakBlockEditor {
       toggleMark: (name) => this.pm.toggleMark(name),
       inputRules: this._config.inputRules,
       markdownPaste: this._config.markdownPaste,
+      complianceLock: this._config.complianceLock,
       history: false, // We manage history ourselves
       additionalPlugins: [...this._coreManagedPlugins(), ...(this._config.prosemirror?.plugins ?? [])],
     });

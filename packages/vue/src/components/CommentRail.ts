@@ -10,7 +10,7 @@ import {
   watch,
   type PropType,
 } from 'vue';
-import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@aurthurm/beakblock-core';
+import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@amusendame/beakblock-core';
 
 import { formatCommentDate, QUICK_REACTIONS, threadAuditMetaLine, threadRangeLabel } from './commentCommon';
 

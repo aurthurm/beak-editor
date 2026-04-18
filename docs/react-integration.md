@@ -5,7 +5,7 @@ Complete guide for using BeakBlock with React.
 ## Installation
 
 ```bash
-npm install @aurthurm/beakblock-core @aurthurm/beakblock-react
+npm install @amusendame/beakblock-core @amusendame/beakblock-react
 ```
 
 ## Basic Setup
@@ -17,7 +17,7 @@ import {
   SlashMenu,
   BubbleMenu,
   TableHandles,
-} from '@aurthurm/beakblock-react';
+} from '@amusendame/beakblock-react';
 
 function Editor() {
   const editor = useBeakBlock({
@@ -91,7 +91,7 @@ const editor = useBeakBlock({
 Subscribes to document changes and returns the current content.
 
 ```tsx
-import { useEditorContent } from '@aurthurm/beakblock-react';
+import { useEditorContent } from '@amusendame/beakblock-react';
 
 function Editor() {
   const editor = useBeakBlock({ /* ... */ });
@@ -111,7 +111,7 @@ function Editor() {
 Subscribes to selection changes and returns selected blocks.
 
 ```tsx
-import { useEditorSelection } from '@aurthurm/beakblock-react';
+import { useEditorSelection } from '@amusendame/beakblock-react';
 
 function Editor() {
   const editor = useBeakBlock({ /* ... */ });
@@ -387,7 +387,7 @@ export default function Editor(props) {
 
 ```tsx
 // components/EditorInner.tsx
-import { useBeakBlock, BeakBlockView } from '@aurthurm/beakblock-react';
+import { useBeakBlock, BeakBlockView } from '@amusendame/beakblock-react';
 
 export default function EditorInner({ initialContent }) {
   const editor = useBeakBlock({ initialContent });
@@ -405,7 +405,7 @@ export default function EditorInner({ initialContent }) {
 The BubbleMenu supports extensive customization for adding, reordering, or hiding items.
 
 ```tsx
-import { BubbleMenu, BubbleMenuItem, BUBBLE_MENU_ITEMS } from '@aurthurm/beakblock-react';
+import { BubbleMenu, BubbleMenuItem, BUBBLE_MENU_ITEMS } from '@amusendame/beakblock-react';
 
 // Create a custom button
 const translateButton: BubbleMenuItem = {
@@ -448,7 +448,7 @@ const translateButton: BubbleMenuItem = {
 The SlashMenu supports similar customization patterns.
 
 ```tsx
-import { SlashMenu, SlashMenuItem } from '@aurthurm/beakblock-react';
+import { SlashMenu, SlashMenuItem } from '@amusendame/beakblock-react';
 
 const customItems: SlashMenuItem[] = [
   {
@@ -482,7 +482,7 @@ const customItems: SlashMenuItem[] = [
 Customize the color palettes for text and background colors.
 
 ```tsx
-import { ColorPicker, ColorOption, DEFAULT_TEXT_COLORS } from '@aurthurm/beakblock-react';
+import { ColorPicker, ColorOption, DEFAULT_TEXT_COLORS } from '@amusendame/beakblock-react';
 
 const brandTextColors: ColorOption[] = [
   { value: '', label: 'Default' },
@@ -513,7 +513,7 @@ const brandBackgroundColors: ColorOption[] = [
 All components and hooks are fully typed:
 
 ```tsx
-import type { Block, BeakBlockEditor } from '@aurthurm/beakblock-core';
+import type { Block, BeakBlockEditor } from '@amusendame/beakblock-core';
 
 interface EditorProps {
   initialContent: Block[];

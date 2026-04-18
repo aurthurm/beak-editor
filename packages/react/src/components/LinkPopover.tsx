@@ -16,7 +16,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
 
 /**
  * Props for LinkPopover component.

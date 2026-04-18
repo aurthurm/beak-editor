@@ -7,9 +7,9 @@ import {
   DEFAULT_CHART_OPTIONS,
   DEFAULT_BORDER_COLORS,
   DEFAULT_CHART_COLORS,
-} from '@aurthurm/beakblock-vue';
+} from '@amusendame/beakblock-vue';
 
-describe('@aurthurm/beakblock-vue chart block', () => {
+describe('@amusendame/beakblock-vue chart block', () => {
   it('exposes the default canvas min-height constant aligned with editor styles', () => {
     expect(DEFAULT_CHART_CANVAS_MIN_HEIGHT_PX).toBe(240);
   });

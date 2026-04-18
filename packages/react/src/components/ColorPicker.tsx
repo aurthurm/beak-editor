@@ -47,7 +47,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import { BeakBlockEditor } from '@aurthurm/beakblock-core';
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
 
 // ============================================================================
 // Types

@@ -9,9 +9,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@aurthurm/beakblock-core': resolve(__dirname, '../core/src'),
-      '@aurthurm/beakblock-core/styles/editor.css': resolve(__dirname, '../core/src/styles/editor.css'),
-      '@aurthurm/beakblock-vue': resolve(__dirname, './src'),
+      '@amusendame/beakblock-core': resolve(__dirname, '../core/src'),
+      '@amusendame/beakblock-core/styles/editor.css': resolve(__dirname, '../core/src/styles/editor.css'),
+      '@amusendame/beakblock-vue': resolve(__dirname, './src'),
     },
   },
 });

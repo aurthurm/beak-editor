@@ -10,7 +10,7 @@ Implement `VersioningAdapter` to persist versions (HTTP API, IndexedDB, etc.). F
 import {
   BeakBlockEditor,
   InMemoryVersioningAdapter,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 const adapter = new InMemoryVersioningAdapter();
 
@@ -59,8 +59,8 @@ The Nuxt compliance workspace shows one way to combine track changes with **gove
 
 ## Framework helpers
 
-- Vue: `useDocumentVersions(editor, adapter)` from `@aurthurm/beakblock-vue`.
-- React: `useDocumentVersions(editor, adapter)` from `@aurthurm/beakblock-react`.
+- Vue: `useDocumentVersions(editor, adapter)` from `@amusendame/beakblock-vue`.
+- React: `useDocumentVersions(editor, adapter)` from `@amusendame/beakblock-react`.
 
 Pass the **same** adapter instance you use in `EditorConfig.versioning.adapter`.
 

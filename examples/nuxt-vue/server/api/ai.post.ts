@@ -1,6 +1,6 @@
 import { generateText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
-import type { AIRequest } from '@aurthurm/beakblock-core';
+import type { AIRequest } from '@amusendame/beakblock-core';
 import { buildAIMessages } from '../../../shared/ai';
 
 function openAiBaseUrl(url: string): string {

@@ -22,7 +22,7 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@aurthurm'
+          scope: '@amusendame'
 
       - name: Extract version from tag
         id: version
@@ -42,21 +42,21 @@ jobs:
           # Update react package version
           npm pkg set version="$VERSION"
           # Update dependency on core to use exact version
-          npm pkg set dependencies.@aurthurm/beakblock-core="$VERSION"
+          npm pkg set dependencies.@amusendame/beakblock-core="$VERSION"
 
       - run: pnpm install --no-frozen-lockfile
 
       - name: Build packages
         run: |
-          pnpm --filter @aurthurm/beakblock-core build
-          pnpm --filter @aurthurm/beakblock-react build
+          pnpm --filter @amusendame/beakblock-core build
+          pnpm --filter @amusendame/beakblock-react build
 
-      - name: Publish @aurthurm/beakblock-core
-        run: pnpm --filter @aurthurm/beakblock-core publish --access public --no-git-checks
+      - name: Publish @amusendame/beakblock-core
+        run: pnpm --filter @amusendame/beakblock-core publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish @aurthurm/beakblock-react
-        run: pnpm --filter @aurthurm/beakblock-react publish --access public --no-git-checks
+      - name: Publish @amusendame/beakblock-react
+        run: pnpm --filter @amusendame/beakblock-react publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -26,6 +26,7 @@ import { createLinkClickPlugin } from './linkClickPlugin';
 import { createMediaMenuPlugin } from './mediaMenuPlugin';
 import { createTableOfContentsPlugin } from './tableOfContentsPlugin';
 import { createMarkdownPastePlugin, type MarkdownPasteMode } from './markdownPastePlugin';
+import { createComplianceLockPlugin, type ComplianceLockPluginOptions } from './complianceLockPlugin';
 
 /**
  * Options for creating plugins.
@@ -124,6 +125,12 @@ export interface CreatePluginsOptions {
    * @default 'heuristic' (parse when text looks like Markdown)
    */
   markdownPaste?: MarkdownPasteMode;
+
+  /**
+   * Enforce read-only compliance locks on nodes with `attrs.locked` (e.g. headings).
+   * @default false (disabled)
+   */
+  complianceLock?: false | ComplianceLockPluginOptions;
 }
 
 /**
@@ -171,8 +178,18 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
     mediaMenu,
     additionalPlugins = [],
     markdownPaste,
+    complianceLock,
   } = options;
   const includeHistory = options.history !== false;
+
+  const complianceLockPlugin =
+    complianceLock !== false && complianceLock !== undefined
+      ? createComplianceLockPlugin(typeof complianceLock === 'object' ? complianceLock : {})
+      : null;
+  const complianceLockOpts =
+    complianceLock !== false && complianceLock !== undefined && typeof complianceLock === 'object'
+      ? complianceLock
+      : null;
 
   // Create slash menu plugin early so we can add it before baseKeymap
   const slashMenuPlugin = slashMenu !== false
@@ -182,6 +199,9 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
   const plugins: Plugin[] = [
     // History for undo/redo (can be disabled for y.js collaboration)
     ...(includeHistory ? [history()] : []),
+
+    // Reject edits that violate compliance-locked blocks (must run with other filters)
+    ...(complianceLockPlugin ? [complianceLockPlugin] : []),
 
     // Slash menu plugin must come before baseKeymap to handle Enter when menu is active
     ...(slashMenuPlugin ? [slashMenuPlugin] : []),
@@ -247,7 +267,10 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
 
   // Add drag & drop plugin
   if (dragDrop !== false) {
-    const dragDropConfig = typeof dragDrop === 'object' ? dragDrop : {};
+    const dragDropConfig = typeof dragDrop === 'object' ? { ...dragDrop } : {};
+    if (complianceLockOpts && complianceLockOpts.allowReorder !== true) {
+      dragDropConfig.allowLockedBlockDrag = false;
+    }
     plugins.push(createDragDropPlugin(dragDropConfig));
   }
 

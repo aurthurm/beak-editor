@@ -13,3 +13,4 @@ export type {
   CollaborationConfig,
   TrackChangesConfig,
 } from './EditorConfig';
+export type { ComplianceLockPluginOptions } from '../plugins/complianceLockPlugin';

@@ -1,5 +1,5 @@
-import type { Block } from '@aurthurm/beakblock-core';
-import { createDefaultChartData } from '@aurthurm/beakblock-vue';
+import type { Block } from '@amusendame/beakblock-core';
+import { createDefaultChartData } from '@amusendame/beakblock-vue';
 
 function createChart(
   type: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea',

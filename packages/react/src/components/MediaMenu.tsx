@@ -30,7 +30,7 @@ import {
   ImageAttrs,
   EmbedAttrs,
   normalizeEmbedAttrsFromUrl,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 
 /**
  * Props for MediaMenu component.

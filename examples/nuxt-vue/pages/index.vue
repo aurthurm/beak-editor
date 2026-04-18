@@ -6,9 +6,9 @@ import {
   BeakBlockView,
   createChartBlockSpec,
   useBeakBlock,
-} from '@aurthurm/beakblock-vue';
-import { BUBBLE_AI_PRESETS, SLASH_AI_PRESETS } from '@aurthurm/beakblock-core';
-import type { BeakBlockEditor, Block, CommentStore } from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-vue';
+import { BUBBLE_AI_PRESETS, SLASH_AI_PRESETS } from '@amusendame/beakblock-core';
+import type { BeakBlockEditor, Block, CommentStore } from '@amusendame/beakblock-core';
 import { complianceSopSections, financialAnalystCvDocument, sampleDocument } from '~/data';
 import {
   boardOnePagerDocument,
@@ -237,7 +237,7 @@ watchEffect((onCleanup) => {
       <aside class="hero-panel hero-panel--enter">
         <div class="hero-stat">
           <span class="hero-stat-label">Package</span>
-          <span class="hero-stat-value">@aurthurm/beakblock-vue</span>
+          <span class="hero-stat-value">@amusendame/beakblock-vue</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-label">Samples</span>
@@ -326,7 +326,7 @@ watchEffect((onCleanup) => {
               :open="commentOpen && viewMode !== 'compliance'"
               :editor="modalTargetEditor"
               :store="modalCommentStore"
-              current-user-id="aurthurm"
+              current-user-id="amusendame"
               title="Comments"
               subtitle="Leave threads, replies, reactions, or mark notes resolved."
               :on-close="closeCommentModal"

@@ -14,13 +14,13 @@ import {
   useCustomSlashMenuItems,
   useEditorContent,
   useBeakBlock,
-} from '@aurthurm/beakblock-vue';
+} from '@amusendame/beakblock-vue';
 import {
   BUBBLE_AI_PRESETS,
   SLASH_AI_PRESETS,
   createCommentPlugin,
   InMemoryCommentStore,
-} from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-core';
 import { sampleDocument } from './data';
 import { sendAIRequest } from '../../shared/ai';
 
@@ -80,7 +80,7 @@ const applyDemoAI = async ({ output }: { output: string }) => {
       <aside class="hero-panel">
         <div class="hero-stat">
           <span class="hero-stat-label">Package</span>
-          <span class="hero-stat-value">@aurthurm/beakblock-vue</span>
+          <span class="hero-stat-value">@amusendame/beakblock-vue</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-label">Aesthetic</span>
@@ -95,7 +95,7 @@ const applyDemoAI = async ({ output }: { output: string }) => {
 
     <main class="layout">
       <section class="editor-stage">
-        <CommentRail :editor="editor" :store="commentStore" current-user-id="aurthurm">
+        <CommentRail :editor="editor" :store="commentStore" current-user-id="amusendame">
           <BeakBlockView :editor="editor" class-name="editor-view" />
         </CommentRail>
         <SlashMenu
@@ -129,7 +129,7 @@ const applyDemoAI = async ({ output }: { output: string }) => {
         :open="commentOpen"
         :editor="editor"
         :store="commentStore"
-        current-user-id="aurthurm"
+        current-user-id="amusendame"
         title="Comments"
         subtitle="Leave threads, replies, reactions, or mark notes resolved."
         :on-close="closeCommentModal"

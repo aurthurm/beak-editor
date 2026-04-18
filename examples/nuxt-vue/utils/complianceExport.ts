@@ -1,6 +1,6 @@
-import type { Block } from '@aurthurm/beakblock-core';
-import { blocksToHtml, blocksToMarkdown } from '@aurthurm/beakblock-core';
-import type { CommentThread } from '@aurthurm/beakblock-core';
+import type { Block } from '@amusendame/beakblock-core';
+import { blocksToHtml, blocksToMarkdown } from '@amusendame/beakblock-core';
+import type { CommentThread } from '@amusendame/beakblock-core';
 import type { ComplianceMergeManifest } from './complianceMerge';
 import type { SectionApprovalRecord } from './complianceApproval';
 import type { DocumentReleaseRecord } from './complianceDocumentRelease';

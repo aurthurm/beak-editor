@@ -1,6 +1,6 @@
 # Compliance workflow (Nuxt example)
 
-The **`examples/nuxt-vue`** app includes a **multi-section compliance workspace** built on BeakBlock. It is **sample product code**, not part of `@aurthurm/beakblock-core` APIs. Use it as a reference for combining versioning, track changes, comments, approvals, and export.
+The **`examples/nuxt-vue`** app includes a **multi-section compliance workspace** built on BeakBlock. It is **sample product code**, not part of `@amusendame/beakblock-core` APIs. Use it as a reference for combining versioning, track changes, comments, approvals, and export.
 
 ## What it demonstrates
 
@@ -29,6 +29,7 @@ The **`examples/nuxt-vue`** app includes a **multi-section compliance workspace*
 
 ## Relationship to core guides
 
+- **[Compliance lock](./compliance-lock.md)** — Core **`EditorConfig.complianceLock`** and heading **`locked`** attrs: document-level read-only blocks, bypass meta, and lock icons in the side menu / heading gutter. The Nuxt demo may combine this with Vue-level `setEditable` for section bodies.
 - **[Versioning and track changes](./versioning.md)** — Core APIs for snapshots and track-change accept/reject. In the demo, **approval lock** is implemented in Vue (`setEditable`, disabling controls), not inside the core package.
 - **[Comments](./comments.md)** — Thread model and `CommentStore`; the compliance section editor is the richest Vue example wiring comments with approvals.
 
@@ -37,7 +38,7 @@ The **`examples/nuxt-vue`** app includes a **multi-section compliance workspace*
 From the repo root:
 
 ```bash
-pnpm --filter @aurthurm/beakblock-example-nuxt-vue dev
+pnpm --filter @amusendame/beakblock-example-nuxt-vue dev
 ```
 
 Toggle **reviewer mode** in the workspace to exercise approve / revoke and document release. Export is blocked until validation rules pass (including complete document release when that option is enabled).

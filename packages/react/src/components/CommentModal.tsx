@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@aurthurm/beakblock-core';
+import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@amusendame/beakblock-core';
 
 export interface CommentModalProps {
   open: boolean;

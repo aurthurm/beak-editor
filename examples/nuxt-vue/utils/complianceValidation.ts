@@ -1,5 +1,5 @@
-import type { Block, InlineContent } from '@aurthurm/beakblock-core';
-import type { CommentStore } from '@aurthurm/beakblock-core';
+import type { Block, InlineContent } from '@amusendame/beakblock-core';
+import type { CommentStore } from '@amusendame/beakblock-core';
 import { isImageSrcAllowed } from './complianceMediaPolicy';
 
 /** Minimum non-whitespace characters for a required text block to count as filled. */

@@ -16,9 +16,9 @@ import {
   useBeakBlock,
   useCustomSlashMenuItems,
   useEditorContent,
-} from '@aurthurm/beakblock-vue';
-import { createCommentPlugin, InMemoryCommentStore } from '@aurthurm/beakblock-core';
-import type { BeakBlockEditor, Block } from '@aurthurm/beakblock-core';
+} from '@amusendame/beakblock-vue';
+import { createCommentPlugin, InMemoryCommentStore } from '@amusendame/beakblock-core';
+import type { BeakBlockEditor, Block } from '@amusendame/beakblock-core';
 
 const emit = defineEmits<{
   ai: [mode: 'bubble' | 'slash'];
@@ -225,7 +225,7 @@ defineExpose({
     </div>
 
     <div class="example-editor-panel">
-      <CommentRail :editor="editor" :store="commentStore" current-user-id="aurthurm">
+      <CommentRail :editor="editor" :store="commentStore" current-user-id="amusendame">
         <BeakBlockView :editor="editor" :class-name="className" />
       </CommentRail>
       <SlashMenu :editor="editor" :custom-items="customSlashItems" @ai="emit('ai', 'slash')" />

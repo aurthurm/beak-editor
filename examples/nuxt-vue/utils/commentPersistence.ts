@@ -1,4 +1,4 @@
-import type { CommentEntry, CommentThread } from '@aurthurm/beakblock-core';
+import type { CommentEntry, CommentThread } from '@amusendame/beakblock-core';
 import { COMMENTS_STORE, openComplianceDb } from './complianceDb';
 
 function reviveEntry(raw: CommentEntry): CommentEntry {

@@ -1,4 +1,4 @@
-import type { DocumentVersion, VersioningAdapter } from '@aurthurm/beakblock-core';
+import type { DocumentVersion, VersioningAdapter } from '@amusendame/beakblock-core';
 
 import { openComplianceDb, VERSIONS_STORE } from './complianceDb';
 

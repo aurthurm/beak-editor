@@ -1,20 +1,20 @@
-# @aurthurm/beakblock-react
+# @amusendame/beakblock-react
 
 React bindings for the BeakBlock rich text editor.
 
 ## Installation
 
 ```bash
-npm install @aurthurm/beakblock-react @aurthurm/beakblock-core
+npm install @amusendame/beakblock-react @amusendame/beakblock-core
 # or
-pnpm add @aurthurm/beakblock-react @aurthurm/beakblock-core
+pnpm add @amusendame/beakblock-react @amusendame/beakblock-core
 ```
 
 ## Quick Start
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@aurthurm/beakblock-react';
-import '@aurthurm/beakblock-core/styles/editor.css';
+import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@amusendame/beakblock-react';
+import '@amusendame/beakblock-core/styles/editor.css';
 
 function MyEditor() {
   const editor = useBeakBlock({
@@ -87,7 +87,7 @@ const isFocused = useEditorFocus(editor);
 
 ## Comments
 
-Use **`CommentStore`** and **`createCommentPlugin`** from `@aurthurm/beakblock-core`, and **`CommentModal`** from this package. There is no React `CommentRail` yet; use the modal and bubble menu.
+Use **`CommentStore`** and **`createCommentPlugin`** from `@amusendame/beakblock-core`, and **`CommentModal`** from this package. There is no React `CommentRail` yet; use the modal and bubble menu.
 
 Wire **`BubbleMenu`** with `onComment` to open the modal. On every editor transaction with a document change, call **`store.mapAnchors(transaction.mapping)`** so thread anchors match the document.
 
@@ -144,7 +144,7 @@ See [BubbleMenu Customization](#bubblemenu-customization) for advanced usage.
 Color picker for text and background colors.
 
 ```tsx
-import { ColorPicker } from '@aurthurm/beakblock-react';
+import { ColorPicker } from '@amusendame/beakblock-react';
 
 <ColorPicker
   editor={editor}
@@ -202,7 +202,7 @@ interface BubbleMenuProps {
 #### Example: Add a Custom Button
 
 ```tsx
-import { BubbleMenu, BubbleMenuItem } from '@aurthurm/beakblock-react';
+import { BubbleMenu, BubbleMenuItem } from '@amusendame/beakblock-react';
 
 const translateButton: BubbleMenuItem = {
   id: 'translate',
@@ -289,7 +289,7 @@ interface SlashMenuProps {
 #### Example: Add Custom Items
 
 ```tsx
-import { SlashMenu, SlashMenuItem } from '@aurthurm/beakblock-react';
+import { SlashMenu, SlashMenuItem } from '@amusendame/beakblock-react';
 
 const customItems: SlashMenuItem[] = [
   {
@@ -365,7 +365,7 @@ interface ColorOption {
 #### Default Palettes
 
 ```tsx
-import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@aurthurm/beakblock-react';
+import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@amusendame/beakblock-react';
 
 // DEFAULT_TEXT_COLORS includes:
 // Default, Gray, Red, Orange, Yellow, Green, Blue, Purple, Pink
@@ -377,7 +377,7 @@ import { DEFAULT_TEXT_COLORS, DEFAULT_BACKGROUND_COLORS } from '@aurthurm/beakbl
 #### Example: Brand Color Palette
 
 ```tsx
-import { ColorPicker, ColorOption } from '@aurthurm/beakblock-react';
+import { ColorPicker, ColorOption } from '@amusendame/beakblock-react';
 
 const brandTextColors: ColorOption[] = [
   { value: '', label: 'Default' },

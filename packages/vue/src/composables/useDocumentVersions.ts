@@ -1,5 +1,5 @@
 import { ref, watch, unref, type MaybeRef } from 'vue';
-import type { BeakBlockEditor, DocumentVersion, VersioningAdapter } from '@aurthurm/beakblock-core';
+import type { BeakBlockEditor, DocumentVersion, VersioningAdapter } from '@amusendame/beakblock-core';
 
 /**
  * Reactive version list + helpers. Pass the same {@link VersioningAdapter} you use in `EditorConfig.versioning.adapter`.

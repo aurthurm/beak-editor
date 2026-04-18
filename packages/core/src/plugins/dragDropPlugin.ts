@@ -12,6 +12,7 @@ import { Plugin, PluginKey, EditorState, TextSelection } from 'prosemirror-state
 import { Decoration, DecorationSet, EditorView } from 'prosemirror-view';
 import { Node as PMNode } from 'prosemirror-model';
 import { SLASH_MENU_PLUGIN_KEY } from './slashMenuPlugin';
+import { nodeIsComplianceLocked } from './complianceLockPlugin';
 
 /**
  * Plugin key for accessing drag/drop state.
@@ -76,6 +77,12 @@ export interface DragDropConfig {
    * If not provided, opens the slash menu.
    */
   onAddClick?: (pos: number, view: EditorView) => void;
+
+  /**
+   * When false, the drag handle is hidden for compliance-locked blocks (`attrs.locked`).
+   * @default true
+   */
+  allowLockedBlockDrag?: boolean;
 }
 
 /**
@@ -109,6 +116,7 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
     addButtonClass = 'ob-add-button',
     onAddClick,
     onDrop,
+    allowLockedBlockDrag = true,
   } = config;
 
   // Single side menu element that gets repositioned
@@ -125,6 +133,34 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
     const menu = document.createElement('div');
     menu.className = sideMenuClass;
     menu.setAttribute('contenteditable', 'false');
+
+    const lockBadge = document.createElement('span');
+    lockBadge.className = 'ob-block-lock-badge';
+    lockBadge.setAttribute('contenteditable', 'false');
+    lockBadge.setAttribute('aria-hidden', 'true');
+    lockBadge.style.display = 'none';
+    const lockSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    lockSvg.setAttribute('width', '14');
+    lockSvg.setAttribute('height', '14');
+    lockSvg.setAttribute('viewBox', '0 0 24 24');
+    lockSvg.setAttribute('fill', 'none');
+    lockSvg.setAttribute('stroke', 'currentColor');
+    lockSvg.setAttribute('stroke-width', '2');
+    lockSvg.setAttribute('stroke-linecap', 'round');
+    lockSvg.setAttribute('stroke-linejoin', 'round');
+    const lockArch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    lockArch.setAttribute('d', 'M7 11V7a5 5 0 0 1 10 0v4');
+    const lockBody = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    lockBody.setAttribute('x', '3');
+    lockBody.setAttribute('y', '11');
+    lockBody.setAttribute('width', '18');
+    lockBody.setAttribute('height', '11');
+    lockBody.setAttribute('rx', '2');
+    lockBody.setAttribute('ry', '2');
+    lockSvg.appendChild(lockArch);
+    lockSvg.appendChild(lockBody);
+    lockBadge.appendChild(lockSvg);
+    menu.appendChild(lockBadge);
 
     // Add button (+)
     if (showAddButton) {
@@ -229,6 +265,23 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
     let top: number;
     let left: number;
 
+    const locked = nodeIsComplianceLocked(node);
+    const lockBadgeEl = sideMenuEl.querySelector('.ob-block-lock-badge') as HTMLElement | null;
+    if (lockBadgeEl) {
+      lockBadgeEl.style.display = locked ? 'flex' : 'none';
+      const reason = node.attrs.lockReason;
+      lockBadgeEl.title =
+        locked && reason ? String(reason) : locked ? 'Read-only' : '';
+    }
+
+    if (showHandles) {
+      const handleEl = sideMenuEl.querySelector(`.${handleClass}`) as HTMLElement | null;
+      if (handleEl) {
+        const canDrag = !locked || allowLockedBlockDrag;
+        handleEl.style.display = canDrag ? '' : 'none';
+      }
+    }
+
     if (blockEl) {
       if (blockEl.closest('.ob-column')) {
         sideMenuEl.classList.remove(`${sideMenuClass}--visible`);
@@ -243,9 +296,7 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
       const listEl = blockEl.closest('ul, ol') as HTMLElement | null;
       const isNestedInList = listEl && !listEl.classList.contains('beakblock-checklist');
 
-      // Position the menu to the LEFT of the block's text content
-      // The side menu is ~40px wide (18px add button + 1px gap + 18px drag handle + some padding)
-      const menuWidth = 40;
+      const menuWidth = Math.ceil(sideMenuEl.getBoundingClientRect().width) || 40;
 
       if (isNestedInList) {
         // For blocks inside lists, position at the editor's left margin
