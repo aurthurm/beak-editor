@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-04-18
+
+### Changed
+
+- **Workspace** — all publishable and example `package.json` versions set to **0.1.0** to match git tag `v0.1.0`.
+
 ### Added
 
-#### Vue Package (`@aurthurm/beakblock-vue`)
-- Vue 3 composables for editor lifecycle and state subscriptions
-- `BeakBlockView` component for mounting the editor into Vue templates
-- Package metadata and documentation updates for Vue installation
-- Vue package test coverage for composables, custom block helpers, and editor mounting
-- Vue/Vite and Nuxt/Vue example apps under `examples/`
+#### Documentation
+
+- **[Compliance workflow (Nuxt)](docs/compliance-demo.md)** — describes the `examples/nuxt-vue` compliance workspace: section approvals, append-only approval history, author read-only lock after sign-off, optional document-level dual attestation, IndexedDB stores, and export appendices. Cross-linked from [Versioning](docs/versioning.md), [Comments](docs/comments.md), the root [README](README.md), and [Vue package README](packages/vue/README.md).
 
 ## [1.0.0] - 2026-01-25
 

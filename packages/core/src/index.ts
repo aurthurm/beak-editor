@@ -156,6 +156,7 @@ export type {
 export {
   markdownToBlocks,
   blocksToMarkdown,
+  blocksToHtml,
   blocksToMdastRoot,
   mdastToBlocks,
   looksLikeMarkdown,
@@ -319,7 +320,10 @@ export {
   createTrackChangesPlugin,
   TRACK_CHANGES_PLUGIN_KEY,
   getTrackChangesState,
+  groupContiguousInsertTrackChanges,
   BEAKBLOCK_META_SKIP_TRACK_CHANGES,
+  BEAKBLOCK_META_TRACK_CLEAR_LOG,
+  BEAKBLOCK_META_TRACK_REMOVE,
 } from './plugins';
 export type {
   TrackedChangeRecord,

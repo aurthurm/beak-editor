@@ -83,6 +83,14 @@ export class InMemoryCommentStore implements CommentStore {
     return this.getThreads();
   }
 
+  hydrate(snapshot: CommentThread[]): void {
+    this.threads.clear();
+    for (const thread of snapshot) {
+      this.threads.set(thread.id, cloneThread(thread));
+    }
+    this.emit();
+  }
+
   getThreads(): CommentThread[] {
     return [...this.threads.values()].map(cloneThread);
   }

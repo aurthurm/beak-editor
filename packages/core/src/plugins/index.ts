@@ -102,7 +102,8 @@ export {
   TABLE_OF_CONTENTS_PLUGIN_KEY,
 } from './tableOfContentsPlugin';
 
-export { BEAKBLOCK_META_SKIP_TRACK_CHANGES } from './trackChangesMeta';
+export { BEAKBLOCK_META_SKIP_TRACK_CHANGES, BEAKBLOCK_META_TRACK_CLEAR_LOG } from './trackChangesMeta';
+export { BEAKBLOCK_META_TRACK_REMOVE } from './trackChangesResolveMeta';
 export {
   createTrackChangesPlugin,
   TRACK_CHANGES_PLUGIN_KEY,
@@ -114,3 +115,4 @@ export type {
   TrackChangeKind,
   CreateTrackChangesPluginOptions,
 } from './trackChangesPlugin';
+export { groupContiguousInsertTrackChanges } from './trackChangeGroups';

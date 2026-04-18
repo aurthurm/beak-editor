@@ -18,7 +18,8 @@ const EDITOR_STYLES = `
 /* BeakBlock Editor Styles - Auto-injected */
 
 .beakblock-container,
-.beakblock-editor {
+.beakblock-editor,
+.beakblock-comment-shell {
   --ob-foreground: var(--foreground, 25 5% 22%);
   --ob-background: var(--background, 0 0% 100%);
   --ob-muted: var(--muted, 40 6% 96%);
@@ -3033,8 +3034,8 @@ th .ob-side-menu,
 }
 
 .beakblock-modal-primary {
-  background: hsl(var(--ob-foreground));
-  border-color: hsl(var(--ob-foreground));
+  background: hsl(var(--ob-foreground, 25 5% 22%));
+  border-color: hsl(var(--ob-foreground, 25 5% 22%));
   color: #fff;
 }
 
@@ -3386,6 +3387,14 @@ th .ob-side-menu,
   margin-top: 0.2rem;
 }
 
+.beakblock-comment-thread__audit {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: hsl(var(--ob-muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+
 .beakblock-comment-thread__comments {
   display: flex;
   flex-direction: column;
@@ -3459,6 +3468,23 @@ th .ob-side-menu,
   padding: 1rem 1.25rem 1.25rem;
   border-top: 1px solid hsl(var(--ob-border));
   background: linear-gradient(180deg, hsl(var(--ob-card) / 0) 0%, hsl(var(--ob-muted) / 0.12) 100%);
+}
+
+.beakblock-ai-modal__ack {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1 1 100%;
+  max-width: 28rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: hsl(222 16% 35%);
+  margin-right: auto;
+}
+
+.beakblock-ai-modal__ack input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
 }
 
 .beakblock-ai-modal__result-actions {

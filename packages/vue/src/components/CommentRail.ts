@@ -12,7 +12,7 @@ import {
 } from 'vue';
 import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@aurthurm/beakblock-core';
 
-import { formatCommentDate, QUICK_REACTIONS, threadRangeLabel } from './commentCommon';
+import { formatCommentDate, QUICK_REACTIONS, threadAuditMetaLine, threadRangeLabel } from './commentCommon';
 
 export interface CommentRailProps {
   editor: BeakBlockEditor | null;
@@ -340,12 +340,14 @@ export const CommentRail = defineComponent({
       editingBody.value = '';
     };
 
-    const renderThreadDetail = (thread: CommentThread) =>
-      h('article', { class: ['beakblock-comment-thread', thread.resolved ? 'beakblock-comment-thread--resolved' : ''].filter(Boolean).join(' ') }, [
+    const renderThreadDetail = (thread: CommentThread) => {
+      const auditLine = threadAuditMetaLine(thread);
+      return h('article', { class: ['beakblock-comment-thread', thread.resolved ? 'beakblock-comment-thread--resolved' : ''].filter(Boolean).join(' ') }, [
         h('header', { class: 'beakblock-comment-thread__header' }, [
           h('div', [
             h('strong', thread.resolved ? 'Resolved thread' : 'Open thread'),
             h('div', { class: 'beakblock-comment-thread__meta' }, `${threadRangeLabel(thread)} · ${formatCommentDate(thread.createdAt)}`),
+            ...(auditLine ? [h('div', { class: 'beakblock-comment-thread__audit' }, auditLine)] : []),
           ]),
           h('div', { class: 'beakblock-comment-thread__header-actions' }, [
             h(
@@ -458,6 +460,7 @@ export const CommentRail = defineComponent({
           ]),
         ]),
       ]);
+    };
 
     return () => {
       const count = activeThreads.value.length;

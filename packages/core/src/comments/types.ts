@@ -42,6 +42,10 @@ export type CommentStoreListener = (threads: CommentStoreSnapshot) => void;
 
 export interface CommentStore {
   snapshot(): CommentStoreSnapshot;
+  /**
+   * Replace all threads (e.g. after loading from persistence). Notifies subscribers so the editor refreshes annotations.
+   */
+  hydrate(snapshot: CommentStoreSnapshot): void;
   getThreads(): CommentThread[];
   getThread(threadId: string): CommentThread | undefined;
   getThreadsAt(pos: number): CommentThread[];

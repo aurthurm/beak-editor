@@ -1,6 +1,6 @@
 {
   "name": "beakblock",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "description": "A fully open-source, framework-agnostic rich text editor built on ProseMirror",

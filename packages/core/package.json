@@ -1,6 +1,6 @@
 {
   "name": "@aurthurm/beakblock-core",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Framework-agnostic core for BeakBlock editor",
   "license": "Apache-2.0",
   "type": "module",
@@ -39,7 +39,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "hast-util-to-html": "^9.0.5",
     "mdast-util-gfm": "^3.1.0",
+    "mdast-util-to-hast": "^13.2.1",
     "mdast-util-to-markdown": "^2.1.2",
     "prosemirror-commands": "^1.6.2",
     "prosemirror-dropcursor": "^1.8.1",

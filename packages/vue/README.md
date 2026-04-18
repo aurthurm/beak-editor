@@ -99,7 +99,7 @@ Hook **`BubbleMenu`** with `@comment` to open the modal. On every editor transac
 
 Full API, anchoring, persistence, and troubleshooting: **[Comments guide](../../docs/comments.md)**.
 
-Example: [`examples/nuxt-vue/components/ComplianceSectionEditor.vue`](../examples/nuxt-vue/components/ComplianceSectionEditor.vue).
+Example: [`examples/nuxt-vue/components/ComplianceSectionEditor.vue`](../examples/nuxt-vue/components/ComplianceSectionEditor.vue) — also wires **section approvals**, **approval history**, **post-approval read-only lock** for authors, and lives inside the broader compliance workspace (**[Compliance workflow](../../docs/compliance-demo.md)**).
 
 ## Components
 

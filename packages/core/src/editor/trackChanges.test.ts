@@ -70,4 +70,53 @@ describe('track changes', () => {
     expect(editor.isTrackChangesEnabled).toBe(false);
     editor.destroy();
   });
+
+  it('acceptTrackedChange removes a pending insert hunk from the log', () => {
+    const editor = new BeakBlockEditor({
+      element: container,
+      injectStyles: false,
+      initialContent: [
+        {
+          id: 'a',
+          type: 'paragraph',
+          props: {},
+          content: [{ type: 'text', text: 'hello', styles: {} }],
+        },
+      ],
+    });
+    editor.enableTrackChanges({ authorId: 't' });
+    editor.focus('end');
+    editor.pm.insertText(' X');
+    const pending = editor.getPendingTrackChanges();
+    expect(pending.length).toBeGreaterThan(0);
+    const id = pending[pending.length - 1]!.id;
+    const ok = editor.acceptTrackedChange(id);
+    expect(ok).toBe(true);
+    expect(editor.getPendingTrackChanges().some((e) => e.id === id)).toBe(false);
+    editor.destroy();
+  });
+
+  it('rejectTrackedChange removes inserted text for an insert hunk', () => {
+    const editor = new BeakBlockEditor({
+      element: container,
+      injectStyles: false,
+      initialContent: [
+        {
+          id: 'a',
+          type: 'paragraph',
+          props: {},
+          content: [{ type: 'text', text: 'hello', styles: {} }],
+        },
+      ],
+    });
+    editor.enableTrackChanges({ authorId: 't' });
+    editor.focus('end');
+    editor.pm.insertText(' X');
+    const pending = editor.getPendingTrackChanges();
+    const id = pending[pending.length - 1]!.id;
+    editor.rejectTrackedChange(id);
+    const text = editor.getDocument()[0]?.content?.[0];
+    expect(text && text.type === 'text' ? text.text : '').toBe('hello');
+    editor.destroy();
+  });
 });

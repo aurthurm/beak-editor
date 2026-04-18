@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch, watchEffect } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch, watchEffect } from 'vue';
 import {
   AIModal,
   CommentModal,
@@ -19,6 +19,7 @@ import {
   runbookShowcaseDocument,
 } from '~/data/showcase-documents';
 import { sendAIRequest } from '../../shared/ai';
+import type { ComplianceMergeManifest } from '~/utils/complianceMerge';
 
 useHead({
   title: 'BeakBlock Vue Showcase',
@@ -47,8 +48,14 @@ const viewMode = ref<DocumentTabId | 'compliance' | 'collaboration'>('generic');
 const previewOpen = ref(false);
 const complianceWorkspaceRef = ref<{
   getMergedDocument: () => Block[];
+  getMergeManifest: () => ComplianceMergeManifest | null;
+  canOpenPreview: () => boolean;
+  exportComplianceBundle: () => Promise<void>;
 } | null>(null);
 const complianceMerged = ref<Block[]>([]);
+const complianceManifest = ref<ComplianceMergeManifest | null>(null);
+const complianceReviewerMode = ref(false);
+const complianceAiOff = ref(false);
 
 const panelRefs = reactive<Record<string, PanelApi | null>>({});
 
@@ -110,13 +117,56 @@ const previewEditor = useBeakBlock({
   customBlocks,
 });
 
+const previewDialogRef = ref<HTMLElement | null>(null);
+
 function openDocumentPreview() {
+  if (!complianceWorkspaceRef.value?.canOpenPreview()) return;
   previewOpen.value = true;
 }
 
 function closeDocumentPreview() {
   previewOpen.value = false;
 }
+
+async function exportComplianceBundle() {
+  if (!complianceWorkspaceRef.value?.canOpenPreview()) return;
+  await complianceWorkspaceRef.value.exportComplianceBundle();
+}
+
+function onPreviewDialogKeydown(e: KeyboardEvent) {
+  const dialog = previewDialogRef.value;
+  if (!dialog) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeDocumentPreview();
+    return;
+  }
+  if (e.key !== 'Tab') return;
+  const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const focusable = [...dialog.querySelectorAll<HTMLElement>(sel)].filter(
+    (el) => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden')
+  );
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last?.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first?.focus();
+  }
+}
+
+watch(previewOpen, async (open) => {
+  if (!open) return;
+  await nextTick();
+  previewDialogRef.value?.focus();
+});
+
+onBeforeUnmount(() => {
+  previewOpen.value = false;
+});
 
 watch(
   () => [previewOpen.value, previewEditor.value] as const,
@@ -129,6 +179,24 @@ watch(
 );
 
 const inspectorBlocks = ref<Block[]>([]);
+
+const complianceInspectorReadout = computed(() =>
+  JSON.stringify(
+    { blocks: complianceMerged.value, mergeManifest: complianceManifest.value },
+    null,
+    2
+  )
+);
+
+watch(
+  complianceMerged,
+  () => {
+    nextTick(() => {
+      complianceManifest.value = complianceWorkspaceRef.value?.getMergeManifest() ?? null;
+    });
+  },
+  { deep: true }
+);
 
 watchEffect((onCleanup) => {
   if (viewMode.value === 'compliance') {
@@ -267,19 +335,60 @@ watchEffect((onCleanup) => {
             <div v-show="viewMode === 'compliance'" class="editor-stage__panel editor-stage__panel--compliance">
               <div class="compliance-toolbar">
                 <p class="compliance-toolbar__label">Gram stain — controlled SOP</p>
-                <button type="button" class="compliance-toolbar__preview" @click="openDocumentPreview">Preview document</button>
+                <div class="compliance-toolbar__controls">
+                  <label class="compliance-toolbar__toggle">
+                    <input v-model="complianceReviewerMode" type="checkbox" />
+                    Reviewer view
+                  </label>
+                  <label class="compliance-toolbar__toggle">
+                    <input v-model="complianceAiOff" type="checkbox" />
+                    Disable AI
+                  </label>
+                  <button
+                    type="button"
+                    class="compliance-toolbar__preview"
+                    :disabled="!complianceWorkspaceRef || !complianceWorkspaceRef.canOpenPreview()"
+                    :title="
+                      complianceWorkspaceRef?.canOpenPreview()
+                        ? 'Open merged read-only preview'
+                        : 'Fix validation issues or enter a waiver reason'
+                    "
+                    @click="openDocumentPreview"
+                  >
+                    Preview document
+                  </button>
+                  <button
+                    type="button"
+                    class="compliance-toolbar__export"
+                    :disabled="!complianceWorkspaceRef || !complianceWorkspaceRef.canOpenPreview()"
+                    title="Download JSON bundle and Markdown (with checksum)"
+                    @click="exportComplianceBundle"
+                  >
+                    Export bundle
+                  </button>
+                </div>
               </div>
               <ComplianceDocumentWorkspace
                 ref="complianceWorkspaceRef"
                 v-model:merged-blocks="complianceMerged"
                 :sections="complianceSopSections"
+                :reviewer-only="complianceReviewerMode"
+                :ai-governance-mode="complianceAiOff ? 'off' : 'governed'"
               />
             </div>
 
             <Teleport to="body">
               <Transition name="modal-dim">
                 <div v-if="previewOpen" class="doc-preview-backdrop" @click.self="closeDocumentPreview">
-                  <div class="doc-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="doc-preview-title">
+                  <div
+                    ref="previewDialogRef"
+                    class="doc-preview-dialog"
+                    tabindex="-1"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="doc-preview-title"
+                    @keydown="onPreviewDialogKeydown"
+                  >
                     <header class="doc-preview-dialog__head">
                       <div>
                         <p id="doc-preview-title" class="doc-preview-dialog__title">Gram stain SOP — merged preview</p>
@@ -301,12 +410,16 @@ watchEffect((onCleanup) => {
           <p class="section-label">Document readout</p>
           <h2>Document JSON</h2>
           <p class="inspector__lede">
-            <template v-if="viewMode === 'compliance'">Live merge of every controlled section (same payload as Preview document).</template>
+            <template v-if="viewMode === 'compliance'">
+              Merged blocks plus <code>mergeManifest</code> (section id → block ids in the preview document).
+            </template>
             <template v-else-if="viewMode === 'collaboration'">Live Yjs document for this tab — open two clients on the same room to verify sync.</template>
             <template v-else>Serialized blocks for the active sample tab.</template>
           </p>
           <Transition name="inspector-snap" mode="out-in">
-            <pre :key="viewMode" class="inspector__pre">{{ JSON.stringify(inspectorBlocks, null, 2) }}</pre>
+            <pre :key="viewMode" class="inspector__pre">{{
+              viewMode === 'compliance' ? complianceInspectorReadout : JSON.stringify(inspectorBlocks, null, 2)
+            }}</pre>
           </Transition>
         </section>
       </div>

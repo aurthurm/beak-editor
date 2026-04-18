@@ -10,7 +10,7 @@ import {
 } from 'vue';
 import { type BeakBlockEditor, type CommentStore, type CommentThread } from '@aurthurm/beakblock-core';
 
-import { formatCommentDate, QUICK_REACTIONS, threadRangeLabel } from './commentCommon';
+import { formatCommentDate, QUICK_REACTIONS, threadAuditMetaLine, threadRangeLabel } from './commentCommon';
 
 export interface CommentModalProps {
   open: boolean;
@@ -19,6 +19,8 @@ export interface CommentModalProps {
   currentUserId?: string;
   title?: string;
   subtitle?: string;
+  /** Merged into each new thread (and first comment) for audit metadata, e.g. version id. */
+  newThreadMetadata?: Record<string, unknown>;
   onClose: () => void;
 }
 
@@ -34,6 +36,7 @@ export const CommentModal = defineComponent({
     currentUserId: { type: String, default: 'you' },
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
+    newThreadMetadata: { type: Object as PropType<Record<string, unknown> | undefined>, default: undefined },
     onClose: { type: Function as PropType<() => void>, required: true },
   },
   setup(props) {
@@ -88,11 +91,16 @@ export const CommentModal = defineComponent({
 
     const createThread = () => {
       if (!anchor.value || !draft.value.trim()) return;
+      const meta =
+        props.newThreadMetadata && Object.keys(props.newThreadMetadata).length > 0
+          ? { ...props.newThreadMetadata }
+          : undefined;
       props.store.createThread({
         from: anchor.value.from,
         to: anchor.value.to,
         authorId: props.currentUserId,
         body: draft.value.trim(),
+        metadata: meta,
       });
       draft.value = '';
     };
@@ -186,8 +194,9 @@ export const CommentModal = defineComponent({
                     h('div', { class: 'beakblock-modal-section-title' }, 'Threads'),
                     visibleThreads.value.length === 0
                       ? h('div', { class: 'beakblock-comment-modal__empty' }, 'No comment threads yet.')
-                      : visibleThreads.value.map((thread) =>
-                          h(
+                      : visibleThreads.value.map((thread) => {
+                          const auditLine = threadAuditMetaLine(thread);
+                          return h(
                             'article',
                             { key: thread.id, class: ['beakblock-comment-thread', thread.resolved ? 'beakblock-comment-thread--resolved' : ''].filter(Boolean).join(' ') },
                             [
@@ -195,6 +204,7 @@ export const CommentModal = defineComponent({
                                 h('div', [
                                   h('strong', thread.resolved ? 'Resolved thread' : 'Open thread'),
                                   h('div', { class: 'beakblock-comment-thread__meta' }, `${threadRangeLabel(thread)} · ${formatCommentDate(thread.createdAt)}`),
+                                  ...(auditLine ? [h('div', { class: 'beakblock-comment-thread__audit' }, auditLine)] : []),
                                 ]),
                                 h('div', { class: 'beakblock-comment-thread__header-actions' }, [
                                   h(
@@ -307,8 +317,8 @@ export const CommentModal = defineComponent({
                                 ]),
                               ]),
                             ]
-                          )
-                        ),
+                          );
+                        }),
                   ]),
                 ]),
               ]

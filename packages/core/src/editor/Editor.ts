@@ -39,6 +39,8 @@ import {
   createTrackChangesPlugin,
   getTrackChangesState,
   BEAKBLOCK_META_SKIP_TRACK_CHANGES,
+  BEAKBLOCK_META_TRACK_CLEAR_LOG,
+  BEAKBLOCK_META_TRACK_REMOVE,
 } from '../plugins';
 import type { DocumentVersion } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
@@ -270,6 +272,7 @@ export class BeakBlockEditor {
     const doc = blocksToDoc(this._schema, blocks);
     const tr = this.pm.createTransaction();
     tr.setMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES, true);
+    tr.setMeta(BEAKBLOCK_META_TRACK_CLEAR_LOG, true);
     tr.replaceWith(0, this.pm.doc.content.size, doc.content);
     this.pm.dispatch(tr);
   }
@@ -361,6 +364,51 @@ export class BeakBlockEditor {
    */
   getPendingTrackChanges(): TrackedChangeRecord[] {
     return getTrackChangesState(this._pmView.state)?.log ?? [];
+  }
+
+  /**
+   * Accept a pending track change: keep the current document text and remove highlights for this hunk.
+   */
+  acceptTrackedChange(id: string): boolean {
+    if (!this._trackChangesPlugin) return false;
+    const log = getTrackChangesState(this._pmView.state)?.log ?? [];
+    if (!log.some((e) => e.id === id)) return false;
+    const tr = this._pmView.state.tr;
+    tr.setMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES, true);
+    tr.setMeta(BEAKBLOCK_META_TRACK_REMOVE, id);
+    this._pmView.dispatch(tr);
+    const st = getTrackChangesState(this._pmView.state);
+    this._trackLogEmitPointer = st?.log.length ?? 0;
+    return true;
+  }
+
+  /**
+   * Reject a pending track change: undo the insertion and/or restore deleted text for this hunk.
+   */
+  rejectTrackedChange(id: string): boolean {
+    if (!this._trackChangesPlugin) return false;
+    const log = getTrackChangesState(this._pmView.state)?.log ?? [];
+    const entry = log.find((e) => e.id === id);
+    if (!entry) return false;
+
+    const schema = this._pmView.state.schema;
+    let tr = this._pmView.state.tr;
+
+    if (entry.insertRange && entry.insertRange.from < entry.insertRange.to) {
+      tr = tr.delete(entry.insertRange.from, entry.insertRange.to);
+    }
+
+    if (entry.deletedText && entry.deleteWidgetPos !== undefined) {
+      const pos = tr.mapping.map(entry.deleteWidgetPos, -1);
+      tr = tr.insert(pos, schema.text(entry.deletedText));
+    }
+
+    tr.setMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES, true);
+    tr.setMeta(BEAKBLOCK_META_TRACK_REMOVE, id);
+    this._pmView.dispatch(tr);
+    const st = getTrackChangesState(this._pmView.state);
+    this._trackLogEmitPointer = st?.log.length ?? 0;
+    return true;
   }
 
   /**

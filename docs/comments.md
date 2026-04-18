@@ -170,7 +170,7 @@ Hook **`BubbleMenu`** with `@comment` (or `onComment`) to open the modal:
 
 ### Full Vue example
 
-See [`examples/nuxt-vue/components/ComplianceSectionEditor.vue`](../examples/nuxt-vue/components/ComplianceSectionEditor.vue): `InMemoryCommentStore`, `createCommentPlugin`, `CommentRail`, `CommentModal`, and bubble `@comment`.
+See [`examples/nuxt-vue/components/ComplianceSectionEditor.vue`](../examples/nuxt-vue/components/ComplianceSectionEditor.vue): `InMemoryCommentStore`, `createCommentPlugin`, `CommentRail`, `CommentModal`, and bubble `@comment`. The same component sits inside a **compliance workspace** that adds **section approvals** (draft / in review / approved), an append-only **approval history** per section, **read-only lock** after sign-off for authors, **document-level release** attestation (optional two approvers), and **export** bundling comments plus approval metadata — described in **[Compliance workflow (Nuxt example)](./compliance-demo.md)**.
 
 ## React: `CommentModal`
 
@@ -209,3 +209,4 @@ Optional: thread metadata can carry machine-readable fields (`metadata` on threa
 
 - [Collaboration](./collaboration.md) — Y.js and comments: still call `mapAnchors` for local steps; remote sync may need equivalent mapping when applying remote transactions.
 - [Versioning](./versioning.md) — Restoring a version replaces the document; re-load or remap comment anchors for the new doc.
+- [Compliance demo](./compliance-demo.md) — Nuxt sample tying comments to approvals, audit history, and export.

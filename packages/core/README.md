@@ -149,6 +149,8 @@ editor.enableTrackChanges({ authorId? }): void
 editor.disableTrackChanges(): void
 editor.isTrackChangesEnabled: boolean
 editor.getPendingTrackChanges(): TrackedChangeRecord[]
+editor.acceptTrackedChange(id: string): boolean
+editor.rejectTrackedChange(id: string): boolean
 
 // Lifecycle
 editor.mount(element): void
@@ -210,7 +212,7 @@ See [Comments](../../docs/comments.md) for the full API, anchoring rules, persis
 - Configure `versioning: { adapter }` and use `saveVersion`, `listVersions`, `getVersion`, and `restoreVersion`.
 - Optional `trackChanges` in config, or `enableTrackChanges` / `disableTrackChanges` at runtime.
 
-See [Versioning and track changes](../../docs/versioning.md) for adapter details, Y.js caveats, and v1 track-changes limits.
+See [Versioning and track changes](../../docs/versioning.md) for adapter details, Y.js caveats, per-hunk accept/reject, and reviewer workflows.
 
 ## License
 

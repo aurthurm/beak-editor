@@ -33,6 +33,9 @@ export interface AIModalProps {
   subtitle?: string;
   /** When true, shows selection + document context (for debugging or power users). Hidden by default. */
   showContext?: boolean;
+  /** When true, user must confirm before Apply (e.g. regulated content acknowledgment). */
+  requireApplyAcknowledgment?: boolean;
+  applyAcknowledgmentLabel?: string;
   onClose: () => void;
   onExecute?: (request: AIRequestPayload) => Promise<string | void> | string | void;
   onApply?: (request: AIRequestPayload & { output: string }) => Promise<void> | void;
@@ -53,6 +56,12 @@ export const AIModal = defineComponent({
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
     showContext: { type: Boolean, default: false },
+    requireApplyAcknowledgment: { type: Boolean, default: false },
+    applyAcknowledgmentLabel: {
+      type: String,
+      default:
+        'I acknowledge this section is AI-assisted and I have reviewed the output for accuracy before applying.',
+    },
     onClose: { type: Function as PropType<() => void>, required: true },
     onExecute: { type: Function as PropType<AIModalProps['onExecute']>, default: undefined },
     onApply: { type: Function as PropType<AIModalProps['onApply']>, default: undefined },
@@ -65,6 +74,7 @@ export const AIModal = defineComponent({
     const output = ref('');
     const request = ref<AIRequestPayload | null>(null);
     const applied = ref(false);
+    const applyAcknowledged = ref(false);
     const promptPanelCollapsed = ref(false);
 
     watch(
@@ -78,6 +88,7 @@ export const AIModal = defineComponent({
         output.value = '';
         request.value = null;
         applied.value = false;
+        applyAcknowledged.value = false;
         promptPanelCollapsed.value = false;
       },
       { immediate: true }
@@ -158,8 +169,13 @@ export const AIModal = defineComponent({
       }
     };
 
+    const applyBlockedByAck = computed(
+      () => props.requireApplyAcknowledgment && status.value === 'ready' && !!output.value && !applyAcknowledged.value
+    );
+
     const applyResult = async () => {
       if (!request.value || !output.value || !props.onApply || isBusy.value || applied.value) return;
+      if (props.requireApplyAcknowledgment && !applyAcknowledged.value) return;
       status.value = 'applying';
       try {
         await props.onApply({ ...request.value, output: output.value });
@@ -177,6 +193,7 @@ export const AIModal = defineComponent({
       output.value = '';
       request.value = null;
       applied.value = false;
+      applyAcknowledged.value = false;
       promptPanelCollapsed.value = false;
     };
 
@@ -187,6 +204,7 @@ export const AIModal = defineComponent({
         output.value = '';
         request.value = null;
         applied.value = false;
+        applyAcknowledged.value = false;
         promptPanelCollapsed.value = false;
       }
     };
@@ -356,6 +374,18 @@ export const AIModal = defineComponent({
                 busyOverlay,
               ]),
               h('div', { class: 'beakblock-modal-footer' }, [
+                props.requireApplyAcknowledgment && status.value === 'ready' && output.value && !applied.value
+                  ? h('label', { class: 'beakblock-ai-modal__ack' }, [
+                      h('input', {
+                        type: 'checkbox',
+                        checked: applyAcknowledged.value,
+                        onChange: (e: Event) => {
+                          applyAcknowledged.value = (e.target as HTMLInputElement).checked;
+                        },
+                      }),
+                      h('span', props.applyAcknowledgmentLabel),
+                    ])
+                  : null,
                 h('div', { class: 'beakblock-ai-modal__result-actions' }, [
                   !showBusyOverlay.value && status.value === 'ready' && output.value
                     ? h('span', { class: 'beakblock-ai-modal__result-badge' }, [
@@ -377,7 +407,7 @@ export const AIModal = defineComponent({
                       {
                         type: 'button',
                         class: 'beakblock-modal-primary',
-                        disabled: isBusy.value || applied.value,
+                        disabled: isBusy.value || applied.value || applyBlockedByAck.value,
                         onClick: applyResult,
                       },
                       applied.value ? 'Applied' : 'Apply result'
