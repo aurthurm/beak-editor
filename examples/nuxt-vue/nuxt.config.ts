@@ -12,7 +12,14 @@ for (const name of ['.env', '.env.local']) {
   }
 }
 
+/** Same repo slug as `examples/basic` Vite `base` for GitHub project pages. */
+const GITHUB_PAGES_BASE = '/beakblock/';
+const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+
 export default defineNuxtConfig({
+  app: {
+    baseURL: isGitHubPages ? GITHUB_PAGES_BASE : '/',
+  },
   css: ['~/assets/main.css'],
   runtimeConfig: {
     openaiApiKey: process.env.NUXT_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '',

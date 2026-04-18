@@ -358,6 +358,7 @@ See the full guide in [`docs/custom-blocks.md`](docs/custom-blocks.md).
 | [`docs/custom-marks.md`](docs/custom-marks.md) | Create inline formatting marks |
 | [`docs/plugins.md`](docs/plugins.md) | Build and extend ProseMirror plugins |
 | [`docs/styling.md`](docs/styling.md) | Style the editor and its blocks |
+| [`docs/publishing.md`](docs/publishing.md) | Release checklist and steps to publish `@amusendame/*` to npm |
 | [`docs/collaboration.md`](docs/collaboration.md) | Use collaborative editing with Y.js |
 | [`docs/versioning.md`](docs/versioning.md) | Snapshots, restore, and track changes |
 | [`docs/comments.md`](docs/comments.md) | Comment threads, stores, and Vue/React modals |

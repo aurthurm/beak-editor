@@ -25,12 +25,14 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
       - run: pnpm install
-      - run: pnpm --filter @amusendame/beakblock-core build && pnpm --filter @amusendame/beakblock-react build
-      - run: pnpm --filter @amusendame/beakblock-example-basic build
+      - name: Build core and Vue (Nuxt example dependencies)
+        run: pnpm --filter @amusendame/beakblock-core build && pnpm --filter @amusendame/beakblock-vue build
+      - name: Static generate Nuxt showcase
+        run: pnpm --filter @amusendame/beakblock-example-nuxt-vue run generate
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: './examples/basic/dist'
+          path: './examples/nuxt-vue/.output/public'
 
   deploy:
     environment:
