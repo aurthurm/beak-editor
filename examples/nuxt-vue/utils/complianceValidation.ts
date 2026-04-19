@@ -95,6 +95,9 @@ export type SectionValidationResult = {
   sectionId: string;
   title: string;
   required: boolean;
+  /** Outline level of the controlled heading (1–3). */
+  headingLevel: 1 | 2 | 3;
+  parentLockId?: string;
   ok: boolean;
   issues: string[];
   unresolvedComments: number;

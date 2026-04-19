@@ -43,7 +43,7 @@ BeakBlock includes these plugins by default:
 | `blockIdPlugin` | Manages block IDs |
 | `slashMenuPlugin` | Slash command menu |
 | `bubbleMenuPlugin` | Formatting toolbar |
-| `dragDropPlugin` | Block drag and drop |
+| `dragDropPlugin` | Block drag and drop, floating side menu (add, handle, optional heading lock badge). Configure via **`EditorConfig.dragDrop`** or **`createPlugins({ dragDrop })`** — see **[Compliance lock](./compliance-lock.md)** for **`headingLockBadge`** and lock-click behavior. |
 | `complianceLockPlugin` | Read-only “compliance” blocks (`attrs.locked`); optional reorder policy; pairs with drag/bubble/multi-select behavior |
 | `tablePlugin` | Table functionality |
 

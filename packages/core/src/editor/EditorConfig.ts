@@ -14,6 +14,7 @@ import type { InputRulesConfig } from '../plugins/inputRules';
 import type { DocumentVersion, VersioningAdapter } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
 import type { ComplianceLockPluginOptions } from '../plugins/complianceLockPlugin';
+import type { DragDropConfig } from '../plugins/dragDropPlugin';
 
 /**
  * Configuration for enabling real-time collaboration.
@@ -154,6 +155,12 @@ export interface EditorConfig {
    * between locked sections; see {@link ComplianceLockPluginOptions}.
    */
   complianceLock?: false | ComplianceLockPluginOptions;
+
+  /**
+   * Drag-and-drop side menu (handles, add block) configuration.
+   * Pass `false` to disable. Merged into the default plugin list from {@link createPlugins}.
+   */
+  dragDrop?: DragDropConfig | false;
 
   /**
    * Configuration for input rules (markdown-style shortcuts).

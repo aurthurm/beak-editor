@@ -1,12 +1,13 @@
 /** Shared IndexedDB for compliance demo: section versions + comment snapshots. */
 
 export const COMPLIANCE_DB_NAME = 'beakblock-compliance-demo';
-export const COMPLIANCE_DB_VERSION = 4;
+export const COMPLIANCE_DB_VERSION = 5;
 
 export const VERSIONS_STORE = 'sectionVersions';
 export const COMMENTS_STORE = 'sectionComments';
 export const APPROVALS_STORE = 'sectionApprovals';
 export const DOCUMENT_RELEASE_STORE = 'documentRelease';
+export const TEMPLATES_STORE = 'complianceTemplates';
 
 export function openComplianceDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -29,6 +30,9 @@ export function openComplianceDb(): Promise<IDBDatabase> {
       }
       if (old < 4 && !db.objectStoreNames.contains(DOCUMENT_RELEASE_STORE)) {
         db.createObjectStore(DOCUMENT_RELEASE_STORE, { keyPath: 'docKey' });
+      }
+      if (old < 5 && !db.objectStoreNames.contains(TEMPLATES_STORE)) {
+        db.createObjectStore(TEMPLATES_STORE, { keyPath: 'id' });
       }
     };
   });

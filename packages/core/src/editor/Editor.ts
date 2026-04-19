@@ -41,6 +41,7 @@ import {
   BEAKBLOCK_META_SKIP_TRACK_CHANGES,
   BEAKBLOCK_META_TRACK_CLEAR_LOG,
   BEAKBLOCK_META_TRACK_REMOVE,
+  COMPLIANCE_LOCK_BYPASS_META,
 } from '../plugins';
 import type { DocumentVersion } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
@@ -171,6 +172,7 @@ export class BeakBlockEditor {
       inputRules: this._config.inputRules,
       markdownPaste: this._config.markdownPaste,
       complianceLock: this._config.complianceLock,
+      dragDrop: this._config.dragDrop,
       history: false, // We manage history ourselves
       additionalPlugins: [...this._coreManagedPlugins(), ...(this._config.prosemirror?.plugins ?? [])],
     });
@@ -274,6 +276,7 @@ export class BeakBlockEditor {
     const tr = this.pm.createTransaction();
     tr.setMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES, true);
     tr.setMeta(BEAKBLOCK_META_TRACK_CLEAR_LOG, true);
+    tr.setMeta(COMPLIANCE_LOCK_BYPASS_META, true);
     tr.replaceWith(0, this.pm.doc.content.size, doc.content);
     this.pm.dispatch(tr);
   }

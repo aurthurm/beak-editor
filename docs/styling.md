@@ -420,7 +420,7 @@ module.exports = {
 When **[Compliance lock](./compliance-lock.md)** is enabled and headings use `props.locked`, default styles add:
 
 - A **padlock** at the **start** of locked headings (`h1`–`h6` with `data-beakblock-locked="true"`), implemented with a `::before` mask and `padding-inline-start`.
-- A **`.ob-block-lock-badge`** icon in the **block side menu** (`.ob-side-menu`) on hover, with tooltip text from `lockReason` when set.
+- A **`.ob-block-lock-badge`** icon in the **block side menu** (`.ob-side-menu`) on hover. With **`dragDrop.headingLockBadge: 'all-headings'`**, every heading shows the badge; **`.ob-block-lock-badge--interactive`** enables pointer cursor and hover styling for click-to-toggle. Tooltip text may use `lockReason` when the heading is locked.
 
 Override these selectors in your stylesheet if you replace or extend the default `editor.css` / injected bundle.
 

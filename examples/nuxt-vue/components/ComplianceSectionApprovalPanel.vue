@@ -35,7 +35,7 @@ function submitForReview() {
 function withdrawFromReview() {
   if (props.approval.state !== 'in_review') return;
   emit('update:approval', {
-    record: { sectionKey: props.sectionId, state: 'draft' },
+    record: { sectionKey: props.approval.sectionKey, state: 'draft' },
     event: 'withdraw',
     actor: { userId: COMPLIANCE_DEMO_USER.userId, displayName: COMPLIANCE_DEMO_USER.displayName },
   });
@@ -64,7 +64,7 @@ function approveSection() {
 function sendBackToDraft() {
   if (!props.reviewerOnly || props.approval.state !== 'in_review') return;
   emit('update:approval', {
-    record: { sectionKey: props.sectionId, state: 'draft' },
+    record: { sectionKey: props.approval.sectionKey, state: 'draft' },
     event: 'send_back',
     actor: { userId: COMPLIANCE_DEMO_USER.userId, displayName: COMPLIANCE_DEMO_USER.displayName },
   });
@@ -74,7 +74,7 @@ function sendBackToDraft() {
 function revokeApproval() {
   if (!props.reviewerOnly || props.approval.state !== 'approved') return;
   emit('update:approval', {
-    record: { sectionKey: props.sectionId, state: 'draft' },
+    record: { sectionKey: props.approval.sectionKey, state: 'draft' },
     event: 'revoke',
     actor: { userId: COMPLIANCE_DEMO_USER.userId, displayName: COMPLIANCE_DEMO_USER.displayName },
   });

@@ -400,6 +400,17 @@ const EDITOR_STYLES = `
   pointer-events: none;
 }
 
+.ob-block-lock-badge--interactive {
+  cursor: pointer;
+  pointer-events: auto;
+  border-radius: 4px;
+}
+
+.ob-block-lock-badge--interactive:hover {
+  color: #6b7280;
+  background: rgba(0, 0, 0, 0.04);
+}
+
 .ob-block-lock-badge svg {
   width: 14px;
   height: 14px;

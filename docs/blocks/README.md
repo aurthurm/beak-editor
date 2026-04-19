@@ -23,7 +23,7 @@ Rich text inside blocks uses **`content`**, not child blocks. See **[Inline cont
 | Block | Description |
 |-------|-------------|
 | [paragraph](./paragraph.md) | Default text block; optional `textAlign`. |
-| [heading](./heading.md) | `level` 1–6; optional `textAlign`; optional compliance **`locked`** / `lockReason` / `lockId`. |
+| [heading](./heading.md) | `level` 1–6; optional `textAlign`; optional compliance **`locked`** / `lockReason` / `lockId` (demo: **H1–H3** + `lockId` for outline sections — see [Compliance demo](../compliance-demo.md)). |
 | [blockquote](./blockquote.md) | Quotation styling; inline content. |
 | [callout](./callout.md) | Info / warning / success / error / note variants. |
 | [codeBlock](./codeBlock.md) | Plain code; optional `language`; no marks inside. |

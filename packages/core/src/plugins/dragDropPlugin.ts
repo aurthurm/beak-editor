@@ -12,7 +12,7 @@ import { Plugin, PluginKey, EditorState, TextSelection } from 'prosemirror-state
 import { Decoration, DecorationSet, EditorView } from 'prosemirror-view';
 import { Node as PMNode } from 'prosemirror-model';
 import { SLASH_MENU_PLUGIN_KEY } from './slashMenuPlugin';
-import { nodeIsComplianceLocked } from './complianceLockPlugin';
+import { COMPLIANCE_LOCK_BYPASS_META, nodeIsComplianceLocked } from './complianceLockPlugin';
 
 /**
  * Plugin key for accessing drag/drop state.
@@ -83,6 +83,14 @@ export interface DragDropConfig {
    * @default true
    */
   allowLockedBlockDrag?: boolean;
+
+  /**
+   * Side-menu lock control beside the drag handle.
+   * - `locked-only`: show for any compliance-locked block (default).
+   * - `all-headings`: show for every heading (locked and unlocked); click toggles `attrs.locked`
+   *   (uses {@link COMPLIANCE_LOCK_BYPASS_META}). Level-2 headings without `lockId` get one when locked.
+   */
+  headingLockBadge?: 'locked-only' | 'all-headings';
 }
 
 /**
@@ -117,6 +125,7 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
     onAddClick,
     onDrop,
     allowLockedBlockDrag = true,
+    headingLockBadge = 'locked-only',
   } = config;
 
   // Single side menu element that gets repositioned
@@ -137,29 +146,89 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
     const lockBadge = document.createElement('span');
     lockBadge.className = 'ob-block-lock-badge';
     lockBadge.setAttribute('contenteditable', 'false');
-    lockBadge.setAttribute('aria-hidden', 'true');
+    lockBadge.setAttribute('role', 'presentation');
     lockBadge.style.display = 'none';
-    const lockSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    lockSvg.setAttribute('width', '14');
-    lockSvg.setAttribute('height', '14');
-    lockSvg.setAttribute('viewBox', '0 0 24 24');
-    lockSvg.setAttribute('fill', 'none');
-    lockSvg.setAttribute('stroke', 'currentColor');
-    lockSvg.setAttribute('stroke-width', '2');
-    lockSvg.setAttribute('stroke-linecap', 'round');
-    lockSvg.setAttribute('stroke-linejoin', 'round');
-    const lockArch = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    lockArch.setAttribute('d', 'M7 11V7a5 5 0 0 1 10 0v4');
-    const lockBody = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    lockBody.setAttribute('x', '3');
-    lockBody.setAttribute('y', '11');
-    lockBody.setAttribute('width', '18');
-    lockBody.setAttribute('height', '11');
-    lockBody.setAttribute('rx', '2');
-    lockBody.setAttribute('ry', '2');
-    lockSvg.appendChild(lockArch);
-    lockSvg.appendChild(lockBody);
-    lockBadge.appendChild(lockSvg);
+
+    function svgIcon(parts: Array<{ tag: 'path' | 'rect'; d?: string; attrs?: Record<string, string> }>): SVGSVGElement {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '14');
+      svg.setAttribute('height', '14');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      for (const p of parts) {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', p.tag);
+        if (p.tag === 'path' && p.d) {
+          el.setAttribute('d', p.d);
+        }
+        if (p.attrs) {
+          for (const [k, v] of Object.entries(p.attrs)) {
+            el.setAttribute(k, v);
+          }
+        }
+        svg.appendChild(el);
+      }
+      return svg;
+    }
+
+    const lockSvgLocked = svgIcon([
+      { tag: 'path', d: 'M7 11V7a5 5 0 0 1 10 0v4' },
+      {
+        tag: 'rect',
+        attrs: { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' },
+      },
+    ]);
+    lockSvgLocked.classList.add('ob-block-lock-badge__icon--locked');
+
+    const lockSvgUnlocked = svgIcon([
+      { tag: 'path', d: 'M7 11V7a5 5 0 0 1 9.9-1' },
+      {
+        tag: 'rect',
+        attrs: { x: '3', y: '11', width: '18', height: '11', rx: '2', ry: '2' },
+      },
+    ]);
+    lockSvgUnlocked.classList.add('ob-block-lock-badge__icon--unlocked');
+    lockSvgUnlocked.style.display = 'none';
+
+    lockBadge.appendChild(lockSvgLocked);
+    lockBadge.appendChild(lockSvgUnlocked);
+
+    lockBadge.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      if (!lockBadge.classList.contains('ob-block-lock-badge--interactive')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (!editorView || !editorView.editable) return;
+      const pos = parseInt(menu.dataset.blockPos || '-1', 10);
+      if (pos < 0) return;
+      const node = editorView.state.doc.nodeAt(pos);
+      if (!node || node.type.name !== 'heading') return;
+
+      const wasLocked = nodeIsComplianceLocked(node);
+      const nextLocked = !wasLocked;
+      const attrs = { ...(node.attrs as Record<string, unknown>) } as Record<string, unknown>;
+      if (nextLocked) {
+        attrs.locked = true;
+        attrs.lockReason = attrs.lockReason ?? 'Required section heading (controlled document)';
+        const level = Number(attrs.level);
+        if (level >= 1 && level <= 3 && (!attrs.lockId || String(attrs.lockId).length === 0)) {
+          attrs.lockId =
+            typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+              ? crypto.randomUUID()
+              : `lock-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        }
+      } else {
+        attrs.locked = false;
+      }
+
+      const tr = editorView.state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, ...attrs });
+      tr.setMeta(COMPLIANCE_LOCK_BYPASS_META, true);
+      editorView.dispatch(tr);
+    });
+
     menu.appendChild(lockBadge);
 
     // Add button (+)
@@ -266,12 +335,46 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
     let left: number;
 
     const locked = nodeIsComplianceLocked(node);
+    const isHeading = node.type.name === 'heading';
+    const showLockBadge =
+      (isHeading && headingLockBadge === 'all-headings') || (headingLockBadge === 'locked-only' && locked);
     const lockBadgeEl = sideMenuEl.querySelector('.ob-block-lock-badge') as HTMLElement | null;
     if (lockBadgeEl) {
-      lockBadgeEl.style.display = locked ? 'flex' : 'none';
+      lockBadgeEl.style.display = showLockBadge ? 'flex' : 'none';
       const reason = node.attrs.lockReason;
-      lockBadgeEl.title =
-        locked && reason ? String(reason) : locked ? 'Read-only' : '';
+      const headingInteractive = isHeading && (headingLockBadge === 'all-headings' || locked);
+      if (headingInteractive) {
+        lockBadgeEl.classList.add('ob-block-lock-badge--interactive');
+        lockBadgeEl.setAttribute('role', 'button');
+        lockBadgeEl.setAttribute('tabindex', '-1');
+        lockBadgeEl.setAttribute(
+          'aria-label',
+          locked ? 'Unlock heading' : 'Lock heading'
+        );
+      } else {
+        lockBadgeEl.classList.remove('ob-block-lock-badge--interactive');
+        lockBadgeEl.setAttribute('role', 'presentation');
+        lockBadgeEl.removeAttribute('tabindex');
+        lockBadgeEl.removeAttribute('aria-label');
+      }
+      const lockedIcon = lockBadgeEl.querySelector('.ob-block-lock-badge__icon--locked') as SVGSVGElement | null;
+      const unlockedIcon = lockBadgeEl.querySelector('.ob-block-lock-badge__icon--unlocked') as SVGSVGElement | null;
+      if (headingLockBadge === 'all-headings' && isHeading && lockedIcon && unlockedIcon) {
+        lockedIcon.style.display = locked ? '' : 'none';
+        unlockedIcon.style.display = locked ? 'none' : '';
+      } else if (lockedIcon && unlockedIcon) {
+        lockedIcon.style.display = '';
+        unlockedIcon.style.display = 'none';
+      }
+      if (showLockBadge) {
+        lockBadgeEl.title = locked
+          ? reason
+            ? String(reason)
+            : 'Read-only — click to unlock'
+          : 'Click to lock this heading';
+      } else {
+        lockBadgeEl.title = '';
+      }
     }
 
     if (showHandles) {

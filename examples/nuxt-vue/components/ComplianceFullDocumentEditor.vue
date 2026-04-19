@@ -24,7 +24,7 @@ import {
   InMemoryCommentStore,
   type TrackedChangeRecord,
 } from '@amusendame/beakblock-core';
-import type { Block } from '@amusendame/beakblock-core';
+import type { BeakBlockEditor, Block } from '@amusendame/beakblock-core';
 import { sendAIRequest } from '../../shared/ai';
 import { appendComplianceAiLog } from '~/utils/complianceAiLog';
 import { COMPLIANCE_DEMO_USER } from '~/utils/complianceIdentity';
@@ -33,18 +33,40 @@ import { createIndexedDbVersioningAdapter } from '~/utils/idbVersioningAdapter';
 import { diffBlockTrees, type BlockDiffLine } from '~/utils/blockTreeDiff';
 import { sha256HexUtf8 } from '~/utils/documentHash';
 import { countUnresolvedCommentThreads } from '~/utils/complianceValidation';
-import { findComplianceSectionIdForBlockId } from '~/utils/complianceFullDocument';
-import type { ComplianceSectionDefinition } from '~/data';
+import {
+  applyComplianceSectionHeadingLockState,
+  findComplianceSectionIdForBlockId,
+  findSectionTitleInDoc,
+} from '~/utils/complianceFullDocument';
 
-const COMMENT_STORAGE_SECTION_KEY = 'compliance-full-doc';
-const VERSION_ADAPTER_KEY = 'compliance-gram-sop-full-doc';
-
-const props = defineProps<{
-  sections: ComplianceSectionDefinition[];
-  initialBlocks: Block[];
-  aiGovernanceMode?: 'off' | 'governed';
-  reviewerOnly?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    initialBlocks: Block[];
+    aiGovernanceMode?: 'off' | 'governed';
+    reviewerOnly?: boolean;
+    /** IndexedDB key for version snapshots (scope per document or template edit session). */
+    versioningKey?: string;
+    /** IndexedDB key for comment persistence. */
+    commentStorageKey?: string;
+    /** When false, compliance lock plugin is off (template authoring). */
+    complianceLockEnabled?: boolean;
+    versionCheckpointLabel?: string;
+    surfaceTitle?: string;
+    surfaceHint?: string;
+    /** Show "Add section" for template authoring (locked H2 + paragraph). */
+    templateAuthoring?: boolean;
+  }>(),
+  {
+    versioningKey: 'compliance-gram-sop-full-doc',
+    commentStorageKey: 'compliance-full-doc',
+    complianceLockEnabled: true,
+    versionCheckpointLabel: 'Checkpoint · controlled document (full document)',
+    surfaceTitle: 'Full SOP document',
+    surfaceHint:
+      'One editor for the entire procedure. Section titles under locked headings are compliance-controlled; add body content under each heading. New comment threads record the section inferred from your cursor when possible.',
+    templateAuthoring: false,
+  }
+);
 
 const emit = defineEmits<{
   update: [];
@@ -59,7 +81,7 @@ const aiMode = ref<'bubble' | 'slash'>('bubble');
 
 const cursorComplianceSectionId = ref<string | undefined>();
 
-const versionAdapter = createIndexedDbVersioningAdapter(VERSION_ADAPTER_KEY);
+const versionAdapter = createIndexedDbVersioningAdapter(props.versioningKey);
 
 const lastCheckpointId = ref<string | null>(null);
 const unresolvedCommentCount = ref(0);
@@ -69,26 +91,47 @@ const newThreadMetadata = computed(() => ({
   raisedAgainstCheckpointId: lastCheckpointId.value,
 }));
 
+/** Innermost doc block (paragraph, heading, etc.) containing the selection start. */
+function innermostBlockIdAtSelection(ed: BeakBlockEditor): string | undefined {
+  const $from = ed.pm.state.selection.$from;
+  for (let d = $from.depth; d > 0; d--) {
+    const n = $from.node(d);
+    const id = n.attrs?.id;
+    if (id != null && String(id) !== '') {
+      return String(id);
+    }
+  }
+  return undefined;
+}
+
+/**
+ * If the caret is at the very start of the reference block, insert before it (e.g. before the next
+ * section heading). Otherwise insert after the whole block.
+ */
+function insertPlacementRelativeToInnermostBlock(ed: BeakBlockEditor, refId: string): 'before' | 'after' {
+  const $from = ed.pm.state.selection.$from;
+  for (let d = $from.depth; d > 0; d--) {
+    const n = $from.node(d);
+    if (n.attrs?.id != null && String(n.attrs.id) === refId) {
+      const firstContentPos = $from.start(d) + 1;
+      return $from.pos <= firstContentPos ? 'before' : 'after';
+    }
+  }
+  return 'after';
+}
+
 function syncCursorSection() {
   const ed = editor.value;
   if (!ed || ed.isDestroyed) {
     cursorComplianceSectionId.value = undefined;
     return;
   }
-  const $from = ed.pm.state.selection.$from;
-  let blockId: string | undefined;
-  for (let d = $from.depth; d > 0; d--) {
-    const n = $from.node(d);
-    if (n.attrs?.id) {
-      blockId = String(n.attrs.id);
-      break;
-    }
-  }
+  const blockId = innermostBlockIdAtSelection(ed);
   if (!blockId) {
     cursorComplianceSectionId.value = undefined;
     return;
   }
-  cursorComplianceSectionId.value = findComplianceSectionIdForBlockId(ed.getDocument(), blockId, props.sections);
+  cursorComplianceSectionId.value = findComplianceSectionIdForBlockId(ed.getDocument(), blockId);
 }
 
 function syncUnresolved() {
@@ -116,11 +159,93 @@ const closeCommentModal = () => {
   commentOpen.value = false;
 };
 
+const applyDemoAI = async ({ output }: { output: string }) => {
+  editor.value?.pm.insertText(output);
+};
+
+function appendComplianceSection(level: 1 | 2 | 3 = 2) {
+  const ed = editor.value;
+  if (!ed || ed.isDestroyed) return;
+  const lockId = crypto.randomUUID();
+  const doc = ed.getDocument();
+  const label =
+    level === 1 ? 'New part' : level === 2 ? 'New section' : 'New subsection';
+  const lockReason =
+    level === 1 ? 'Part heading (template)' : level === 2 ? 'Section heading (template)' : 'Subsection heading (template)';
+  const toInsert: Block[] = [
+    {
+      id: crypto.randomUUID(),
+      type: 'heading',
+      props: {
+        level,
+        textAlign: 'left',
+        locked: true,
+        lockReason,
+        lockId,
+      },
+      content: [{ type: 'text', text: label, styles: {} }],
+    },
+    {
+      id: crypto.randomUUID(),
+      type: 'paragraph',
+      props: {},
+      content: [{ type: 'text', text: ' ', styles: {} }],
+    },
+  ];
+
+  const beforeCount = doc.length;
+  let refId = innermostBlockIdAtSelection(ed);
+  if (!refId) {
+    refId = doc[doc.length - 1]?.id;
+  }
+  if (refId) {
+    const placement =
+      innermostBlockIdAtSelection(ed) === refId ?
+        insertPlacementRelativeToInnermostBlock(ed, refId)
+      : 'after';
+    ed.insertBlocks(toInsert, refId, placement);
+    const afterCount = ed.getDocument().length;
+    if (afterCount <= beforeCount) {
+      ed.setDocument([...doc, ...toInsert]);
+    }
+  } else {
+    ed.setDocument([...doc, ...toInsert]);
+  }
+  emit('update');
+}
+
+/** Toggle compliance enforcement on a section title (`props.locked`); boundary `lockId` is unchanged. */
+function setSectionHeadingLockState(sectionLockId: string, locked: boolean) {
+  const ed = editor.value;
+  if (!ed || ed.isDestroyed) return;
+  const doc = ed.getDocument();
+  const next = applyComplianceSectionHeadingLockState(doc, sectionLockId, locked);
+  ed.setDocument(next);
+  emit('update');
+}
+
+const customBlocks = [createChartBlockSpec()];
+const editor = useBeakBlock({
+  initialContent: props.initialBlocks,
+  customBlocks,
+  complianceLock: props.complianceLockEnabled ? { allowReorder: false } : false,
+  dragDrop: {
+    headingLockBadge: 'all-headings',
+  },
+  versioning: { adapter: versionAdapter },
+  prosemirror: {
+    plugins: [createCommentPlugin(commentStore)],
+  },
+});
+
 const runAIPrompt = async (request: Parameters<typeof sendAIRequest>[0]) => {
   const out = await sendAIRequest(request, '/api/ai');
   if (aiGov.value === 'governed' && typeof out === 'string') {
     const sid = cursorComplianceSectionId.value;
-    const title = props.sections.find((s) => s.id === sid)?.title ?? 'Full document';
+    const ed = editor.value;
+    const doc = ed && !ed.isDestroyed ? ed.getDocument() : [];
+    const title =
+      sid ? (findSectionTitleInDoc(doc, sid) ?? 'Section') : 'Full document';
     appendComplianceAiLog({
       at: new Date().toISOString(),
       sectionId: sid ?? 'full-doc',
@@ -134,21 +259,6 @@ const runAIPrompt = async (request: Parameters<typeof sendAIRequest>[0]) => {
   }
   return out;
 };
-
-const applyDemoAI = async ({ output }: { output: string }) => {
-  editor.value?.pm.insertText(output);
-};
-
-const customBlocks = [createChartBlockSpec()];
-const editor = useBeakBlock({
-  initialContent: props.initialBlocks,
-  customBlocks,
-  complianceLock: { allowReorder: false },
-  versioning: { adapter: versionAdapter },
-  prosemirror: {
-    plugins: [createCommentPlugin(commentStore)],
-  },
-});
 
 const { versions, saveVersion, restoreVersion } = useDocumentVersions(editor, versionAdapter);
 const trackChangesOn = ref(false);
@@ -259,11 +369,11 @@ const onSaveVersion = async () => {
   const blocks = ed.getDocument();
   const checksum = await sha256HexUtf8(JSON.stringify(blocks));
   const v = await saveVersion({
-    label: 'Checkpoint · Gram stain SOP (full document)',
+    label: props.versionCheckpointLabel,
     meta: {
       userId: COMPLIANCE_DEMO_USER.userId,
       displayName: COMPLIANCE_DEMO_USER.displayName,
-      sectionId: VERSION_ADAPTER_KEY,
+      sectionId: props.versioningKey,
       contentChecksum: checksum,
     },
   });
@@ -335,14 +445,14 @@ watch(
 );
 
 onMounted(async () => {
-  const snap = await loadSectionComments(COMMENT_STORAGE_SECTION_KEY);
+  const snap = await loadSectionComments(props.commentStorageKey);
   if (snap.length) commentStore.hydrate(snap);
   syncUnresolved();
   unsubscribePersist = commentStore.subscribe(() => {
     syncUnresolved();
     clearTimeout(persistTimer);
     persistTimer = setTimeout(() => {
-      void saveSectionComments(COMMENT_STORAGE_SECTION_KEY, commentStore.snapshot());
+      void saveSectionComments(props.commentStorageKey, commentStore.snapshot());
     }, 450);
   });
 });
@@ -368,6 +478,8 @@ defineExpose({
   getCommentSnapshot,
   getPendingTrackGroupCount: () => pendingTrackGroups.value.length,
   countUnresolvedInSection,
+  appendComplianceSection,
+  setSectionHeadingLockState,
 });
 </script>
 
@@ -376,18 +488,44 @@ defineExpose({
     <div class="visually-hidden" aria-live="polite">{{ trackChangesLiveMessage }}</div>
     <header class="compliance-section__head">
       <div class="compliance-section__labels">
-        <span class="compliance-section__title">Full SOP document</span>
-        <span class="compliance-section__badge">Controlled · section headings locked</span>
+        <span class="compliance-section__title">{{ surfaceTitle }}</span>
+        <span class="compliance-section__badge">{{
+          complianceLockEnabled ? 'Controlled · section headings locked' : 'Template · headings editable'
+        }}</span>
         <span v-if="reviewerOnly" class="compliance-section__badge compliance-section__badge--reviewer">Reviewer view</span>
         <span v-if="unresolvedCommentCount > 0" class="compliance-section__badge compliance-section__badge--comments">
           {{ unresolvedCommentCount }} open comments
         </span>
       </div>
-      <p class="compliance-section__hint">
-        One editor for the entire procedure. Numbered section titles (<strong>1. Purpose</strong>, etc.) are compliance-locked and cannot be edited or reordered; add body content under each heading. New comment threads record the section inferred from your cursor when possible.
-      </p>
+      <p class="compliance-section__hint">{{ surfaceHint }}</p>
 
       <div class="compliance-section__version-bar" role="group" aria-label="Versioning and track changes">
+        <template v-if="templateAuthoring">
+          <button
+            type="button"
+            class="compliance-section__version-btn compliance-section__version-btn--primary"
+            title="Insert after the block that contains the text cursor (place the cursor between sections or in a paragraph, then click)"
+            @click="appendComplianceSection(1)"
+          >
+            Add H1 part
+          </button>
+          <button
+            type="button"
+            class="compliance-section__version-btn compliance-section__version-btn--primary"
+            title="Insert after the block that contains the text cursor (place the cursor between sections or in a paragraph, then click)"
+            @click="appendComplianceSection(2)"
+          >
+            Add H2 section
+          </button>
+          <button
+            type="button"
+            class="compliance-section__version-btn compliance-section__version-btn--primary"
+            title="Insert after the block that contains the text cursor (place the cursor between sections or in a paragraph, then click)"
+            @click="appendComplianceSection(3)"
+          >
+            Add H3 subsection
+          </button>
+        </template>
         <label class="compliance-section__version-check">
           <input type="checkbox" v-model="trackChangesOn" :disabled="reviewerOnly" @change="toggleTrackChanges" />
           Track changes

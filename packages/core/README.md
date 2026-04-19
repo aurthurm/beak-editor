@@ -214,6 +214,14 @@ See [Comments](../../docs/comments.md) for the full API, anchoring rules, persis
 
 See [Versioning and track changes](../../docs/versioning.md) for adapter details, Y.js caveats, per-hunk accept/reject, and reviewer workflows.
 
+## Compliance lock and drag-drop configuration
+
+- **`complianceLock`** — Optional read-only policy for blocks with **`attrs.locked`**. See **[Compliance lock](../../docs/compliance-lock.md)** for the policy matrix, **`COMPLIANCE_LOCK_BYPASS_META`**, and collaboration notes.
+- **`dragDrop`** — Optional **`DragDropConfig | false`** merged into **`createPlugins`**. Use **`headingLockBadge: 'all-headings'`** to show a **clickable** lock control on every heading (toggle uses bypass meta). Omit or pass **`false`** to disable the drag-drop plugin.
+- **`setDocument(blocks)`** — Full document replacement sets compliance **bypass** meta so programmatic reloads can change locked headings when the lock plugin is enabled.
+
+Types: **`EditorConfig`**, **`DragDropConfig`**, **`ComplianceLockPluginOptions`** are exported from `@amusendame/beakblock-core`.
+
 ## License
 
 Apache-2.0

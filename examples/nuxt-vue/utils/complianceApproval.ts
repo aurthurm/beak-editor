@@ -42,6 +42,11 @@ export type SectionApprovalRecord = {
 
 const MAX_SECTION_APPROVAL_HISTORY = 80;
 
+/** IndexedDB approval row key: isolates section sign-offs per document instance. */
+export function formatApprovalSectionKey(documentInstanceId: string, sectionLockId: string): string {
+  return `${documentInstanceId}::${sectionLockId}`;
+}
+
 export function draftApprovalRecord(sectionKey: string): SectionApprovalRecord {
   return { sectionKey, state: 'draft', history: [] };
 }
@@ -99,6 +104,29 @@ export async function loadAllSectionApprovals(): Promise<Record<string, SectionA
       const out: Record<string, SectionApprovalRecord> = {};
       for (const row of req.result as SectionApprovalRecord[]) {
         if (row?.sectionKey) out[row.sectionKey] = normalizeSectionApprovalRecord(row);
+      }
+      resolve(out);
+    };
+  });
+}
+
+/** Approvals for one compliance document; keys are section lockIds; each record.sectionKey is the full storage key. */
+export async function loadSectionApprovalsForDocument(
+  documentInstanceId: string
+): Promise<Record<string, SectionApprovalRecord>> {
+  const db = await openComplianceDb();
+  const prefix = `${documentInstanceId}::`;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(APPROVALS_STORE, 'readonly');
+    const req = tx.objectStore(APPROVALS_STORE).getAll();
+    req.onerror = (): void => reject(req.error ?? new Error('read approvals'));
+    req.onsuccess = (): void => {
+      const out: Record<string, SectionApprovalRecord> = {};
+      for (const row of req.result as SectionApprovalRecord[]) {
+        const sk = row?.sectionKey;
+        if (!sk || !sk.startsWith(prefix)) continue;
+        const logicalId = sk.slice(prefix.length);
+        out[logicalId] = normalizeSectionApprovalRecord(row);
       }
       resolve(out);
     };

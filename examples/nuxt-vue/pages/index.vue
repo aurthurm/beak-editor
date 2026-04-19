@@ -9,7 +9,14 @@ import {
 } from '@amusendame/beakblock-vue';
 import { BUBBLE_AI_PRESETS, SLASH_AI_PRESETS } from '@amusendame/beakblock-core';
 import type { BeakBlockEditor, Block, CommentStore } from '@amusendame/beakblock-core';
-import { complianceSopSections, financialAnalystCvDocument, sampleDocument } from '~/data';
+import { financialAnalystCvDocument, sampleDocument } from '~/data';
+import {
+  cloneTemplateBlocksForNewDocument,
+  getTemplate,
+  listTemplates,
+  seedGramStainTemplateIfEmpty,
+  type ComplianceTemplateRecord,
+} from '~/utils/complianceTemplates';
 import {
   boardOnePagerDocument,
   lessonPlanDocument,
@@ -57,6 +64,47 @@ const complianceManifest = ref<ComplianceMergeManifest | null>(null);
 const complianceReviewerMode = ref(false);
 const complianceAiOff = ref(false);
 
+const complianceView = ref<'document' | 'templates'>('document');
+const complianceDocumentInstanceId = ref(crypto.randomUUID());
+const complianceSelectedTemplateId = ref('');
+const complianceWorkingBlocks = ref<Block[]>([]);
+const complianceSectionRequiredMap = ref<Record<string, boolean>>({});
+const complianceExportTitle = ref('Compliance document');
+const complianceTemplateList = ref<ComplianceTemplateRecord[]>([]);
+const complianceBootstrapDone = ref(false);
+
+async function refreshComplianceTemplateOptions() {
+  complianceTemplateList.value = await listTemplates();
+  if (
+    complianceSelectedTemplateId.value &&
+    !complianceTemplateList.value.some((t) => t.id === complianceSelectedTemplateId.value)
+  ) {
+    complianceSelectedTemplateId.value = complianceTemplateList.value[0]?.id ?? '';
+  }
+}
+
+async function applyComplianceTemplate(templateId: string) {
+  const t = await getTemplate(templateId);
+  if (!t) return;
+  complianceSelectedTemplateId.value = templateId;
+  complianceDocumentInstanceId.value = crypto.randomUUID();
+  complianceWorkingBlocks.value = cloneTemplateBlocksForNewDocument(t.blocks);
+  complianceSectionRequiredMap.value = { ...t.sectionRequiredByLockId };
+  complianceExportTitle.value = t.name;
+}
+
+async function onComplianceTemplateSelect() {
+  if (complianceSelectedTemplateId.value) {
+    await applyComplianceTemplate(complianceSelectedTemplateId.value);
+  }
+}
+
+function newComplianceDocumentFromTemplate() {
+  if (complianceSelectedTemplateId.value) {
+    void applyComplianceTemplate(complianceSelectedTemplateId.value);
+  }
+}
+
 const panelRefs = reactive<Record<string, PanelApi | null>>({});
 
 function setPanelRef(id: string, el: unknown) {
@@ -73,9 +121,18 @@ const commentOpen = ref(false);
 const aiOpen = ref(false);
 const aiMode = ref<'bubble' | 'slash'>('bubble');
 
-watch(viewMode, () => {
+watch(viewMode, async (m) => {
   commentOpen.value = false;
   aiOpen.value = false;
+  if (m !== 'compliance') return;
+  await seedGramStainTemplateIfEmpty();
+  await refreshComplianceTemplateOptions();
+  if (!complianceBootstrapDone.value) {
+    complianceBootstrapDone.value = true;
+    if (complianceWorkingBlocks.value.length === 0 && complianceTemplateList.value[0]) {
+      await applyComplianceTemplate(complianceTemplateList.value[0].id);
+    }
+  }
 });
 
 const openCommentModal = () => {
@@ -230,7 +287,7 @@ watchEffect((onCleanup) => {
         <h1>Almost every block in one editorial page.</h1>
         <p>
           Pick a sample from the <strong>left rail</strong> — each opens a dedicated editor with comments, AI, tables, media, and charts where the document uses them. The
-          <strong>Gram stain SOP</strong> mode demonstrates multi-section compliance authoring and a merged preview.
+          <strong>Compliance</strong> mode uses templates (seeded Gram stain SOP), per-section approvals, and export.
         </p>
       </div>
 
@@ -282,7 +339,7 @@ watchEffect((onCleanup) => {
           :class="{ 'sample-sidebar__btn--active': viewMode === 'compliance' }"
           @click="viewMode = 'compliance'"
         >
-          Gram stain SOP
+          Compliance
           <span class="sample-sidebar__sub">Compliance + preview</span>
         </button>
       </aside>
@@ -334,47 +391,98 @@ watchEffect((onCleanup) => {
 
             <div v-show="viewMode === 'compliance'" class="editor-stage__panel editor-stage__panel--compliance">
               <div class="compliance-toolbar">
-                <p class="compliance-toolbar__label">Gram stain — controlled SOP</p>
+                <p class="compliance-toolbar__label">
+                  {{ complianceView === 'templates' ? 'Template studio' : 'Controlled document' }}
+                </p>
                 <div class="compliance-toolbar__controls">
-                  <label class="compliance-toolbar__toggle">
-                    <input v-model="complianceReviewerMode" type="checkbox" />
-                    Reviewer view
-                  </label>
-                  <label class="compliance-toolbar__toggle">
-                    <input v-model="complianceAiOff" type="checkbox" />
-                    Disable AI
-                  </label>
                   <button
                     type="button"
-                    class="compliance-toolbar__preview"
-                    :disabled="!complianceWorkspaceRef || !complianceWorkspaceRef.canOpenPreview()"
-                    :title="
-                      complianceWorkspaceRef?.canOpenPreview()
-                        ? 'Open merged read-only preview'
-                        : 'Fix validation issues or enter a waiver reason'
-                    "
-                    @click="openDocumentPreview"
+                    class="compliance-toolbar__tab"
+                    :class="{ 'compliance-toolbar__tab--active': complianceView === 'document' }"
+                    @click="complianceView = 'document'"
                   >
-                    Preview document
+                    Document
                   </button>
                   <button
                     type="button"
-                    class="compliance-toolbar__export"
-                    :disabled="!complianceWorkspaceRef || !complianceWorkspaceRef.canOpenPreview()"
-                    title="Download JSON bundle and Markdown (with checksum)"
-                    @click="exportComplianceBundle"
+                    class="compliance-toolbar__tab"
+                    :class="{ 'compliance-toolbar__tab--active': complianceView === 'templates' }"
+                    @click="complianceView = 'templates'"
                   >
-                    Export bundle
+                    Templates
                   </button>
+                  <template v-if="complianceView === 'document'">
+                    <label class="compliance-toolbar__select-label">
+                      Template
+                      <select
+                        v-model="complianceSelectedTemplateId"
+                        class="compliance-toolbar__select"
+                        @change="onComplianceTemplateSelect"
+                      >
+                        <option v-if="!complianceTemplateList.length" value="" disabled>No templates</option>
+                        <option v-for="t in complianceTemplateList" :key="t.id" :value="t.id">{{ t.name }}</option>
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      class="compliance-toolbar__tab"
+                      :disabled="!complianceSelectedTemplateId"
+                      @click="newComplianceDocumentFromTemplate"
+                    >
+                      New document
+                    </button>
+                  </template>
+                  <template v-if="complianceView === 'document'">
+                    <label class="compliance-toolbar__toggle">
+                      <input v-model="complianceReviewerMode" type="checkbox" />
+                      Reviewer view
+                    </label>
+                    <label class="compliance-toolbar__toggle">
+                      <input v-model="complianceAiOff" type="checkbox" />
+                      Disable AI
+                    </label>
+                    <button
+                      type="button"
+                      class="compliance-toolbar__preview"
+                      :disabled="!complianceWorkspaceRef || !complianceWorkspaceRef.canOpenPreview()"
+                      :title="
+                        complianceWorkspaceRef?.canOpenPreview()
+                          ? 'Open merged read-only preview'
+                          : 'Fix validation issues or enter a waiver reason'
+                      "
+                      @click="openDocumentPreview"
+                    >
+                      Preview document
+                    </button>
+                    <button
+                      type="button"
+                      class="compliance-toolbar__export"
+                      :disabled="!complianceWorkspaceRef || !complianceWorkspaceRef.canOpenPreview()"
+                      title="Download JSON bundle and Markdown (with checksum)"
+                      @click="exportComplianceBundle"
+                    >
+                      Export bundle
+                    </button>
+                  </template>
                 </div>
               </div>
+              <ComplianceTemplateStudio
+                v-if="complianceView === 'templates'"
+                @templates-updated="refreshComplianceTemplateOptions"
+              />
               <ComplianceDocumentWorkspace
+                v-else-if="complianceWorkingBlocks.length > 0"
+                :key="complianceDocumentInstanceId"
                 ref="complianceWorkspaceRef"
                 v-model:merged-blocks="complianceMerged"
-                :sections="complianceSopSections"
+                :document-instance-id="complianceDocumentInstanceId"
+                :initial-document-blocks="complianceWorkingBlocks"
+                :section-required-by-lock-id="complianceSectionRequiredMap"
+                :document-title="complianceExportTitle"
                 :reviewer-only="complianceReviewerMode"
                 :ai-governance-mode="complianceAiOff ? 'off' : 'governed'"
               />
+              <p v-else class="compliance-toolbar__loading">Loading compliance document…</p>
             </div>
 
             <Teleport to="body">
@@ -391,8 +499,8 @@ watchEffect((onCleanup) => {
                   >
                     <header class="doc-preview-dialog__head">
                       <div>
-                        <p id="doc-preview-title" class="doc-preview-dialog__title">Gram stain SOP — merged preview</p>
-                        <p class="doc-preview-dialog__sub">Read-only — all controlled sections and reference images combined with section headings.</p>
+                        <p id="doc-preview-title" class="doc-preview-dialog__title">{{ complianceExportTitle }} — preview</p>
+                        <p class="doc-preview-dialog__sub">Read-only merged document from the controlled editor.</p>
                       </div>
                       <button type="button" class="doc-preview-dialog__close" @click="closeDocumentPreview">Close</button>
                     </header>

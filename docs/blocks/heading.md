@@ -29,9 +29,9 @@ Section heading (`<h1>`–`<h6>`).
 | `textAlign` | `'left' \| 'center' \| 'right'` | `'left'` | Alignment. |
 | `locked` | `boolean` | `false` | When `true` and **[compliance lock](../compliance-lock.md)** is enabled, the heading is read-only (no edit/delete/attr changes; reorder depends on `allowReorder`). |
 | `lockReason` | `string \| null` | `null` | Optional human-readable reason (tooltip in the block side menu; exported in HTML attrs). |
-| `lockId` | `string \| null` | `null` | Optional stable id for the lock policy (exported as `data-beakblock-lock-id`). |
+| `lockId` | `string \| null` | `null` | Optional stable id for the lock policy (exported as `data-beakblock-lock-id`). In the Nuxt compliance demo, **H1–H3** headings with a non-empty `lockId` define **outline sections**; nesting follows heading levels (see **[Compliance workflow](../compliance-demo.md)**). |
 
-When `locked` is true, the DOM uses **`data-beakblock-locked="true"`** and default CSS shows a **padlock** at the start of the heading and in the **hover side menu**.
+When `locked` is true, the DOM uses **`data-beakblock-locked="true"`** and default CSS shows a **padlock** at the start of the heading and in the **hover side menu** (see **[Compliance lock](../compliance-lock.md)** for **`headingLockBadge: 'all-headings'`** and click-to-toggle).
 
 ## Usage
 

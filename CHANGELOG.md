@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-04-18
+
+### Added
+
+#### Core (`@amusendame/beakblock-core`)
+
+- **`EditorConfig.dragDrop`** — Forwards **`DragDropConfig`** (or **`false`**) into **`createPlugins`**. New **`headingLockBadge`** option: **`'locked-only'`** (default) vs **`'all-headings'`** (show lock control on every heading; **click** toggles **`locked`** with **`COMPLIANCE_LOCK_BYPASS_META`**; assigns **`lockId`** for levels **1–3** when locking if missing).
+- **`setDocument`** — Applies **`COMPLIANCE_LOCK_BYPASS_META`** on the replace transaction so full-document updates are allowed when compliance lock is enabled.
+
+#### Documentation
+
+- **[Compliance demo](docs/compliance-demo.md)** — Hierarchical **H1–H3** section boundaries, flat slice shape (`level`, `parentLockId`, `headingBlockId`), template validation, cursor-based **Add H1/H2/H3**, side-menu lock, and **`complianceFullDocument`** API list (**`sliceComplianceDocumentTree`**, **`nextIndexAfterComplianceSlice`**, …).
+- **[Compliance lock](docs/compliance-lock.md)** — **`EditorConfig.dragDrop`**, **`headingLockBadge`**, **`setDocument`** bypass, **`.ob-block-lock-badge--interactive`**.
+- **[Plugins](docs/plugins.md)**, **[Heading block](docs/blocks/heading.md)**, **[Styling](docs/styling.md)**, **[Core README](packages/core/README.md)** — Cross-references for the above.
+
+#### Examples (`examples/nuxt-vue`)
+
+- Compliance **outline** parsing and UI: nested subsections, workspace indent, **`insertBlocks`** at cursor for template toolbar, **`ComplianceFullDocumentEditor`** **`dragDrop.headingLockBadge: 'all-headings'`**.
+
 ## [0.1.1] - 2026-04-18
 
 ### Changed

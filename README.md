@@ -284,7 +284,7 @@ The examples are intentionally dense and show:
 - inline icons and emojis
 - links and colors
 
-The **Nuxt** app additionally demonstrates a **compliance-oriented workspace**: per-section versioning and track changes, **section approvals** with **audit history**, **read-only lock** after sign-off for authors, optional **document-level dual attestation**, and **HTML export** with compliance appendices. See [`docs/compliance-demo.md`](docs/compliance-demo.md).
+The **Nuxt** app additionally demonstrates a **compliance-oriented workspace**: **H1–H3** outline sections (`lockId`), per-section versioning and track changes, **section approvals** with **audit history**, **read-only lock** after sign-off for authors, optional **document-level dual attestation**, **cursor-based section insertion**, side-menu **heading lock** toggle, and **HTML export** with compliance appendices. See [`docs/compliance-demo.md`](docs/compliance-demo.md).
 
 ## Core API
 
@@ -292,7 +292,7 @@ The **Nuxt** app additionally demonstrates a **compliance-oriented workspace**: 
 
 ```ts
 editor.getDocument()
-editor.setDocument(blocks)
+editor.setDocument(blocks) // applies compliance-lock bypass when replacing the doc
 editor.getBlock(id)
 editor.insertBlocks(blocks, ref, pos)
 editor.updateBlock(id, update)
@@ -362,7 +362,7 @@ See the full guide in [`docs/custom-blocks.md`](docs/custom-blocks.md).
 | [`docs/collaboration.md`](docs/collaboration.md) | Use collaborative editing with Y.js |
 | [`docs/versioning.md`](docs/versioning.md) | Snapshots, restore, and track changes |
 | [`docs/comments.md`](docs/comments.md) | Comment threads, stores, and Vue/React modals |
-| [`docs/compliance-lock.md`](docs/compliance-lock.md) | Read-only compliance blocks, `EditorConfig.complianceLock`, bypass meta, lock UI |
+| [`docs/compliance-lock.md`](docs/compliance-lock.md) | Read-only compliance blocks, `EditorConfig.complianceLock` & `dragDrop.headingLockBadge`, bypass meta, lock UI, `setDocument` bypass |
 | [`docs/compliance-demo.md`](docs/compliance-demo.md) | Nuxt example: approvals, audit trail, document release, export |
 
 ## Packages

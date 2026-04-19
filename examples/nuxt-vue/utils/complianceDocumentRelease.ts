@@ -1,7 +1,5 @@
 import { DOCUMENT_RELEASE_STORE, openComplianceDb } from './complianceDb';
 
-export const DOCUMENT_RELEASE_DOC_KEY = 'gram-sop-demo';
-
 export type DocumentReleaseSignOff = {
   at: string;
   userId: string;

@@ -529,6 +529,53 @@ textarea {
   gap: 12px 16px;
 }
 
+.compliance-toolbar__tab {
+  border: 1px solid rgba(31, 45, 77, 0.25);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1f2d4d;
+  background: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+}
+
+.compliance-toolbar__tab--active {
+  background: #1f2d4d;
+  color: #fff;
+  border-color: #1f2d4d;
+}
+
+.compliance-toolbar__tab:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.compliance-toolbar__select-label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1f2d4d;
+}
+
+.compliance-toolbar__select {
+  min-width: 180px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 45, 77, 0.3);
+  font-size: 0.88rem;
+}
+
+.compliance-toolbar__loading {
+  margin: 12px 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
 .compliance-toolbar__toggle {
   display: inline-flex;
   align-items: center;
@@ -712,6 +759,26 @@ textarea {
   margin: 0;
   font-size: 0.78rem;
   color: #6b5d54;
+}
+
+.compliance-workspace__status-lock {
+  flex: 1 1 100%;
+}
+
+.compliance-workspace__status-lock-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 45, 77, 0.35);
+  background: rgba(255, 255, 255, 0.95);
+  color: #1f2d4d;
+  cursor: pointer;
+}
+
+.compliance-workspace__status-lock-btn--warn {
+  border-color: rgba(180, 83, 9, 0.45);
+  color: #9a3412;
 }
 
 .compliance-workspace__waiver {
