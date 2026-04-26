@@ -1,20 +1,3 @@
-/**
- * Custom React blocks module.
- *
- * @module
- */
-
-export {
-  createReactBlockSpec,
-  useBlockEditor,
-  useUpdateBlock,
-  type PropSchema,
-  type BlockSpec,
-  type BlockRenderProps,
-  type BlockImplementation,
-  type ReactBlockSpec,
-  type SlashMenuConfig,
-} from './createReactBlockSpec';
 export {
   createChartBlockSpec,
   createDefaultChartData,
@@ -24,7 +7,7 @@ export {
   DEFAULT_CHART_OPTIONS,
   DEFAULT_BORDER_COLORS,
   DEFAULT_CHART_COLORS,
-} from './chart';
+} from './createChartBlockSpec';
 export type {
   ChartBlockType,
   ChartColorMode,
@@ -32,4 +15,4 @@ export type {
   ChartDataset,
   ChartData,
   ChartOptions,
-} from './chart';
+} from './chartTypes';

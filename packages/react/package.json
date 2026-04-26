@@ -35,7 +35,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@amusendame/beakblock-core": "workspace:*"
+    "@amusendame/beakblock-core": "workspace:*",
+    "chart.js": "^4.5.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",

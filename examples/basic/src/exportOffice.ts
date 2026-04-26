@@ -4,60 +4,58 @@
  */
 
 import { blocksToMarkdown, type Block, type InlineContent } from '@amusendame/beakblock-core';
-import {
-  Document,
-  ExternalHyperlink,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  TextRun,
-  UnderlineType,
+import type {
+  ExternalHyperlink as DocxExternalHyperlink,
+  Paragraph as DocxParagraph,
+  TextRun as DocxTextRun,
 } from 'docx';
-import { marked } from 'marked';
 
-const HEADINGS = [
-  HeadingLevel.HEADING_1,
-  HeadingLevel.HEADING_2,
-  HeadingLevel.HEADING_3,
-  HeadingLevel.HEADING_4,
-  HeadingLevel.HEADING_5,
-  HeadingLevel.HEADING_6,
-];
+function inlinesToRuns(docx: typeof import('docx'), content: InlineContent[] | undefined): Array<DocxTextRun | DocxExternalHyperlink> {
+  if (!content?.length) return [new docx.TextRun('')];
 
-function inlinesToRuns(content: InlineContent[] | undefined): (TextRun | ExternalHyperlink)[] {
-  if (!content?.length) return [new TextRun('')];
-  const out: (TextRun | ExternalHyperlink)[] = [];
+  const out: Array<DocxTextRun | DocxExternalHyperlink> = [];
+
   for (const item of content) {
     if (item.type === 'text') {
       out.push(
-        new TextRun({
+        new docx.TextRun({
           text: item.text,
           bold: Boolean(item.styles.bold),
           italics: Boolean(item.styles.italic),
           strike: Boolean(item.styles.strikethrough),
-          underline: item.styles.underline ? { type: UnderlineType.SINGLE } : undefined,
+          underline: item.styles.underline ? { type: docx.UnderlineType.SINGLE } : undefined,
           font: item.styles.code ? 'Consolas' : undefined,
         })
       );
     } else if (item.type === 'link') {
       const text = item.content.map((c) => c.text).join('') || item.href;
       out.push(
-        new ExternalHyperlink({
-          children: [new TextRun({ text, style: 'Hyperlink' })],
+        new docx.ExternalHyperlink({
+          children: [new docx.TextRun({ text, style: 'Hyperlink' })],
           link: item.href,
         })
       );
     } else if (item.type === 'hardBreak') {
-      out.push(new TextRun({ break: 1 }));
+      out.push(new docx.TextRun({ break: 1 }));
     } else if (item.type === 'icon') {
-      out.push(new TextRun({ text: item.symbol || item.icon }));
+      out.push(new docx.TextRun({ text: item.symbol || item.icon }));
     }
   }
-  return out.length ? out : [new TextRun('')];
+
+  return out.length ? out : [new docx.TextRun('')];
 }
 
-function blocksToParagraphs(blocks: Block[]): Paragraph[] {
-  const paragraphs: Paragraph[] = [];
+function blocksToParagraphs(docx: typeof import('docx'), blocks: Block[]): DocxParagraph[] {
+  const headings = [
+    docx.HeadingLevel.HEADING_1,
+    docx.HeadingLevel.HEADING_2,
+    docx.HeadingLevel.HEADING_3,
+    docx.HeadingLevel.HEADING_4,
+    docx.HeadingLevel.HEADING_5,
+    docx.HeadingLevel.HEADING_6,
+  ] as const;
+
+  const paragraphs: DocxParagraph[] = [];
 
   const walk = (list: Block[]) => {
     for (const b of list) {
@@ -65,22 +63,22 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
         case 'heading': {
           const idx = Math.min(6, Math.max(1, Number(b.props?.level) || 1)) - 1;
           paragraphs.push(
-            new Paragraph({
-              heading: HEADINGS[idx],
-              children: inlinesToRuns(b.content),
+            new docx.Paragraph({
+              heading: headings[idx],
+              children: inlinesToRuns(docx, b.content),
             })
           );
           break;
         }
         case 'paragraph':
-          paragraphs.push(new Paragraph({ children: inlinesToRuns(b.content) }));
+          paragraphs.push(new docx.Paragraph({ children: inlinesToRuns(docx, b.content) }));
           break;
         case 'blockquote':
         case 'callout':
           paragraphs.push(
-            new Paragraph({
+            new docx.Paragraph({
               indent: { left: 720 },
-              children: inlinesToRuns(b.content),
+              children: inlinesToRuns(docx, b.content),
             })
           );
           break;
@@ -89,11 +87,11 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
             .filter((x): x is Extract<InlineContent, { type: 'text' }> => x.type === 'text')
             .map((x) => x.text)
             .join('');
-          paragraphs.push(new Paragraph({ children: [new TextRun({ text, font: 'Consolas' })] }));
+          paragraphs.push(new docx.Paragraph({ children: [new docx.TextRun({ text, font: 'Consolas' })] }));
           break;
         }
         case 'divider':
-          paragraphs.push(new Paragraph({ children: [new TextRun('---')] }));
+          paragraphs.push(new docx.Paragraph({ children: [new docx.TextRun('---')] }));
           break;
         case 'bulletList':
         case 'orderedList':
@@ -107,8 +105,8 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
                   ? `${(li.props as { checked?: boolean } | undefined)?.checked ? '[x] ' : '[ ] '}`
                   : '• ';
             paragraphs.push(
-              new Paragraph({
-                children: [new TextRun(prefix), ...inlinesToRuns(li.content)],
+              new docx.Paragraph({
+                children: [new docx.TextRun(prefix), ...inlinesToRuns(docx, li.content)],
               })
             );
           }
@@ -132,7 +130,7 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
                   .join(' ')
               )
               .join(' | ');
-            paragraphs.push(new Paragraph({ children: [new TextRun(cellTexts || ' ')] }));
+            paragraphs.push(new docx.Paragraph({ children: [new docx.TextRun(cellTexts || ' ')] }));
           }
           break;
         }
@@ -142,12 +140,12 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
           break;
         case 'image': {
           const alt = String(b.props?.alt || 'image');
-          paragraphs.push(new Paragraph({ children: [new TextRun(`[Image: ${alt}]`)] }));
+          paragraphs.push(new docx.Paragraph({ children: [new docx.TextRun(`[Image: ${alt}]`)] }));
           break;
         }
         case 'embed': {
           const url = String(b.props?.url || '');
-          paragraphs.push(new Paragraph({ children: [new TextRun(`[Embed: ${url}]`)] }));
+          paragraphs.push(new docx.Paragraph({ children: [new docx.TextRun(`[Embed: ${url}]`)] }));
           break;
         }
         case 'listItem':
@@ -159,7 +157,7 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
         default:
           if (b.children?.length) walk(b.children);
           else if (b.content?.length) {
-            paragraphs.push(new Paragraph({ children: inlinesToRuns(b.content) }));
+            paragraphs.push(new docx.Paragraph({ children: inlinesToRuns(docx, b.content) }));
           }
       }
     }
@@ -171,10 +169,11 @@ function blocksToParagraphs(blocks: Block[]): Paragraph[] {
 
 /** Download the current document as a Word `.docx` file. */
 export async function downloadBlocksAsDocx(blocks: Block[], filename = 'document.docx'): Promise<void> {
-  const doc = new Document({
-    sections: [{ children: blocksToParagraphs(blocks) }],
+  const docx = await import('docx');
+  const doc = new docx.Document({
+    sections: [{ children: blocksToParagraphs(docx, blocks) }],
   });
-  const blob = await Packer.toBlob(doc);
+  const blob = await docx.Packer.toBlob(doc);
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -186,7 +185,8 @@ export async function downloadBlocksAsDocx(blocks: Block[], filename = 'document
 /**
  * Open a print dialog with HTML rendered from Markdown (use “Save as PDF” in the browser).
  */
-export function printDocumentAsPdf(blocks: Block[]): void {
+export async function printDocumentAsPdf(blocks: Block[]): Promise<void> {
+  const { marked } = await import('marked');
   const md = blocksToMarkdown(blocks);
   const body = marked.parse(md, { async: false }) as string;
   const w = window.open('', '_blank');

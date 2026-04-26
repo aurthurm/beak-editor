@@ -40,6 +40,8 @@ export {
   BubbleMenu,
   AIModal,
   CommentModal,
+  CommentRail,
+  LinkPopover,
   TableMenu,
   TableHandles,
   MediaMenu,
@@ -59,6 +61,8 @@ export type {
   BubbleMenuItem,
   AIModalProps,
   CommentModalProps,
+  CommentRailProps,
+  LinkPopoverProps,
   TableMenuProps,
   TableHandlesProps,
   MediaMenuProps,
@@ -69,6 +73,14 @@ export type {
 // Custom blocks
 export {
   createReactBlockSpec,
+  createChartBlockSpec,
+  createDefaultChartData,
+  createDefaultDataset,
+  createCategoryColorPalette,
+  DEFAULT_CHART_CANVAS_MIN_HEIGHT_PX,
+  DEFAULT_CHART_OPTIONS,
+  DEFAULT_BORDER_COLORS,
+  DEFAULT_CHART_COLORS,
   useBlockEditor,
   useUpdateBlock,
 } from './blocks';
@@ -79,6 +91,12 @@ export type {
   BlockImplementation,
   ReactBlockSpec,
   SlashMenuConfig,
+  ChartBlockType,
+  ChartColorMode,
+  ChartNodeData,
+  ChartDataset,
+  ChartData,
+  ChartOptions,
 } from './blocks';
 
 // Re-export core types for convenience

@@ -58,17 +58,14 @@ const roomId = ref(
     : 'beakblock-nuxt-showcase'
 );
 
+const collabWsBase =
+  typeof config.public.collabWsUrl === 'string' ? config.public.collabWsUrl.trim() : '';
+
 const wsDisplay = computed(() => {
-  const u = config.public.collabWsUrl;
-  return typeof u === 'string' && u.length > 0 ? u : 'ws://127.0.0.1:1234';
+  return collabWsBase || 'not configured';
 });
 
 /** Snapshot at setup — avoids watchEffect/watcher accidentally tracking `config.public` churn from unrelated updates. */
-const collabWsBase =
-  typeof config.public.collabWsUrl === 'string' && config.public.collabWsUrl.length > 0
-    ? config.public.collabWsUrl
-    : 'ws://127.0.0.1:1234';
-
 const commentStore = new InMemoryCommentStore();
 const customBlocks = [createChartBlockSpec()];
 
@@ -129,6 +126,10 @@ watch(
   ([ed, room], _prev, onCleanup) => {
     const r = (room ?? '').trim() || 'beakblock-nuxt-showcase';
     if (!ed || ed.isDestroyed) return;
+    if (!collabWsBase) {
+      connectionStatus.value = 'idle';
+      return;
+    }
 
     connectionStatus.value = 'connecting';
     const ydoc = new Y.Doc();

@@ -2,6 +2,14 @@
 
 React bindings for the BeakBlock rich text editor.
 
+This package now exposes the same core editing surface as the Vue bindings, including:
+
+- `CommentRail` for threaded comment annotations alongside the editor
+- `CommentModal` for selection-based discussion workflows
+- `AIModal` for AI-assisted rewrite / continue flows
+- `createChartBlockSpec` for an interactive Chart.js-backed custom block
+- `LinkPopover`, `TableMenu`, `TableHandles`, `MediaMenu`, `ColorPicker`, and the standard menus
+
 ## Installation
 
 ```bash
@@ -13,10 +21,21 @@ pnpm add @amusendame/beakblock-react @amusendame/beakblock-core
 ## Quick Start
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu } from '@amusendame/beakblock-react';
+import {
+  useBeakBlock,
+  BeakBlockView,
+  SlashMenu,
+  BubbleMenu,
+  CommentRail,
+  CommentModal,
+  AIModal,
+  createChartBlockSpec,
+} from '@amusendame/beakblock-react';
+import { BUBBLE_AI_PRESETS, InMemoryCommentStore } from '@amusendame/beakblock-core';
 import '@amusendame/beakblock-core/styles/editor.css';
 
 function MyEditor() {
+  const commentStore = new InMemoryCommentStore();
   const editor = useBeakBlock({
     initialContent: [
       {
@@ -29,16 +48,19 @@ function MyEditor() {
         content: [{ type: 'text', text: 'Start editing...', styles: {} }],
       },
     ],
+    customBlocks: [createChartBlockSpec()],
   });
 
   if (!editor) return <div>Loading...</div>;
 
   return (
-    <div className="editor-container">
-      <BeakBlockView editor={editor} />
-      <SlashMenu editor={editor} />
-      <BubbleMenu editor={editor} />
-    </div>
+    <CommentRail editor={editor} store={commentStore}>
+      <div className="editor-container">
+        <BeakBlockView editor={editor} />
+        <SlashMenu editor={editor} />
+        <BubbleMenu editor={editor} />
+      </div>
+    </CommentRail>
   );
 }
 ```
@@ -87,9 +109,11 @@ const isFocused = useEditorFocus(editor);
 
 ## Comments
 
-Use **`CommentStore`** and **`createCommentPlugin`** from `@amusendame/beakblock-core`, and **`CommentModal`** from this package. There is no React `CommentRail` yet; use the modal and bubble menu.
+Use **`CommentStore`** and **`createCommentPlugin`** from `@amusendame/beakblock-core`, plus **`CommentRail`** and **`CommentModal`** from this package.
 
 Wire **`BubbleMenu`** with `onComment` to open the modal. On every editor transaction with a document change, call **`store.mapAnchors(transaction.mapping)`** so thread anchors match the document.
+
+The React example in [`examples/basic`](../../examples/basic) shows the full flow: comments, AI modal, threaded rail, chart block, table tools, and media controls.
 
 Full API and patterns: **[Comments guide](../../docs/comments.md)**.
 
@@ -169,6 +193,48 @@ Menu for media blocks (images, videos, files).
 
 ```tsx
 <MediaMenu editor={editor} />
+```
+
+### createChartBlockSpec
+
+Chart.js-backed custom block helper for React.
+
+```tsx
+const customBlocks = [createChartBlockSpec()];
+
+const editor = useBeakBlock({
+  customBlocks,
+});
+```
+
+### CommentRail
+
+Threaded comment rail that wraps the editor content.
+
+```tsx
+<CommentRail editor={editor} store={commentStore}>
+  <BeakBlockView editor={editor} />
+</CommentRail>
+```
+
+### AIModal
+
+AI modal for bubble and slash workflows.
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<AIModal
+  open={open}
+  editor={editor}
+  mode="bubble"
+  presets={BUBBLE_AI_PRESETS}
+  onClose={() => setOpen(false)}
+  onExecute={(request) => sendAIRequest(request, '/api/ai')}
+  onApply={({ request, output }) => {
+    // apply output
+  }}
+/>
 ```
 
 ---

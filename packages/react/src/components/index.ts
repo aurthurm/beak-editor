@@ -13,6 +13,9 @@ export type { AIModalProps } from './AIModal';
 export { CommentModal } from './CommentModal';
 export type { CommentModalProps } from './CommentModal';
 
+export { CommentRail } from './CommentRail';
+export type { CommentRailProps } from './CommentRail';
+
 export { LinkPopover } from './LinkPopover';
 export type { LinkPopoverProps } from './LinkPopover';
 

@@ -1,0 +1,7 @@
+[build]
+  command = "pnpm --filter @amusendame/beakblock-example-nuxt-vue build"
+  publish = "examples/nuxt-vue/.output/public"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_FLAGS = "--shamefully-hoist"

@@ -15,6 +15,7 @@ for (const name of ['.env', '.env.local']) {
 /** Same repo slug as `examples/basic` Vite `base` for GitHub project pages. */
 const GITHUB_PAGES_BASE = '/beakblock/';
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+const defaultCollabWsUrl = process.env.NODE_ENV === 'production' ? '' : 'ws://127.0.0.1:1234';
 
 export default defineNuxtConfig({
   app: {
@@ -27,7 +28,7 @@ export default defineNuxtConfig({
     beakblockAiBaseUrl: process.env.BEAKBLOCK_AI_BASE_URL || 'https://api.openai.com',
     public: {
       /** WebSocket URL for the Yjs demo (no trailing slash). `pnpm dev` starts the server on 1234. */
-      collabWsUrl: process.env.NUXT_PUBLIC_COLLAB_WS_URL || 'ws://127.0.0.1:1234',
+      collabWsUrl: process.env.NUXT_PUBLIC_COLLAB_WS_URL || defaultCollabWsUrl,
       /** Default room name for the Live collaboration sample (each tab can override in the UI). */
       collabRoom: process.env.NUXT_PUBLIC_COLLAB_ROOM || 'beakblock-nuxt-showcase',
     },

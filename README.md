@@ -247,12 +247,14 @@ See [`docs/styling.md`](docs/styling.md).
 - `BubbleMenu`
 - `AIModal`
 - `CommentModal`
+- `CommentRail`
+- `LinkPopover`
 - `TableMenu`
 - `TableHandles`
 - `MediaMenu`
 - `ColorPicker`
 
-It also exports custom block helpers like `createReactBlockSpec`, `useBlockEditor`, and `useUpdateBlock`.
+It also exports custom block helpers like `createReactBlockSpec`, `createChartBlockSpec`, `useBlockEditor`, and `useUpdateBlock`.
 
 ### Vue
 
