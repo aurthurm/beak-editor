@@ -716,7 +716,7 @@ textarea {
 .compliance-workspace__status-item {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 8px 12px;
   font-size: 0.85rem;
 }
@@ -762,7 +762,7 @@ textarea {
 }
 
 .compliance-workspace__status-lock {
-  flex: 1 1 100%;
+  flex: 0 0 auto;
 }
 
 .compliance-workspace__status-lock-btn {

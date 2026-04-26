@@ -1,88 +1,95 @@
-<p align="center">
-  <h1 align="center">BeakBlock</h1>
-  <p align="center">
-    A block editor with a fully public ProseMirror API, shipped as Core, React, and Vue packages.
-  </p>
-</p>
+# BeakBlock
+
+BeakBlock is a monorepo for a block-based rich text editor built on ProseMirror. The core idea is simple: the editor keeps a public ProseMirror surface instead of hiding it behind a private wrapper, and the framework packages expose that core cleanly for React and Vue.
 
 <p align="center">
-  <img src=".github/beakblock-vue-showcase.png" alt="BeakBlock Vue showcase: rich text, callouts, blockquote, lists, links, and inline formatting" width="720" />
-</p>
-<p align="center">
-  <sub>Screenshot from the Vite + Vue showcase (<code>examples/vite-vue</code>).</sub>
+  <img src=".github/beakblock-vue-showcase.png" alt="BeakBlock Vue showcase" width="720" />
 </p>
 
-<p align="center">
-  <a href="#what-you-get">What you get</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#ai-assistant">AI assistant</a> •
-  <a href="#slash-commands-menu">Slash commands</a> •
-  <a href="#examples">Examples</a> •
-  <a href="#documentation">Documentation</a> •
-  <a href="#packages">Packages</a>
-</p>
+## What's in this repo
 
----
+- `packages/core` - the editor engine, schema, plugins, markdown tools, collaboration hooks, comments, versioning, track changes, and compliance lock support
+- `packages/react` - React hooks and components for embedding the editor
+- `packages/vue` - Vue 3 composables and components for embedding the editor
+- `examples/basic` - React demo with toolbar actions, JSON inspection, markdown export, and DOCX/PDF export
+- `examples/vite-vue` - Vue showcase with rich blocks, AI, comments, and custom chart blocks
+- `examples/nuxt-vue` - a larger Nuxt app showing collaboration, approvals, templates, and compliance workflows
+- `docs` - the reference docs for blocks, markdown, comments, collaboration, styling, versioning, and publishing
 
-## What BeakBlock Is
+## Why BeakBlock
 
-BeakBlock is a framework-agnostic rich text editor built on ProseMirror. It is designed for teams that want:
+BeakBlock is designed for teams that want a real editor runtime, not a black box.
 
-- direct access to the editor internals
-- typed APIs instead of hidden implementation details
-- a block-based document model
-- React and Vue bindings over the same core
-- built-in UI for menus, tables, media, charts, AI-assisted writing, comments, and custom blocks
+- Public access to ProseMirror through `editor.pm.*`
+- A JSON block model that can be stored, transformed, and restored
+- First-class React and Vue integrations on top of the same core
+- Built-in support for menus, tables, media, embeds, comments, AI entry points, versioning, track changes, and compliance locks
+- Markdown import/export and clipboard paste support
+- Optional collaboration via Y.js
+- Custom block and custom mark support
 
-Unlike editors that hide ProseMirror behind wrappers, BeakBlock exposes the editor state, view, document, and transaction layer directly through `editor.pm.*`.
+## Packages
 
-```ts
-editor.pm.view
-editor.pm.state
-editor.pm.dispatch(tr)
-editor.pm.setNodeAttrs(pos, attrs)
-```
-
-## What You Get
-
-- **Core editor package** with the ProseMirror schema, commands, plugins, and block model
-- **React bindings** with hooks and components
-- **Vue bindings** with composables and components
-- **Built-in blocks** for headings, paragraphs, lists, checklists, code, tables, columns, images, embeds, icons, charts, and callouts
-- **Built-in menus** for slash commands, bubble formatting, tables, media, and links
-- **AI assistant** — slash command and bubble-menu entry, modal UI in React/Vue, document + selection context helpers, and curated presets in core
-- **Comments** — `CommentModal` and bubble-menu hook for threaded discussions (see Vue/React examples)
-- **Block JSON** that can be stored, transformed, and reloaded
-- **Custom block support** for React and Vue
-- **TypeScript-first APIs** across the workspace
+| Package | Purpose |
+| --- | --- |
+| `@amusendame/beakblock-core` | Core editor engine, schema, commands, plugins, markdown, comments, versioning, collaboration, and styling |
+| `@amusendame/beakblock-react` | React hooks, editor view, slash menu, bubble menu, AI modal, comments modal, table tools, and custom block helpers |
+| `@amusendame/beakblock-vue` | Vue 3 composables, editor view, slash menu, bubble menu, AI modal, comments UI, table tools, chart block helpers, and custom block helpers |
 
 ## Installation
 
-BeakBlock packages are published under the `@amusendame` scope on the **public npm registry** (default for `npm` / `pnpm` / `yarn`).
-
-Install the packages you need:
+Install only what you need:
 
 ```bash
-pnpm add @amusendame/beakblock-core @amusendame/beakblock-react @amusendame/beakblock-vue
+pnpm add @amusendame/beakblock-core
+pnpm add @amusendame/beakblock-core @amusendame/beakblock-react
+pnpm add @amusendame/beakblock-core @amusendame/beakblock-vue
 ```
 
-If you only want a single binding layer, install just the package you need.
+For collaboration features, also install:
 
-**GitHub Packages:** Older or duplicate builds may be published to `https://npm.pkg.github.com`. To consume those, add to `.npmrc`:
-
-```ini
-@amusendame:registry=https://npm.pkg.github.com
+```bash
+pnpm add yjs y-prosemirror y-websocket
 ```
-
-and authenticate per [GitHub’s npm docs](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
 
 ## Quick Start
+
+### Core
+
+```ts
+import { BeakBlockEditor } from '@amusendame/beakblock-core';
+import '@amusendame/beakblock-core/styles/editor.css';
+
+const editor = new BeakBlockEditor({
+  element: document.getElementById('editor'),
+  initialContent: [
+    {
+      type: 'heading',
+      props: { level: 1 },
+      content: [{ type: 'text', text: 'Hello BeakBlock', styles: {} }],
+    },
+    {
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Start editing...', styles: {} }],
+    },
+  ],
+});
+
+console.log(editor.getDocument());
+console.log(editor.pm.state);
+```
 
 ### React
 
 ```tsx
-import { useBeakBlock, BeakBlockView, SlashMenu, BubbleMenu, TableHandles } from '@amusendame/beakblock-react';
+import {
+  useBeakBlock,
+  BeakBlockView,
+  SlashMenu,
+  BubbleMenu,
+  TableHandles,
+} from '@amusendame/beakblock-react';
+import '@amusendame/beakblock-core/styles/editor.css';
 
 function Editor() {
   const editor = useBeakBlock({
@@ -91,7 +98,7 @@ function Editor() {
         id: '1',
         type: 'paragraph',
         props: {},
-        content: [{ type: 'text', text: 'Hello, world!', styles: {} }],
+        content: [{ type: 'text', text: 'Hello, React', styles: {} }],
       },
     ],
   });
@@ -107,6 +114,8 @@ function Editor() {
 }
 ```
 
+`useBeakBlock()` returns `null` until the editor is mounted, and `BeakBlockView` accepts that null state while it initializes.
+
 ### Vue
 
 ```vue
@@ -119,7 +128,7 @@ const editor = useBeakBlock({
       id: '1',
       type: 'paragraph',
       props: {},
-      content: [{ type: 'text', text: 'Hello, Vue!', styles: {} }],
+      content: [{ type: 'text', text: 'Hello, Vue', styles: {} }],
     },
   ],
 });
@@ -130,280 +139,205 @@ const editor = useBeakBlock({
 </template>
 ```
 
-Wire **SlashMenu**, **BubbleMenu**, **AIModal**, and **CommentModal** the same way as in [`examples/vite-vue`](examples/vite-vue) or [`examples/nuxt-vue`](examples/nuxt-vue): pass `@ai` / `@comment` handlers from the menus into your modals, and call your backend from the modal’s execute/apply callbacks.
+## Core Capabilities
 
-### Vanilla JavaScript
+### Public editor runtime
 
-```ts
-import { BeakBlockEditor } from '@amusendame/beakblock-core';
-
-const editor = new BeakBlockEditor({
-  initialContent: [],
-});
-
-editor.mount(document.getElementById('editor'));
-```
-
-> BeakBlock injects its base editor styles by default. If you want to supply your own stylesheet, set `injectStyles: false` in the editor config.
-
-## AI assistant
-
-BeakBlock treats AI as a first-class integration point: the core builds structured **context** (document markdown, block JSON, and optional selection), and the React/Vue packages ship an **AI modal** you can connect to any model or API.
-
-### Where it appears
-
-| Entry | What happens |
-| --- | --- |
-| **Slash menu** → **AI assistant** (`id`: `ai`) | Framework adapters emit an `ai` event (Vue) or you handle the menu (React) so you can open the modal in **slash** mode — tuned for continuing or restructuring from the cursor. |
-| **Bubble menu** → sparkles (**AI**) | Shown when you pass `onAI`; opens the modal in **bubble** mode — tuned for rewriting the current text selection. |
-
-The default slash item is a no-op at the ProseMirror layer on purpose; **React** `SlashMenu` and **Vue** `SlashMenu` detect the `ai` item and delegate to your handler.
-
-### Core helpers and presets
-
-From `@amusendame/beakblock-core`:
-
-- **`buildAIContext(editor, mode, preset?, instruction?)`** — builds `AIContext` with document blocks, derived markdown, and selection metadata when the selection is non-empty.
-- **`BUBBLE_AI_PRESETS`** / **`SLASH_AI_PRESETS`** — opinionated starter prompts (titles, descriptions, and underlying instructions).
-- **`getAIPresets(mode)`** — returns the preset list for the given entry mode.
-
-**Bubble presets:** Improve writing, Fix grammar, Fix spelling, Simplify, Make shorter, Make longer.
-
-**Slash presets:** Continue writing, Summarize, Add action items, Outline, Rewrite.
-
-### `AIModal` (React and Vue)
-
-Use **`AIModal`** from `@amusendame/beakblock-react` or `@amusendame/beakblock-vue`. Typical props:
-
-- **`open`**, **`onClose`** — visibility
-- **`editor`** — `BeakBlockEditor` instance
-- **`mode`** — `'bubble' | 'slash'` (drives which preset list and context shape feel natural)
-- **`presets`** — usually `BUBBLE_AI_PRESETS` or `SLASH_AI_PRESETS`, or your own array of the same shape
-- **`onExecute`** — called with an `AIRequest`; run your model here and return text (see examples)
-- **`onApply`** — insert or replace content in the document from the model output
-
-The shared example helpers in [`examples/shared/ai.ts`](examples/shared/ai.ts) show how to:
-
-- **`buildAIMessages`** — turn an `AIRequest` into chat messages (system + user) including preset, instruction, selection, markdown, and JSON blocks.
-- **`runOpenAICompletion`** — call OpenAI-compatible chat completions using **`OPENAI_API_KEY`**, optional **`BEAKBLOCK_AI_MODEL`** (default `gpt-4.1-mini`), and optional **`BEAKBLOCK_AI_BASE_URL`**.
-- **`sendAIRequest`** — POST JSON to your own route (e.g. `/api/ai`) for server-side keys.
-
-### Comments
-
-**`CommentModal`** works alongside **`BubbleMenu`**’s comment action (`onComment` / `@comment`). The Nuxt and Vite Vue demos wire both AI and comments end-to-end.
-
-## Slash commands (`/` menu)
-
-Type **`/`** at the **start of a block** to open the command palette. The query filters by **title** and **keywords** (case-insensitive). Items are grouped in the UI as below.
-
-Default **`SlashMenuItem` `id` values** (for `hideItems`, `itemOrder`, or custom extensions):
-
-### Basic blocks
-
-| ID | Title | Notes |
-| --- | --- | --- |
-| `heading1` | Heading 1 | Large section heading |
-| `heading2` | Heading 2 | Medium section heading |
-| `heading3` | Heading 3 | Small section heading |
-| `quote` | Quote | Blockquote |
-| `calloutInfo` | Callout | Info-style callout |
-| `calloutWarning` | Warning | Warning callout |
-| `calloutSuccess` | Success | Success callout |
-| `calloutError` | Error | Error callout |
-| `codeBlock` | Code Block | Fenced-style code block |
-| `divider` | Divider | Horizontal rule + new paragraph |
-
-### Insert
-
-| ID | Title | Notes |
-| --- | --- | --- |
-| `emoji` | Emoji | Opens emoji **picker** (`picker: 'emoji'`) |
-| `icon` | Icon | Opens icon **picker** (`picker: 'icon'`) |
-
-### AI
-
-| ID | Title | Notes |
-| --- | --- | --- |
-| `ai` | AI assistant | Opens your AI flow (handled in React/Vue `SlashMenu`) |
-
-### Lists
-
-| ID | Title | Notes |
-| --- | --- | --- |
-| `bulletList` | Bullet List | Unordered list |
-| `orderedList` | Numbered List | Ordered list |
-| `checklist` | To-do list | Interactive checklist items |
-
-### Layout
-
-| ID | Title | Notes |
-| --- | --- | --- |
-| `columns2` | 2 Columns | Equal two-column layout |
-| `columns3` | 3 Columns | Three-column layout |
-| `tableOfContents` | Table of contents | Auto outline of headings; click to jump |
-| `table` | Table | 3×3 table |
-| `table2x2` | Table 2x2 | 2×2 table |
-| `table4x4` | Table 4x4 | 4×4 table |
-
-### Media
-
-| ID | Title | Notes |
-| --- | --- | --- |
-| `image` | Image | Image block |
-| `embed` | Embed | Generic embed |
-| `youtube` | YouTube | YouTube embed preset |
-
-### Customizing the menu
-
-- **`customItems`** — append commands (including AI or app-specific blocks).
-- **`hideItems`** — pass item IDs to remove defaults (e.g. `youtube`, `tableOfContents`).
-- **`itemOrder`** — control which default items appear and in what order; IDs not listed are typically hidden — see package READMEs.
-
-Custom blocks can register their own slash entries via **`createReactBlockSpec`** / **`createVueBlockSpec`**.
-
-## Examples
-
-The workspace includes two BeakBlock Vue demos:
-
-```bash
-pnpm --filter @amusendame/beakblock-example-vite-vue dev
-pnpm --filter @amusendame/beakblock-example-nuxt-vue dev
-```
-
-The examples are intentionally dense and show:
-
-- editorial page layout
-- multi-column content
-- tables and table actions
-- charts
-- images and embeds
-- full slash menu (including **AI assistant**, emoji/icon pickers, and layout tables)
-- bubble formatting and **AI** / **comment** actions
-- **AIModal** with OpenAI-compatible or custom API wiring (`examples/shared/ai.ts`)
-- **CommentModal** with threads and reactions
-- inline icons and emojis
-- links and colors
-
-The **Nuxt** app additionally demonstrates a **compliance-oriented workspace**: **H1–H3** outline sections (`lockId`), per-section versioning and track changes, **section approvals** with **audit history**, **read-only lock** after sign-off for authors, optional **document-level dual attestation**, **cursor-based section insertion**, side-menu **heading lock** toggle, and **HTML export** with compliance appendices. See [`docs/compliance-demo.md`](docs/compliance-demo.md).
-
-## Core API
-
-### Document Operations
-
-```ts
-editor.getDocument()
-editor.setDocument(blocks) // applies compliance-lock bypass when replacing the doc
-editor.getBlock(id)
-editor.insertBlocks(blocks, ref, pos)
-editor.updateBlock(id, update)
-editor.removeBlocks(ids)
-```
-
-### Text Formatting
-
-```ts
-editor.toggleBold()
-editor.toggleItalic()
-editor.toggleUnderline()
-editor.toggleStrikethrough()
-editor.toggleCode()
-editor.setTextColor(color)
-editor.setBackgroundColor(color)
-```
-
-### Block Types
-
-```ts
-editor.setBlockType('heading', { level: 1 })
-editor.setBlockType('codeBlock', { language: 'typescript' })
-editor.setBlockType('bulletList')
-editor.setBlockType('orderedList')
-editor.setBlockType('blockquote')
-editor.setBlockType('table')
-```
-
-### ProseMirror Access
+The core package exposes the editor instance and the underlying ProseMirror objects directly. The main escape hatch is intentional, not hidden:
 
 ```ts
 editor.pm.view
 editor.pm.state
-editor.pm.doc
 editor.pm.dispatch(tr)
-editor.pm.setNodeAttrs(pos, attrs)
 ```
 
-## Custom Blocks
+### Document model
 
-BeakBlock supports custom blocks in both React and Vue.
+Documents are stored as arrays of `Block` objects. Built-in block families include:
 
-- React: `createReactBlockSpec`
-- Vue: `createVueBlockSpec`
+- Text blocks such as `paragraph`, `heading`, `blockquote`, `callout`, and `codeBlock`
+- Structural blocks such as `divider`
+- Lists such as `bulletList`, `orderedList`, `listItem`, `checkList`, and `checkListItem`
+- Layout blocks such as `columnList`, `column`, and `tableOfContents`
+- Tables such as `table`, `tableRow`, `tableCell`, and `tableHeader`
+- Media blocks such as `image` and `embed`
 
-Custom blocks can provide:
+See the block reference in [`docs/blocks/README.md`](docs/blocks/README.md).
 
-- node schema
-- node view rendering
-- slash menu entries
-- update hooks
-- custom props
+### Markdown
 
-See the full guide in [`docs/custom-blocks.md`](docs/custom-blocks.md).
+The core supports Markdown import/export and Markdown-aware paste handling.
+
+- `markdownToBlocks`
+- `blocksToMarkdown`
+- `blocksToMdastRoot`
+- `mdastToBlocks`
+- `looksLikeMarkdown`
+
+See [`docs/markdown.md`](docs/markdown.md).
+
+### Comments
+
+Comments are selection-anchored threads stored outside the document JSON.
+
+- Use `createCommentPlugin(store)` to render annotations
+- Use `CommentStore` or `InMemoryCommentStore`
+- Call `store.mapAnchors(transaction.mapping)` on document-changing transactions
+
+See [`docs/comments.md`](docs/comments.md).
+
+### Versioning and track changes
+
+The core supports snapshot storage through a pluggable adapter and a separate track-changes flow.
+
+- `VersioningAdapter`
+- `InMemoryVersioningAdapter`
+- `saveVersion`, `listVersions`, `getVersion`, `restoreVersion`
+- `enableTrackChanges`, `disableTrackChanges`, `acceptTrackedChange`, `rejectTrackedChange`
+
+See [`docs/versioning.md`](docs/versioning.md).
+
+### Collaboration
+
+Y.js collaboration is supported through optional peers:
+
+- `yjs`
+- `y-prosemirror`
+- `y-websocket`
+
+See [`docs/collaboration.md`](docs/collaboration.md).
+
+### Compliance locks
+
+The core includes compliance lock support for read-only headings and lock-aware drag/drop behavior.
+
+- `complianceLock`
+- `dragDrop.headingLockBadge`
+- `COMPLIANCE_LOCK_BYPASS_META`
+
+See [`docs/compliance-lock.md`](docs/compliance-lock.md) and the compliance example in [`docs/compliance-demo.md`](docs/compliance-demo.md).
+
+### Styling
+
+Styles are auto-injected by default. If you want to control CSS yourself, disable injection and import the stylesheet manually.
+
+```ts
+import '@amusendame/beakblock-core/styles/editor.css';
+
+const editor = new BeakBlockEditor({
+  injectStyles: false,
+});
+```
+
+See [`docs/styling.md`](docs/styling.md).
+
+## Framework Adapters
+
+### React
+
+`@amusendame/beakblock-react` exports:
+
+- `useBeakBlock`
+- `useEditorContent`
+- `useEditorSelection`
+- `useEditorFocus`
+- `useDocumentVersions`
+- `BeakBlockView`
+- `SlashMenu`
+- `BubbleMenu`
+- `AIModal`
+- `CommentModal`
+- `TableMenu`
+- `TableHandles`
+- `MediaMenu`
+- `ColorPicker`
+
+It also exports custom block helpers like `createReactBlockSpec`, `useBlockEditor`, and `useUpdateBlock`.
+
+### Vue
+
+`@amusendame/beakblock-vue` exports:
+
+- `useBeakBlock`
+- `useEditorContent`
+- `useEditorSelection`
+- `useEditorFocus`
+- `useDocumentVersions`
+- `BeakBlockView`
+- `SlashMenu`
+- `BubbleMenu`
+- `AIModal`
+- `CommentModal`
+- `CommentRail`
+- `LinkPopover`
+- `TableMenu`
+- `TableHandles`
+- `MediaMenu`
+- `ColorPicker`
+
+It also exports Vue custom block helpers such as `createVueBlockSpec`, `createChartBlockSpec`, `useBlockEditor`, and `useUpdateBlock`.
+
+## AI Integration
+
+BeakBlock treats AI as a workflow entry point rather than a hardcoded model integration.
+
+- The core provides AI context helpers and preset sets
+- React and Vue provide an `AIModal`
+- Slash menu and bubble menu can surface AI actions
+- The shared example helper lives in [`examples/shared/ai.ts`](examples/shared/ai.ts)
+
+Useful core exports include:
+
+- `buildAIContext`
+- `BUBBLE_AI_PRESETS`
+- `SLASH_AI_PRESETS`
+- `getAIPresets`
+
+## Examples
+
+- [`examples/basic`](examples/basic) demonstrates a React editor, toolbar controls, document JSON, Markdown output, and Office export helpers
+- [`examples/vite-vue`](examples/vite-vue) demonstrates the Vue package with AI, comments, a custom chart block, and a broad block showcase
+- [`examples/nuxt-vue`](examples/nuxt-vue) demonstrates collaboration, approvals, templates, document release, comments, and export in a compliance-oriented workspace
+
+Run them from the repo root with:
+
+```bash
+pnpm --filter @amusendame/beakblock-example-basic dev
+pnpm --filter @amusendame/beakblock-example-vite-vue dev
+pnpm --filter @amusendame/beakblock-example-nuxt-vue dev
+```
 
 ## Documentation
 
-| Guide | Description |
-| --- | --- |
-| [`docs/react-integration.md`](docs/react-integration.md) | React hooks, components, and integration patterns |
-| [`docs/custom-blocks.md`](docs/custom-blocks.md) | Create custom block types |
-| [`docs/custom-marks.md`](docs/custom-marks.md) | Create inline formatting marks |
-| [`docs/plugins.md`](docs/plugins.md) | Build and extend ProseMirror plugins |
-| [`docs/styling.md`](docs/styling.md) | Style the editor and its blocks |
-| [`docs/publishing.md`](docs/publishing.md) | Release checklist and steps to publish `@amusendame/*` to npm |
-| [`docs/collaboration.md`](docs/collaboration.md) | Use collaborative editing with Y.js |
-| [`docs/versioning.md`](docs/versioning.md) | Snapshots, restore, and track changes |
-| [`docs/comments.md`](docs/comments.md) | Comment threads, stores, and Vue/React modals |
-| [`docs/compliance-lock.md`](docs/compliance-lock.md) | Read-only compliance blocks, `EditorConfig.complianceLock` & `dragDrop.headingLockBadge`, bypass meta, lock UI, `setDocument` bypass |
-| [`docs/compliance-demo.md`](docs/compliance-demo.md) | Nuxt example: approvals, audit trail, document release, export |
+Start here:
 
-## Packages
-
-| Package | Description |
-| --- | --- |
-| [`@amusendame/beakblock-core`](packages/core) | Framework-agnostic editor core |
-| [`@amusendame/beakblock-react`](packages/react) | React bindings and components |
-| [`@amusendame/beakblock-vue`](packages/vue) | Vue bindings and components |
-
-## Repository Layout
-
-- `packages/core` - schema, commands, plugins, editor core, and shared styles
-- `packages/react` - React hooks and components
-- `packages/vue` - Vue composables and components
-- `examples/basic` - vanilla example
-- `examples/vite-vue` - Vite + Vue showcase
-- `examples/nuxt-vue` - Nuxt + Vue showcase
-- `examples/shared` - shared demo helpers (AI message building, OpenAI client)
-- `docs` - integration and customization guides
-
-## GitHub social preview image
-
-The showcase image used at the top of this README is committed as [`.github/beakblock-vue-showcase.png`](.github/beakblock-vue-showcase.png). To use it as the repository **Social preview** card on GitHub, open **Settings → General → Social preview** for the repo and upload that file (or the same asset from your machine). GitHub does not read the README image automatically for the social card.
+- [`docs/blocks/README.md`](docs/blocks/README.md)
+- [`docs/markdown.md`](docs/markdown.md)
+- [`docs/comments.md`](docs/comments.md)
+- [`docs/versioning.md`](docs/versioning.md)
+- [`docs/collaboration.md`](docs/collaboration.md)
+- [`docs/custom-blocks.md`](docs/custom-blocks.md)
+- [`docs/custom-marks.md`](docs/custom-marks.md)
+- [`docs/plugins.md`](docs/plugins.md)
+- [`docs/styling.md`](docs/styling.md)
+- [`docs/compliance-lock.md`](docs/compliance-lock.md)
+- [`docs/compliance-demo.md`](docs/compliance-demo.md)
+- [`docs/publishing.md`](docs/publishing.md)
 
 ## Development
 
+From the repository root:
+
 ```bash
 pnpm install
+pnpm dev
 pnpm build
 pnpm test
-pnpm dev
+pnpm lint
 ```
 
-## Notes
-
-- CSS is auto-injected by default in the editor core.
-- The document model is block-based and serializable.
-- React and Vue bindings are thin wrappers over the same ProseMirror core.
-- Releases are published to **npm** (`@amusendame/*`); GitHub Releases may also publish copies to GitHub Packages.
+Package-level build and watch scripts live in each package and example app. The workspace is configured for Node 18+ and pnpm 8+.
 
 ## License
 
-[Apache-2.0](LICENSE)
+Apache-2.0

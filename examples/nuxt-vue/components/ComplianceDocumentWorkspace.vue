@@ -351,7 +351,6 @@ defineExpose({
             :data-approval="approvals[row.sectionId]?.state ?? 'draft'"
             >{{ approvalStatusLabel(row) }}</span
           >
-          <span v-if="!row.ok && row.issues.length" class="compliance-workspace__status-hint">{{ row.issues[0] }}</span>
           <span v-if="!reviewerOnly" class="compliance-workspace__status-lock">
             <button
               v-if="sectionHeadingLockStates[row.sectionId] === true"
@@ -370,6 +369,7 @@ defineExpose({
               Lock title
             </button>
           </span>
+          <span v-if="!row.ok && row.issues.length" class="compliance-workspace__status-hint">{{ row.issues[0] }}</span>
         </li>
       </ul>
       <label class="compliance-workspace__approval-gate">
