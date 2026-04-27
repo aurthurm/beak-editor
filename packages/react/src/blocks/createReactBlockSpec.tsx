@@ -287,8 +287,13 @@ export function createReactBlockSpec<T extends PropSchema>(
         },
         destroy: () => {
           if (root) {
-            root.unmount();
+            // Defer unmounting to the next task so teardown does not run while
+            // React is still finishing the current render cycle.
+            const currentRoot = root;
             root = null;
+            setTimeout(() => {
+              currentRoot.unmount();
+            }, 0);
           }
         },
         stopEvent: (event: Event) => {

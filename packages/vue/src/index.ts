@@ -85,4 +85,25 @@ export type {
   HardBreakContent,
   InlineContent,
   SlashMenuItem,
+  AIContext,
+  AIEntryMode,
+  AIPreset,
+  AISelectionContext,
+  AICursorContext,
+  AIDocumentContext,
+  AISchemaContext,
+  AISchemaNodeSummary,
+  AIRequest,
+  AIBlockOutput,
+  AIBlockOutputStrategy,
+} from '@amusendame/beakblock-core';
+
+export {
+  buildAIContext,
+  buildAIMessages,
+  applyAIBlockOutput,
+  parseAIBlockOutput,
+  BUBBLE_AI_PRESETS,
+  SLASH_AI_PRESETS,
+  getAIPresets,
 } from '@amusendame/beakblock-core';

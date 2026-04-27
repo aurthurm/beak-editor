@@ -5,8 +5,12 @@ import {
   type AIContext,
   type AIEntryMode,
   buildAIContext,
+  parseAIBlockOutput,
   type BeakBlockEditor,
 } from '@amusendame/beakblock-core';
+import { BeakBlockView } from './BeakBlockView';
+import { useBeakBlock } from '../hooks';
+import type { PropSchema, ReactBlockSpec } from '../blocks';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; pending?: boolean };
 
@@ -24,10 +28,12 @@ export interface AIModalProps {
   editor: BeakBlockEditor | null;
   mode: AIEntryMode;
   presets: AIPreset[];
+  customBlocks?: ReactBlockSpec<PropSchema>[];
   title?: string;
   subtitle?: string;
   /** When true, shows selection + document context (for debugging or power users). Hidden by default. */
   showContext?: boolean;
+  contextSnapshot?: AIContext | null;
   onClose: () => void;
   onExecute?: (request: AIRequestPayload) => Promise<string | void> | string | void;
   onApply?: (request: AIRequestPayload & { output: string }) => Promise<void> | void;
@@ -43,14 +49,34 @@ function busyLabel(status: AIStatus): string {
   return 'Generating a response…';
 }
 
+function AIOutputPreview({
+  blocks,
+  customBlocks,
+}: {
+  blocks: NonNullable<ReturnType<typeof parseAIBlockOutput>>['blocks'];
+  customBlocks?: ReactBlockSpec<PropSchema>[];
+}): React.ReactElement | null {
+  const previewEditor = useBeakBlock({
+    initialContent: blocks,
+    editable: false,
+    injectStyles: false,
+    customBlocks,
+  });
+
+  if (!previewEditor) return null;
+  return <BeakBlockView editor={previewEditor} className="beakblock-ai-modal__preview-editor" />;
+}
+
 export function AIModal({
   open,
   editor,
   mode,
   presets,
+  customBlocks,
   title,
   subtitle,
   showContext = false,
+  contextSnapshot = null,
   onClose,
   onExecute,
   onApply,
@@ -93,11 +119,16 @@ export function AIModal({
     setInstruction((current) => current || selectedPreset.prompt);
   }, [selectedPreset]);
 
+  const previewParse = useMemo(() => parseAIBlockOutput(output), [output]);
+  const previewBlocks = previewParse?.blocks ?? [];
+  const previewKey = useMemo(() => `${previewParse?.version ?? 'none'}:${output}`, [previewParse?.version, output]);
+  const hasStructuredPreview = previewBlocks.length > 0;
+
   if (!open) return null;
   const portalTarget = getPortalTarget();
   if (!portalTarget) return null;
 
-  const context = editor ? buildAIContext(editor, mode, selectedPreset, instruction) : null;
+  const context = contextSnapshot ?? (editor ? buildAIContext(editor, mode, selectedPreset, instruction) : null);
   const isBusy = status === 'working' || status === 'applying';
   const hasChat = messages.length > 0;
   const resultsFocus = status === 'ready' && !!output && hasChat;
@@ -124,12 +155,12 @@ export function AIModal({
   const submit = async () => {
     if (!editor || !instruction.trim() || isBusy) return;
     const prompt = instruction.trim();
-    const payload: AIRequestPayload = {
-      mode,
-      preset: selectedPreset,
-      instruction: prompt,
-      context: context ?? buildAIContext(editor, mode, selectedPreset, prompt),
-    };
+      const payload: AIRequestPayload = {
+        mode,
+        preset: selectedPreset,
+        instruction: prompt,
+        context: context ?? buildAIContext(editor, mode, selectedPreset, prompt),
+      };
 
     setStatus('working');
     setOutput('');
@@ -259,7 +290,9 @@ export function AIModal({
     <div className={`beakblock-ai-modal__chat ${resultsFocus ? 'beakblock-ai-modal__chat--prominent' : ''}`}>
       <div className="beakblock-ai-modal__chat-head">
         <div className="beakblock-modal-section-title">AI response</div>
-        <p className="beakblock-ai-modal__chat-lede">What the model produced for your prompt.</p>
+        <p className="beakblock-ai-modal__chat-lede">
+          {hasStructuredPreview ? 'Rendered as BeakBlock blocks for review.' : 'What the model produced for your prompt.'}
+        </p>
       </div>
       <div className="beakblock-ai-modal__messages">
         {messages.map((message, index) => (
@@ -270,10 +303,24 @@ export function AIModal({
             <span className="beakblock-ai-modal__message-role">
               {message.role === 'user' ? 'Your prompt' : 'Assistant'}
             </span>
-            <div className="beakblock-ai-modal__message-body">{message.content}</div>
+            <div className="beakblock-ai-modal__message-body">
+              {message.role === 'assistant' && !message.pending && hasStructuredPreview && index === messages.length - 1
+                ? 'Structured output parsed for preview below.'
+                : message.content}
+            </div>
           </div>
         ))}
       </div>
+      {status === 'ready' && output ? (
+        <div className="beakblock-ai-modal__preview">
+          <div className="beakblock-modal-section-title">Structured preview</div>
+          {hasStructuredPreview ? (
+            <AIOutputPreview key={previewKey} blocks={previewBlocks} customBlocks={customBlocks} />
+          ) : (
+            <pre className="beakblock-ai-modal__preview-raw">{output}</pre>
+          )}
+        </div>
+      ) : null}
     </div>
   ) : null;
 

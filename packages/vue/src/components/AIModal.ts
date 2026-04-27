@@ -9,11 +9,15 @@ import {
 } from 'vue';
 import {
   buildAIContext,
+  parseAIBlockOutput,
   type AIPreset,
   type AIContext,
   type AIEntryMode,
   type BeakBlockEditor,
 } from '@amusendame/beakblock-core';
+import { BeakBlockView } from './BeakBlockView';
+import { useBeakBlock } from '../composables';
+import type { PropSchema, VueBlockSpec } from '../blocks';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; pending?: boolean };
 type AIRequestPayload = {
@@ -29,10 +33,12 @@ export interface AIModalProps {
   editor: BeakBlockEditor | null;
   mode: AIEntryMode;
   presets: AIPreset[];
+  customBlocks?: VueBlockSpec<PropSchema>[];
   title?: string;
   subtitle?: string;
   /** When true, shows selection + document context (for debugging or power users). Hidden by default. */
   showContext?: boolean;
+  contextSnapshot?: AIContext | null;
   /** When true, user must confirm before Apply (e.g. regulated content acknowledgment). */
   requireApplyAcknowledgment?: boolean;
   applyAcknowledgmentLabel?: string;
@@ -46,6 +52,28 @@ function busyLabel(status: AIStatus): string {
   return 'Generating a response…';
 }
 
+const AIOutputPreview = defineComponent({
+  name: 'AIOutputPreview',
+  props: {
+    blocks: { type: Array as PropType<NonNullable<ReturnType<typeof parseAIBlockOutput>>['blocks']>, required: true },
+    customBlocks: { type: Array as PropType<VueBlockSpec<PropSchema>[]>, default: undefined },
+  },
+  setup(props) {
+    const previewEditor = useBeakBlock({
+      initialContent: props.blocks,
+      editable: false,
+      injectStyles: false,
+      customBlocks: props.customBlocks,
+    });
+
+    return () => {
+      const editor = previewEditor.value;
+      if (!editor) return null;
+      return h(BeakBlockView, { editor, className: 'beakblock-ai-modal__preview-editor' });
+    };
+  },
+});
+
 export const AIModal = defineComponent({
   name: 'AIModal',
   props: {
@@ -53,9 +81,11 @@ export const AIModal = defineComponent({
     editor: { type: Object as PropType<BeakBlockEditor | null>, default: null },
     mode: { type: String as PropType<AIEntryMode>, required: true },
     presets: { type: Array as PropType<AIPreset[]>, default: () => [] },
+    customBlocks: { type: Array as PropType<VueBlockSpec<PropSchema>[]>, default: undefined },
     title: { type: String, default: '' },
     subtitle: { type: String, default: '' },
     showContext: { type: Boolean, default: false },
+    contextSnapshot: { type: Object as PropType<AIContext | null>, default: null },
     requireApplyAcknowledgment: { type: Boolean, default: false },
     applyAcknowledgmentLabel: {
       type: String,
@@ -76,6 +106,10 @@ export const AIModal = defineComponent({
     const applied = ref(false);
     const applyAcknowledged = ref(false);
     const promptPanelCollapsed = ref(false);
+    const previewParse = computed(() => parseAIBlockOutput(output.value));
+    const previewBlocks = computed(() => previewParse.value?.blocks ?? []);
+    const previewKey = computed(() => `${previewParse.value?.version ?? 'none'}:${output.value}`);
+    const hasStructuredPreview = computed(() => previewBlocks.value.length > 0);
 
     watch(
       () => props.open,
@@ -103,7 +137,7 @@ export const AIModal = defineComponent({
     const selectedPreset = computed(() => props.presets.find((preset) => preset.id === selectedPresetId.value) ?? null);
     const isBusy = computed(() => status.value === 'working' || status.value === 'applying');
     const context = computed(() =>
-      props.editor ? buildAIContext(props.editor, props.mode, selectedPreset.value, instruction.value) : null
+      props.contextSnapshot ?? (props.editor ? buildAIContext(props.editor, props.mode, selectedPreset.value, instruction.value) : null)
     );
     const hasChat = computed(() => messages.value.length > 0);
     const resultsFocus = computed(() => status.value === 'ready' && !!output.value && hasChat.value);
@@ -118,12 +152,12 @@ export const AIModal = defineComponent({
       const editor = props.editor;
       if (!editor || !instruction.value.trim() || isBusy.value) return;
       const prompt = instruction.value.trim();
-      const payload: AIRequestPayload = {
-        mode: props.mode,
-        preset: selectedPreset.value,
-        instruction: prompt,
-        context: context.value ?? buildAIContext(editor, props.mode, selectedPreset.value, prompt),
-      };
+        const payload: AIRequestPayload = {
+          mode: props.mode,
+          preset: selectedPreset.value,
+          instruction: prompt,
+          context: context.value ?? buildAIContext(editor, props.mode, selectedPreset.value, prompt),
+        };
 
       status.value = 'working';
       output.value = '';
@@ -303,7 +337,13 @@ export const AIModal = defineComponent({
             [
               h('div', { class: 'beakblock-ai-modal__chat-head' }, [
                 h('div', { class: 'beakblock-modal-section-title' }, 'AI response'),
-                h('p', { class: 'beakblock-ai-modal__chat-lede' }, 'What the model produced for your prompt.'),
+                h(
+                  'p',
+                  { class: 'beakblock-ai-modal__chat-lede' },
+                  hasStructuredPreview.value
+                    ? 'Rendered as BeakBlock blocks for review.'
+                    : 'What the model produced for your prompt.'
+                ),
               ]),
               h('div', { class: 'beakblock-ai-modal__messages' }, [
                 ...messages.value.map((message, index) =>
@@ -325,11 +365,27 @@ export const AIModal = defineComponent({
                         { class: 'beakblock-ai-modal__message-role' },
                         message.role === 'user' ? 'Your prompt' : 'Assistant'
                       ),
-                      h('div', { class: 'beakblock-ai-modal__message-body' }, message.content),
+                      h('div', { class: 'beakblock-ai-modal__message-body' }, [
+                        message.role === 'assistant' && !message.pending && hasStructuredPreview.value && index === messages.value.length - 1
+                          ? 'Structured output parsed for preview below.'
+                          : message.content,
+                      ]),
                     ]
                   )
                 ),
               ]),
+              status.value === 'ready' && output.value
+                ? h('div', { class: 'beakblock-ai-modal__preview' }, [
+                    h('div', { class: 'beakblock-modal-section-title' }, 'Structured preview'),
+                    hasStructuredPreview.value
+                      ? h(AIOutputPreview, {
+                          key: previewKey.value,
+                          blocks: previewBlocks.value,
+                          customBlocks: props.customBlocks,
+                        })
+                      : h('pre', { class: 'beakblock-ai-modal__preview-raw' }, output.value),
+                  ])
+                : null,
             ]
           )
         : null;

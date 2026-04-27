@@ -113,7 +113,7 @@ Use **`CommentStore`** and **`createCommentPlugin`** from `@amusendame/beakblock
 
 Wire **`BubbleMenu`** with `onComment` to open the modal. On every editor transaction with a document change, call **`store.mapAnchors(transaction.mapping)`** so thread anchors match the document.
 
-The React example in [`examples/basic`](../../examples/basic) shows the full flow: comments, AI modal, threaded rail, chart block, table tools, and media controls.
+The React example in [`examples/next-app`](../../examples/next-app) shows the full flow: comments, AI modal, threaded rail, chart block, table tools, media controls, and the Next.js server AI route.
 
 Full API and patterns: **[Comments guide](../../docs/comments.md)**.
 

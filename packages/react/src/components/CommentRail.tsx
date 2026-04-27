@@ -36,6 +36,8 @@ export function CommentRail({ editor, store, currentUserId = 'you', children }: 
   const rafRef = useRef<number>(0);
   const activeThreadsRef = useRef<CommentThread[]>([]);
   const selectedThreadIdRef = useRef<string | null>(null);
+  const lastLayoutSnapshotRef = useRef('');
+  const lastConnectorSnapshotRef = useRef('');
 
   const activeThreads = useMemo(
     () =>
@@ -87,7 +89,11 @@ export function CommentRail({ editor, store, currentUserId = 'you', children }: 
       last = yy;
     }
 
-    setLayoutY(next);
+    const layoutSnapshot = JSON.stringify(next);
+    if (lastLayoutSnapshotRef.current !== layoutSnapshot) {
+      lastLayoutSnapshotRef.current = layoutSnapshot;
+      setLayoutY(next);
+    }
     col.style.setProperty('--beakblock-comment-flyout-left', `${colRect.width + 20}px`);
 
     const sid = selectedThreadIdRef.current;
@@ -171,11 +177,16 @@ export function CommentRail({ editor, store, currentUserId = 'you', children }: 
     const ryTop = Math.round(yTop * 100) / 100;
     const rx1 = Math.round(x1 * 100) / 100;
 
-    setConnectorGeom({
+    const nextConnector = {
       w,
       h,
       d: `M ${rx0} ${ryBottom} L ${rx0} ${ryTop} L ${rx1} ${ryTop}`,
-    });
+    };
+    const connectorSnapshot = `${nextConnector.w}:${nextConnector.h}:${nextConnector.d}`;
+    if (lastConnectorSnapshotRef.current !== connectorSnapshot) {
+      lastConnectorSnapshotRef.current = connectorSnapshot;
+      setConnectorGeom(nextConnector);
+    }
   };
 
   const focusThreadInEditor = (thread: CommentThread) => {

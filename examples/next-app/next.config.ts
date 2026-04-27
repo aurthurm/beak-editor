@@ -1,7 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    externalDir: true,
+    webpackBuildWorker: false,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  transpilePackages: [
+    "@amusendame/beakblock-core",
+    "@amusendame/beakblock-react",
+    "@amusendame/beakblock-vue",
+  ],
 };
 
 export default nextConfig;

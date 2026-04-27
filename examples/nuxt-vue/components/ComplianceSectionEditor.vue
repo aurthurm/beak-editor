@@ -5,8 +5,10 @@ import {
   CommentModal,
   CommentRail,
   BeakBlockView,
+  applyAIBlockOutput,
   BubbleMenu,
   createChartBlockSpec,
+  buildAIContext,
   MediaMenu,
   SlashMenu,
   TableHandles,
@@ -24,7 +26,7 @@ import {
   InMemoryCommentStore,
   type TrackedChangeRecord,
 } from '@aurthurm/beakblock-core';
-import type { Block } from '@aurthurm/beakblock-core';
+import type { AIContext, Block } from '@aurthurm/beakblock-core';
 import { sendAIRequest } from '../../shared/ai';
 import { appendComplianceAiLog } from '~/utils/complianceAiLog';
 import { COMPLIANCE_DEMO_USER } from '~/utils/complianceIdentity';
@@ -65,6 +67,7 @@ const commentStore = new InMemoryCommentStore();
 const commentOpen = ref(false);
 const aiOpen = ref(false);
 const aiMode = ref<'bubble' | 'slash'>('bubble');
+const aiContextSnapshot = ref<AIContext | null>(null);
 
 const versionAdapter = createIndexedDbVersioningAdapter(props.sectionId);
 
@@ -90,6 +93,7 @@ const openCommentModal = () => {
 const openAiModal = (mode: 'bubble' | 'slash') => {
   if (aiGov.value === 'off') return;
   aiMode.value = mode;
+  aiContextSnapshot.value = editor.value ? buildAIContext(editor.value, mode, null, '') : null;
   aiOpen.value = true;
 };
 
@@ -118,8 +122,10 @@ const runAIPrompt = async (request: Parameters<typeof sendAIRequest>[0]) => {
   return out;
 };
 
-const applyDemoAI = async ({ output }: { output: string }) => {
-  editor.value?.pm.insertText(output);
+const applyDemoAI = async (payload: Parameters<typeof applyAIBlockOutput>[1] & { output: string }) => {
+  const ed = editor.value;
+  if (!ed) return;
+  applyAIBlockOutput(ed, payload, payload.output);
 };
 
 const customBlocks = [createChartBlockSpec()];
@@ -636,6 +642,8 @@ defineExpose({
         :editor="editor"
         :mode="aiMode"
         :presets="aiMode === 'bubble' ? BUBBLE_AI_PRESETS : SLASH_AI_PRESETS"
+        :custom-blocks="customBlocks"
+        :context-snapshot="aiContextSnapshot"
         title="AI assistant"
         subtitle="Use curated prompts to rewrite the selection or continue this section."
         :require-apply-acknowledgment="aiGov === 'governed'"

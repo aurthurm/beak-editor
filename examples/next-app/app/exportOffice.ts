@@ -4,17 +4,12 @@
  */
 
 import { blocksToMarkdown, type Block, type InlineContent } from '@amusendame/beakblock-core';
-import type {
-  ExternalHyperlink as DocxExternalHyperlink,
-  Paragraph as DocxParagraph,
-  TextRun as DocxTextRun,
-} from 'docx';
+import type { ExternalHyperlink as DocxExternalHyperlink, Paragraph as DocxParagraph, TextRun as DocxTextRun } from 'docx';
 
 function inlinesToRuns(docx: typeof import('docx'), content: InlineContent[] | undefined): Array<DocxTextRun | DocxExternalHyperlink> {
   if (!content?.length) return [new docx.TextRun('')];
 
   const out: Array<DocxTextRun | DocxExternalHyperlink> = [];
-
   for (const item of content) {
     if (item.type === 'text') {
       out.push(

@@ -11,7 +11,7 @@ BeakBlock is a monorepo for a block-based rich text editor built on ProseMirror.
 - `packages/core` - the editor engine, schema, plugins, markdown tools, collaboration hooks, comments, versioning, track changes, and compliance lock support
 - `packages/react` - React hooks and components for embedding the editor
 - `packages/vue` - Vue 3 composables and components for embedding the editor
-- `examples/basic` - React demo with toolbar actions, JSON inspection, markdown export, and DOCX/PDF export
+- `examples/next-app` - Next.js React demo with a full-stack AI route, threaded comments, chart blocks, JSON inspection, markdown export, and DOCX/PDF export
 - `examples/vite-vue` - Vue showcase with rich blocks, AI, comments, and custom chart blocks
 - `examples/nuxt-vue` - a larger Nuxt app showing collaboration, approvals, templates, and compliance workflows
 - `docs` - the reference docs for blocks, markdown, comments, collaboration, styling, versioning, and publishing
@@ -297,14 +297,14 @@ Useful core exports include:
 
 ## Examples
 
-- [`examples/basic`](examples/basic) demonstrates a React editor, toolbar controls, document JSON, Markdown output, and Office export helpers
+- [`examples/next-app`](examples/next-app) demonstrates the React editor in a Next.js App Router app with toolbar controls, document JSON, Markdown output, Office export helpers, and a server AI route
 - [`examples/vite-vue`](examples/vite-vue) demonstrates the Vue package with AI, comments, a custom chart block, and a broad block showcase
 - [`examples/nuxt-vue`](examples/nuxt-vue) demonstrates collaboration, approvals, templates, document release, comments, and export in a compliance-oriented workspace
 
 Run them from the repo root with:
 
 ```bash
-pnpm --filter @amusendame/beakblock-example-basic dev
+pnpm --filter @amusendame/beakblock-example-next-app dev
 pnpm --filter @amusendame/beakblock-example-vite-vue dev
 pnpm --filter @amusendame/beakblock-example-nuxt-vue dev
 ```

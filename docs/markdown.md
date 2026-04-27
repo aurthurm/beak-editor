@@ -171,10 +171,10 @@ Round-trip is **best-effort** for rich documents; treat Markdown as an interchan
 
 ## Word and PDF (examples, not core)
 
-The core package does **not** bundle `.docx` or PDF libraries. The **React basic example** shows one pattern:
+The core package does **not** bundle `.docx` or PDF libraries. The **Next.js React example** shows one pattern:
 
-- [`examples/basic/src/exportOffice.ts`](../examples/basic/src/exportOffice.ts) — `downloadBlocksAsDocx` (using [`docx`](https://www.npmjs.com/package/docx)) and `printDocumentAsPdf` (`blocksToMarkdown` + [`marked`](https://www.npmjs.com/package/marked) + browser **Print** → “Save as PDF”).
-- [`examples/basic/src/App.tsx`](../examples/basic/src/App.tsx) — toolbar actions: **Log MD**, **.docx**, **PDF**.
+- [`examples/next-app/app/exportOffice.ts`](../examples/next-app/app/exportOffice.ts) — `downloadBlocksAsDocx` (using [`docx`](https://www.npmjs.com/package/docx)) and `printDocumentAsPdf` (`blocksToMarkdown` + [`marked`](https://www.npmjs.com/package/marked) + browser **Print** → “Save as PDF”).
+- [`examples/next-app/app/editor-shell.tsx`](../examples/next-app/app/editor-shell.tsx) — toolbar actions: **Log MD**, **.docx**, **PDF**.
 
 Reuse or adapt that module in your app; fidelity is intentionally simple (headings, paragraphs, lists, rough tables, etc.).
 

@@ -1,5 +1,5 @@
-import { buildAIMessages } from '../../packages/core/src/ai/prompt';
-import type { AIRequest } from '../../packages/core/src/ai/types';
+import { buildAIMessages } from '../../../packages/core/src/ai/prompt';
+import type { AIRequest } from '../../../packages/core/src/ai/types';
 
 export type AICompletionEnv = {
   OPENAI_API_KEY?: string;
@@ -7,7 +7,7 @@ export type AICompletionEnv = {
   BEAKBLOCK_AI_BASE_URL?: string;
 };
 
-export async function runOpenAICompletion(request: AIRequest, env: AICompletionEnv = process.env): Promise<string> {
+export async function runOpenAICompletion(request: AIRequest, env: AICompletionEnv = process.env as AICompletionEnv): Promise<string> {
   const apiKey = env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error('Missing OPENAI_API_KEY');
@@ -33,7 +33,7 @@ export async function runOpenAICompletion(request: AIRequest, env: AICompletionE
     throw new Error(`AI request failed (${response.status}): ${errorText || response.statusText}`);
   }
 
-  const data = await response.json() as {
+  const data = (await response.json()) as {
     choices?: Array<{ message?: { content?: string | null } }>;
   };
 
@@ -43,22 +43,4 @@ export async function runOpenAICompletion(request: AIRequest, env: AICompletionE
   }
 
   return content;
-}
-
-export async function sendAIRequest(request: AIRequest, endpoint = '/api/ai'): Promise<string> {
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => '');
-    throw new Error(errorText || `AI request failed (${response.status})`);
-  }
-
-  const data = (await response.json()) as { output?: string; text?: string };
-  const output = (data.output || data.text || '').trim();
-  if (!output) throw new Error('AI endpoint returned no output');
-  return output;
 }

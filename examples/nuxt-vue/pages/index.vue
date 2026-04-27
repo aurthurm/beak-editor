@@ -4,11 +4,13 @@ import {
   AIModal,
   CommentModal,
   BeakBlockView,
+  applyAIBlockOutput,
   createChartBlockSpec,
+  buildAIContext,
   useBeakBlock,
 } from '@amusendame/beakblock-vue';
 import { BUBBLE_AI_PRESETS, SLASH_AI_PRESETS } from '@amusendame/beakblock-core';
-import type { BeakBlockEditor, Block, CommentStore } from '@amusendame/beakblock-core';
+import type { AIContext, BeakBlockEditor, Block, CommentStore } from '@amusendame/beakblock-core';
 import { financialAnalystCvDocument, sampleDocument } from '~/data';
 import {
   cloneTemplateBlocksForNewDocument,
@@ -120,6 +122,7 @@ const customBlocks = [createChartBlockSpec()];
 const commentOpen = ref(false);
 const aiOpen = ref(false);
 const aiMode = ref<'bubble' | 'slash'>('bubble');
+const aiContextSnapshot = ref<AIContext | null>(null);
 
 watch(viewMode, async (m) => {
   commentOpen.value = false;
@@ -141,6 +144,8 @@ const openCommentModal = () => {
 
 const openAiModal = (mode: 'bubble' | 'slash') => {
   aiMode.value = mode;
+  const editor = modalTargetEditor.value;
+  aiContextSnapshot.value = editor ? buildAIContext(editor, mode, null, '') : null;
   aiOpen.value = true;
 };
 
@@ -164,8 +169,10 @@ const modalCommentStore = computed(() => {
   return panelRefs[viewMode.value]?.getCommentStore() ?? null;
 });
 
-const applyDemoAI = async ({ output }: { output: string }) => {
-  modalTargetEditor.value?.pm.insertText(output);
+const applyDemoAI = async (payload: Parameters<typeof applyAIBlockOutput>[1] & { output: string }) => {
+  const editor = modalTargetEditor.value;
+  if (!editor) return;
+  applyAIBlockOutput(editor, payload, payload.output);
 };
 
 const previewEditor = useBeakBlock({
@@ -371,6 +378,8 @@ watchEffect((onCleanup) => {
               :editor="modalTargetEditor"
               :mode="aiMode"
               :presets="aiMode === 'bubble' ? BUBBLE_AI_PRESETS : SLASH_AI_PRESETS"
+              :custom-blocks="customBlocks"
+              :context-snapshot="aiContextSnapshot"
               title="AI assistant"
               subtitle="Use curated prompts to rewrite the selection or continue the document."
               :on-close="closeAiModal"

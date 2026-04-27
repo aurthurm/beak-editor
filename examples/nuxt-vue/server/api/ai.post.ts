@@ -1,7 +1,7 @@
 import { generateText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
-import type { AIRequest } from '@amusendame/beakblock-core';
-import { buildAIMessages } from '../../../shared/ai';
+import { buildAIMessages } from '../../../../packages/core/src/ai/prompt';
+import type { AIRequest } from '../../../../packages/core/src/ai/types';
 
 function openAiBaseUrl(url: string): string {
   const trimmed = url.replace(/\/$/, '');

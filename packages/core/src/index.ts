@@ -293,14 +293,19 @@ export type {
 } from './comments';
 
 // AI
-export { buildAIContext, BUBBLE_AI_PRESETS, SLASH_AI_PRESETS, getAIPresets } from './ai';
+export { buildAIContext, buildAIMessages, applyAIBlockOutput, parseAIBlockOutput, BUBBLE_AI_PRESETS, SLASH_AI_PRESETS, getAIPresets } from './ai';
 export type {
   AIContext,
   AIEntryMode,
   AIPreset,
   AISelectionContext,
+  AICursorContext,
   AIDocumentContext,
+  AISchemaContext,
+  AISchemaNodeSummary,
   AIRequest,
+  AIBlockOutput,
+  AIBlockOutputStrategy,
 } from './ai';
 
 // Media menu plugin

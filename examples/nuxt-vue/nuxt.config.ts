@@ -12,7 +12,7 @@ for (const name of ['.env', '.env.local']) {
   }
 }
 
-/** Same repo slug as `examples/basic` Vite `base` for GitHub project pages. */
+/** Same repo slug as `examples/next-app` for GitHub project pages. */
 const GITHUB_PAGES_BASE = '/beakblock/';
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
 const defaultCollabWsUrl = process.env.NODE_ENV === 'production' ? '' : 'ws://127.0.0.1:1234';
