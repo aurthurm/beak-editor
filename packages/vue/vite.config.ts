@@ -16,7 +16,7 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['vue', '@amusendame/beakblock-core'],
+      external: ['vue', '@amusendame/beakblock-core', '@amusendame/beakblock-commands'],
     },
     sourcemap: true,
     minify: false,

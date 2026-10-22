@@ -8,13 +8,23 @@
 
 import type { Plugin } from 'prosemirror-state';
 import type { NodeViewConstructor } from 'prosemirror-view';
-import type { NodeSpec } from 'prosemirror-model';
+import type { MarkSpec, NodeSpec } from 'prosemirror-model';
 import type { Block } from '../blocks/types';
 import type { InputRulesConfig } from '../plugins/inputRules';
 import type { DocumentVersion, VersioningAdapter } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
 import type { ComplianceLockPluginOptions } from '../plugins/complianceLockPlugin';
 import type { DragDropConfig } from '../plugins/dragDropPlugin';
+import type { BeakExtension, EditorMode } from '../extensions';
+
+/** Review view for revision marks (track changes). */
+export type ReviewView = 'markup' | 'final' | 'original';
+
+/** All review view names. */
+export const REVIEW_VIEWS: readonly ReviewView[] = ['markup', 'final', 'original'];
+
+/** All editor mode names. */
+export const EDITOR_MODES: readonly EditorMode[] = ['block', 'office', 'controlled'];
 
 /**
  * Configuration for enabling real-time collaboration.
@@ -60,6 +70,8 @@ export interface EditorEvents {
   versionRestored: { version: DocumentVersion };
   /** Track changes recorded an edit (only when track changes is enabled) */
   trackChange: { entry: TrackedChangeRecord };
+  /** The editor mode changed (see {@link BeakBlockEditor.setMode}) */
+  modeChange: { mode: EditorMode; previousMode: EditorMode };
 }
 
 /**
@@ -213,6 +225,31 @@ export interface EditorConfig {
    * Keys are node type names, values are ProseMirror NodeSpec objects.
    */
   customNodes?: Record<string, NodeSpec>;
+
+  /**
+   * Custom mark specifications to add to the schema.
+   * Keys are mark names, values are ProseMirror MarkSpec objects.
+   */
+  customMarks?: Record<string, MarkSpec>;
+
+  /**
+   * Editor mode.
+   * - `'block'`: drag handles and slash menu are active
+   * - `'office'` / `'controlled'`: block chrome is disabled
+   * @default 'block'
+   */
+  mode?: EditorMode;
+
+  /**
+   * Extensions that contribute nodes, marks, plugins, node views and block definitions.
+   */
+  extensions?: BeakExtension[];
+
+  /**
+   * Word-compatible keyboard behaviour (consumed by the Word keymap plugin).
+   * @default mode !== 'block'
+   */
+  wordBehaviour?: boolean;
 
   /**
    * Direct ProseMirror configuration.

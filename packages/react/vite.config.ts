@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [
     dts({
       insertTypesEntry: true,
+      exclude: ['**/*.test.ts', '**/*.test.tsx'],
     }),
   ],
   build: {
@@ -22,6 +23,7 @@ export default defineConfig({
         'react-dom/client',
         'react/jsx-runtime',
         '@amusendame/beakblock-core',
+        '@amusendame/beakblock-commands',
         'prosemirror-commands',
         'prosemirror-dropcursor',
         'prosemirror-gapcursor',

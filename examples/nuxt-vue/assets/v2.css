@@ -1,0 +1,56 @@
+/* BeakBlock 2.0 showcase scenarios (components/v2). Scoped to .v2-stage and the 2.0 sidebar group. */
+
+.sample-sidebar__group {
+  margin: 6px 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2b579a;
+}
+
+.sample-sidebar__btn--v2 {
+  border-left: 3px solid #2b579a;
+  border-radius: 10px;
+}
+
+.v2-stage {
+  width: 100%;
+  min-width: 0;
+  padding: 2px;
+}
+
+.v2-stage .v2-scenario {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #1f1d1b;
+}
+
+.v2-stage .v2-scenario button {
+  font-family: inherit;
+}
+
+/* Office surfaces inside the editor stage: keep the Word-like canvas readable. */
+.v2-stage .bb-office-shell {
+  border: 1px solid #d6d3cd;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.v2-stage .v2-editor-view {
+  min-height: 0;
+}
+
+.v2-stage iframe.v2-print-frame {
+  border-radius: 6px;
+}
+
+@media (max-width: 1100px) {
+  .layout--with-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sample-sidebar {
+    position: static;
+    max-height: none;
+  }
+}

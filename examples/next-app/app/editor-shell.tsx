@@ -29,10 +29,13 @@ import {
   InMemoryCommentStore,
   blocksToMarkdown,
   createCommentPlugin,
+  isBuiltinInline,
+  isStyledText,
   type AIContext,
   type BeakBlockEditor,
   type Block,
   type CommentStore,
+  type InlineContent,
 } from '@amusendame/beakblock-core';
 import {
   boardOnePagerDocument,
@@ -45,6 +48,7 @@ import {
   sampleDocument,
 } from './data';
 import { sendAIRequest } from './ai.client';
+import { BEAKBLOCK_V2_SCENARIOS, BeakBlock2Panel, isBeakBlock2Scenario, type BeakBlock2ScenarioId } from './v2/BeakBlock2Panel';
 
 type DocumentTabId =
   | 'generic'
@@ -56,7 +60,7 @@ type DocumentTabId =
   | 'postmortem'
   | 'newsletter';
 
-type ViewMode = DocumentTabId | 'collaboration' | 'compliance';
+type ViewMode = DocumentTabId | 'collaboration' | 'compliance' | BeakBlock2ScenarioId;
 
 type PanelApi = {
   getEditor: () => BeakBlockEditor | null;
@@ -98,16 +102,20 @@ const documentTabs = [
 
 function blockText(block: Block): string {
   return block.content
-    ?.map((item) => (item.type === 'text' ? item.text : item.type === 'link' ? blockInlineText(item.content) : ''))
+    ?.map((item) => {
+      if (isStyledText(item)) return item.text;
+      if (isBuiltinInline(item) && item.type === 'link') return blockInlineText(item.content);
+      return '';
+    })
     .join('')
     .trim() ?? '';
 }
 
-function blockInlineText(items: NonNullable<Block['content']>): string {
+function blockInlineText(items: ReadonlyArray<InlineContent>): string {
   return items
     .map((item) => {
-      if (item.type === 'text') return item.text;
-      if (item.type === 'link') return blockInlineText(item.content);
+      if (isStyledText(item)) return item.text;
+      if (isBuiltinInline(item) && item.type === 'link') return blockInlineText(item.content);
       return '';
     })
     .join('');
@@ -328,7 +336,9 @@ const CollaborationPanel = forwardRef<
   const editor = useBeakBlock({
     initialContent: [
       {
+        id: 'collab-intro',
         type: 'paragraph',
+        props: {},
         content: [
           {
             type: 'text',
@@ -438,13 +448,13 @@ const CollaborationPanel = forwardRef<
   );
 });
 
-function ComplianceWorkspace({
-  onBlocksChange,
-  onInspectorChange,
-}: {
-  onBlocksChange?: (blocks: Block[]) => void;
-  onInspectorChange?: (payload: { blocks: Block[]; manifest: ComplianceManifest | null }) => void;
-}) {
+const ComplianceWorkspace = forwardRef<
+  PanelApi,
+  {
+    onBlocksChange?: (blocks: Block[]) => void;
+    onInspectorChange?: (payload: { blocks: Block[]; manifest: ComplianceManifest | null }) => void;
+  }
+>(function ComplianceWorkspace({ onBlocksChange, onInspectorChange }, ref) {
   const [mode, setMode] = useState<'document' | 'templates'>('document');
   const [templateId, setTemplateId] = useState(COMPLIANCE_SEED_TEMPLATES[0]?.id ?? '');
   const [templates, setTemplates] = useState(COMPLIANCE_SEED_TEMPLATES);
@@ -488,7 +498,7 @@ function ComplianceWorkspace({
   }, [activeTemplate?.name, onBlocksChange, onInspectorChange, visibleBlocks]);
 
   useEffect(() => {
-    if (!previewOpen) return;
+    if (!previewOpen || !previewEditor) return;
     previewEditor.setDocument(visibleBlocks);
   }, [previewEditor, previewOpen, visibleBlocks]);
 
@@ -654,6 +664,7 @@ function ComplianceWorkspace({
             This controlled document uses the same BeakBlock surface as the sample tabs, but with a compliance-style toolbar and preview/export actions.
           </p>
           <ComplianceExampleEditor
+            ref={ref}
             key={selectedTemplateId}
             initialBlocks={mergedBlocks.length > 0 ? mergedBlocks : activeTemplate?.blocks ?? []}
             editorClassName="editor-view"
@@ -688,7 +699,7 @@ function ComplianceWorkspace({
 
     </div>
   );
-}
+});
 
 export function BeakBlockShowcase(): ReactElement {
   const [viewMode, setViewMode] = useState<ViewMode>('generic');
@@ -831,6 +842,22 @@ export function BeakBlockShowcase(): ReactElement {
             Compliance
             <span className="sample-sidebar__sub">Compliance + preview</span>
           </button>
+
+          <div className="sample-sidebar__divider" role="presentation" />
+          <p className="sample-sidebar__title sample-sidebar__title--v2">BeakBlock 2.0</p>
+          <nav className="sample-sidebar__nav sample-sidebar__nav--v2" aria-label="BeakBlock 2.0 scenarios">
+            {BEAKBLOCK_V2_SCENARIOS.map((scenario) => (
+              <button
+                key={scenario.id}
+                type="button"
+                className={`sample-sidebar__btn sample-sidebar__btn--v2 ${viewMode === scenario.id ? 'sample-sidebar__btn--active' : ''}`}
+                onClick={() => setViewMode(scenario.id)}
+              >
+                {scenario.label}
+                <span className="sample-sidebar__sub">{scenario.sub}</span>
+              </button>
+            ))}
+          </nav>
         </aside>
 
         <div className="layout__main">
@@ -876,6 +903,8 @@ export function BeakBlockShowcase(): ReactElement {
                   onInspectorChange={(payload) => setComplianceInspector(payload)}
                 />
               </div>
+
+              {isBeakBlock2Scenario(viewMode) ? <BeakBlock2Panel key={viewMode} scenario={viewMode} /> : null}
             </div>
           </section>
 
@@ -890,7 +919,9 @@ export function BeakBlockShowcase(): ReactElement {
                   : 'Serialized blocks for the active sample tab.'}
             </p>
             <pre className="inspector__pre">
-              {viewMode === 'compliance' ? JSON.stringify({ blocks: complianceInspector.blocks, mergeManifest: complianceInspector.manifest }, null, 2) : JSON.stringify(inspectorBlocks, null, 2)}
+              {isBeakBlock2Scenario(viewMode)
+                ? 'BeakBlock 2.0 scenarios show their own state in the panel beside the editor.'
+                : viewMode === 'compliance' ? JSON.stringify({ blocks: complianceInspector.blocks, mergeManifest: complianceInspector.manifest }, null, 2) : JSON.stringify(inspectorBlocks, null, 2)}
             </pre>
           </section>
         </div>

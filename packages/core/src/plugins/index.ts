@@ -75,7 +75,7 @@ export {
 } from './multiBlockSelectionPlugin';
 export type { MultiBlockSelectionConfig, MultiBlockSelectionState } from './multiBlockSelectionPlugin';
 
-export { createTablePlugin, TABLE_PLUGIN_KEY } from './tablePlugin';
+export { createTablePlugin, createTablePlugins, TABLE_PLUGIN_KEY } from './tablePlugin';
 export type { TablePluginConfig } from './tablePlugin';
 
 export { createChecklistPlugin } from './checklistPlugin';
@@ -111,6 +111,7 @@ export {
 } from './tableOfContentsPlugin';
 
 export { BEAKBLOCK_META_SKIP_TRACK_CHANGES, BEAKBLOCK_META_TRACK_CLEAR_LOG } from './trackChangesMeta';
+export { BEAKBLOCK_META_LOAD_DOCUMENT } from './documentLoadMeta';
 export { BEAKBLOCK_META_TRACK_REMOVE } from './trackChangesResolveMeta';
 export {
   createTrackChangesPlugin,
@@ -124,3 +125,5 @@ export type {
   CreateTrackChangesPluginOptions,
 } from './trackChangesPlugin';
 export { groupContiguousInsertTrackChanges } from './trackChangeGroups';
+// Editor mode
+export { createEditorModePlugin, getEditorMode, isBlockChromeEnabled, EDITOR_MODE_PLUGIN_KEY } from './editorModePlugin';

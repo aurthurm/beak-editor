@@ -1,0 +1,37 @@
+{
+  "name": "@amusendame/beakblock-conformance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cross-package conformance, security, fidelity and performance suites for BeakBlock 2.0",
+  "scripts": {
+    "test": "vitest run",
+    "fidelity": "node scripts/fidelity.mjs"
+  },
+  "dependencies": {
+    "@amusendame/beakblock-core": "workspace:*",
+    "@amusendame/beakblock-schema": "workspace:*",
+    "@amusendame/beakblock-ir": "workspace:*",
+    "@amusendame/beakblock-commands": "workspace:*",
+    "@amusendame/beakblock-permissions": "workspace:*",
+    "@amusendame/beakblock-review": "workspace:*",
+    "@amusendame/beakblock-layout": "workspace:*",
+    "@amusendame/beakblock-export-docx": "workspace:*",
+    "@amusendame/beakblock-import-docx": "workspace:*",
+    "@amusendame/beakblock-templates": "workspace:*",
+    "@amusendame/beakblock-blocks-qms": "workspace:*",
+    "@amusendame/beakblock-blocks-office": "workspace:*",
+    "@amusendame/beakblock-blocks-clinical": "workspace:*",
+    "@amusendame/beakblock-ai": "workspace:*",
+    "prosemirror-model": "^1.24.1",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-transform": "^1.10.2",
+    "prosemirror-view": "^1.37.1",
+    "fflate": "^0.8.2"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

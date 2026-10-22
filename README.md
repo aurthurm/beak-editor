@@ -28,6 +28,44 @@ BeakBlock is designed for teams that want a real editor runtime, not a black box
 - Optional collaboration via Y.js
 - Custom block and custom mark support
 
+## BeakBlock 2.0
+
+BeakBlock 2.0 (alpha, branch `feat/beakblock-2.0`) turns the editor into a headless, block-native document engine
+with Office-quality output and section-level governance. Existing `Block[]` content and the 0.1.x APIs keep working.
+It adds a versioned document model, a DOCX writer and reader, a layout and print engine, durable track changes,
+controlled sections with server-side permission checks, controlled templates and releases, and an AI command layer
+that only proposes tracked changes.
+
+New packages (workspace, not yet published):
+
+| Package | Purpose |
+| --- | --- |
+| `@amusendame/beakblock-schema` | Versioned `BeakDocument` (v2), style sheet, numbering, page setup, migrations from `Block[]` |
+| `@amusendame/beakblock-ir` | BeakDoc intermediate representation (with a Python twin) used by every exporter |
+| `@amusendame/beakblock-commands` | Command registry, shortcuts, and the ribbon definition |
+| `@amusendame/beakblock-permissions` | Typed operations, policy engine, client guard, and the server verifier `verifyDocumentChange` |
+| `@amusendame/beakblock-review` | Durable track changes, comments on stable anchors, revision compare, Original, Final and Markup views |
+| `@amusendame/beakblock-layout` | Pagination, page layout, fields, and print HTML |
+| `@amusendame/beakblock-export-docx` | DOCX writer (deterministic, with a loss report) |
+| `@amusendame/beakblock-import-docx` | DOCX reader with passthrough for unsupported content |
+| `@amusendame/beakblock-templates` | Controlled templates, lifecycles, composition, and release manifests with hashes |
+| `@amusendame/beakblock-blocks-qms` | Controlled sections, signatures, approvals, revision history, controlled notices |
+| `@amusendame/beakblock-blocks-office` | Captions, equations, footnotes, text boxes, shapes, conditionals, repeating sections |
+| `@amusendame/beakblock-blocks-clinical` | SOP steps, safety warnings, reagent tables, test-method specs, forms |
+| `@amusendame/beakblock-ai` | AI commands whose results are tracked, attributed proposals |
+
+Documentation:
+
+- [Migration guide](docs/2.0/migration-guide.md): what changed, how to move from `Block[]`, and deprecations
+- [Architecture](docs/2.0/architecture.md): package map, data flow, and the parity checklist
+- [Status](docs/2.0/status.md): progress against the roadmap, release gates, and known defects
+- [Architecture Decision Records](docs/adr/): renderer, layout authority, collaboration, canonical format, units, fonts
+- [Roadmap](beakblock-2.0-roadmap.md) and [contracts](docs/2.0/contracts.md)
+
+Conformance tests (`tests/conformance`) run a synthetic corpus through every package and check round trips, DOCX
+structure, security, table invariants, layout, and a Phase 4 vertical slice. CI also writes a fidelity report that
+compares page counts with LibreOffice. The corpus is synthetic; real anonymised SOPs are still needed.
+
 ## Packages
 
 | Package | Purpose |

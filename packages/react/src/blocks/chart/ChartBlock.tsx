@@ -187,7 +187,6 @@ export function ChartBlock({ block, editor, isEditable }: ChartBlockRenderProps)
 
   useEffect(() => {
     void renderChart();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartData]);
 
   useEffect(() => () => destroyChart(), []);

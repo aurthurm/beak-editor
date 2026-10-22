@@ -28,6 +28,14 @@ import {
   runbookShowcaseDocument,
 } from '~/data/showcase-documents';
 import { sendAIRequest } from '../../shared/ai';
+import { V2_SCENARIOS } from '~/utils/v2/demoData';
+import V2OfficeSop from '~/components/v2/V2OfficeSop.vue';
+import V2BlockMode from '~/components/v2/V2BlockMode.vue';
+import V2ControlledDocument from '~/components/v2/V2ControlledDocument.vue';
+import V2TrackChanges from '~/components/v2/V2TrackChanges.vue';
+import V2DocxImportExport from '~/components/v2/V2DocxImportExport.vue';
+import V2ClinicalForms from '~/components/v2/V2ClinicalForms.vue';
+import V2AiProposals from '~/components/v2/V2AiProposals.vue';
 import type { ComplianceMergeManifest } from '~/utils/complianceMerge';
 
 useHead({
@@ -53,7 +61,18 @@ const documentTabs = [
 
 type DocumentTabId = (typeof documentTabs)[number]['id'];
 
-const viewMode = ref<DocumentTabId | 'compliance' | 'collaboration'>('generic');
+type V2ScenarioId = (typeof V2_SCENARIOS)[number]['id'];
+const viewMode = ref<DocumentTabId | 'compliance' | 'collaboration' | V2ScenarioId>('generic');
+const v2Components: Record<V2ScenarioId, unknown> = {
+  'v2-office': V2OfficeSop,
+  'v2-block': V2BlockMode,
+  'v2-controlled': V2ControlledDocument,
+  'v2-review': V2TrackChanges,
+  'v2-docx': V2DocxImportExport,
+  'v2-clinical': V2ClinicalForms,
+  'v2-ai': V2AiProposals,
+};
+const isV2View = computed(() => V2_SCENARIOS.some((s) => s.id === viewMode.value));
 const previewOpen = ref(false);
 const complianceWorkspaceRef = ref<{
   getMergedDocument: () => Block[];
@@ -349,6 +368,20 @@ watchEffect((onCleanup) => {
           Compliance
           <span class="sample-sidebar__sub">Compliance + preview</span>
         </button>
+
+        <div class="sample-sidebar__divider" role="presentation" />
+        <p class="sample-sidebar__group">BeakBlock 2.0</p>
+        <button
+          v-for="scenario in V2_SCENARIOS"
+          :key="scenario.id"
+          type="button"
+          class="sample-sidebar__btn sample-sidebar__btn--v2"
+          :class="{ 'sample-sidebar__btn--active': viewMode === scenario.id }"
+          @click="viewMode = scenario.id"
+        >
+          {{ scenario.label }}
+          <span class="sample-sidebar__sub">{{ scenario.sub }}</span>
+        </button>
       </aside>
 
       <div class="layout__main">
@@ -372,6 +405,10 @@ watchEffect((onCleanup) => {
               @ai="openAiModal"
               @comment="openCommentModal"
             />
+
+            <div v-if="isV2View" class="v2-stage" :data-scenario="viewMode">
+              <component :is="v2Components[viewMode as V2ScenarioId] as never" :key="viewMode" />
+            </div>
 
             <AIModal
               :open="aiOpen && viewMode !== 'compliance'"
@@ -523,7 +560,7 @@ watchEffect((onCleanup) => {
           </ClientOnly>
         </section>
 
-        <section class="inspector inspector--enter">
+        <section v-if="!isV2View" class="inspector inspector--enter">
           <p class="section-label">Document readout</p>
           <h2>Document JSON</h2>
           <p class="inspector__lede">

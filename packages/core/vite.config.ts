@@ -16,20 +16,9 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: [
-        'prosemirror-commands',
-        'prosemirror-dropcursor',
-        'prosemirror-gapcursor',
-        'prosemirror-history',
-        'prosemirror-inputrules',
-        'prosemirror-keymap',
-        'prosemirror-model',
-        'prosemirror-schema-list',
-        'prosemirror-state',
-        'prosemirror-transform',
-        'prosemirror-view',
-        'uuid',
-      ],
+      // Bare imports (dependencies, peers, workspace packages) stay external so Node
+      // resolves each dependency's own node export condition at runtime.
+      external: (id) => /^[^./]/.test(id),
     },
     sourcemap: true,
     minify: false,

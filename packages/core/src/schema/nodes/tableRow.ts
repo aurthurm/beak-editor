@@ -1,29 +1,17 @@
 /**
- * TableRow node specification - A row within a table.
+ * TableRow node specification - A row within an Office-class table.
  *
- * A tableRow contains multiple tableCell nodes.
- *
- * @example
- * ```json
- * {
- *   "type": "tableRow",
- *   "attrs": { "id": "row-1" },
- *   "content": [
- *     { "type": "tableCell", "content": [...] },
- *     { "type": "tableCell", "content": [...] }
- *   ]
- * }
- * ```
+ * Row attrs (contract §1.6): `isHeader` (repeat as header row), `cantSplit`
+ * (prevent splitting across pages) and `heightTwips`.
  *
  * @module
  */
 
 import { NodeSpec, DOMOutputSpec, Node as PMNode } from 'prosemirror-model';
+import { tableRowAttrsFromDom, tableRowDomAttrs, tableRowOfficeAttrs } from './tableOffice';
 
 /**
  * TableRow node spec for ProseMirror.
- *
- * Represents a row within a table.
  */
 export const tableRowNode: NodeSpec = {
   content: '(tableCell | tableHeader)+',
@@ -32,29 +20,19 @@ export const tableRowNode: NodeSpec = {
   attrs: {
     /** Unique block identifier */
     id: { default: null },
+    ...tableRowOfficeAttrs,
   },
 
   parseDOM: [
     {
       tag: 'tr',
       getAttrs(dom: HTMLElement): Record<string, unknown> {
-        const id = dom.getAttribute('data-block-id');
-        return {
-          id: id || null,
-        };
+        return tableRowAttrsFromDom(dom);
       },
     },
   ],
 
   toDOM(node: PMNode): DOMOutputSpec {
-    const attrs: Record<string, string> = {
-      class: 'ob-table-row',
-    };
-
-    if (node.attrs.id) {
-      attrs['data-block-id'] = node.attrs.id;
-    }
-
-    return ['tr', attrs, 0];
+    return ['tr', tableRowDomAttrs(node.attrs), 0];
   },
 };

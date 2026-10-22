@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { blocksToMarkdown } from './toMarkdown';
 import { markdownToBlocks } from './parse';
 import { looksLikeMarkdown } from './heuristic';
+import type { StyledText } from '../blocks/types';
 
 describe('markdownToBlocks', () => {
   it('parses beakblock-lock HTML comment before a heading', () => {
@@ -23,7 +24,7 @@ describe('markdownToBlocks', () => {
     expect(blocks[0]?.props).toMatchObject({ level: 1 });
     expect(blocks[1]?.type).toBe('paragraph');
     const content = blocks[1]?.content;
-    expect(content?.some((c) => c.type === 'text' && c.styles.bold && c.text === 'world')).toBe(true);
+    expect(content?.some((c) => c.type === 'text' && (c as StyledText).styles.bold && (c as StyledText).text === 'world')).toBe(true);
   });
 
   it('parses GFM task lists', () => {

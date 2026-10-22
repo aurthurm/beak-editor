@@ -23,6 +23,24 @@ export interface TextStyles {
   textColor?: string;
   backgroundColor?: string;
   fontSize?: number;
+  /** Durable track-change record (insertion or deletion). */
+  revision?: RevisionStyle;
+}
+
+/**
+ * Revision (track change) metadata carried by styled text.
+ *
+ * `kind: 'insert'` maps to the `insertion` mark, `kind: 'delete'` to `deletion`.
+ */
+export interface RevisionStyle {
+  kind: 'insert' | 'delete';
+  revisionId: string;
+  authorId?: string;
+  authorName?: string;
+  at: string;
+  aiGenerated?: boolean;
+  /** Groups related revisions (e.g. one logical change split across runs). */
+  groupId?: string;
 }
 
 /**
@@ -87,9 +105,42 @@ export interface HardBreakContent {
 }
 
 /**
+ * Field inline content (PAGE, DOCPROPERTY, REF, SEQ, ...).
+ *
+ * `fallback` is shown when no resolved value is available.
+ */
+export interface FieldContent {
+  type: 'field';
+  fieldType: string;
+  name: string | null;
+  format?: string;
+  fallback?: string;
+}
+
+/**
  * Union of all inline content types.
  */
-export type InlineContent = StyledText | LinkContent | IconContent | HardBreakContent;
+/**
+ * Inline node from an extension (any inline node type not built in).
+ *
+ * `props` holds the node attrs; `content` holds inline children for nodes
+ * with inline content (omitted for atoms).
+ */
+export interface CustomInlineContent {
+  type: string;
+  props?: Record<string, unknown>;
+  content?: InlineContent[];
+}
+
+/** Built-in inline content kinds (discriminated by `type`). */
+export type BuiltinInlineContent =
+  | StyledText
+  | LinkContent
+  | IconContent
+  | HardBreakContent
+  | FieldContent;
+
+export type InlineContent = BuiltinInlineContent | CustomInlineContent;
 
 /**
  * A block in the document.

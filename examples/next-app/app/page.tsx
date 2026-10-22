@@ -1,12 +1,4 @@
-"use client";
-
-import nextDynamic from 'next/dynamic';
-
-export const dynamic = 'force-dynamic';
-
-const BeakBlockShowcase = nextDynamic(() => import('./editor-shell').then((mod) => mod.BeakBlockShowcase), {
-  ssr: false,
-});
+import { BeakBlockShowcase } from './editor-shell';
 
 export default function Home() {
   return <BeakBlockShowcase />;

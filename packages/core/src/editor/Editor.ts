@@ -23,15 +23,32 @@
  */
 
 import { EditorView } from 'prosemirror-view';
-import { CodeBlockNodeView, EmbedNodeView, TableOfContentsNodeView } from '../nodeviews';
+import type { NodeViewConstructor } from 'prosemirror-view';
+import { CodeBlockNodeView, EmbedNodeView, TableOfContentsNodeView, FieldNodeView } from '../nodeviews';
+import type { FieldResolver } from '../nodeviews';
 import { EditorState, Transaction, Plugin } from 'prosemirror-state';
 import { Schema } from 'prosemirror-model';
+import type { MarkSpec, NodeSpec } from 'prosemirror-model';
 import { history as createHistoryPlugin } from 'prosemirror-history';
 import { v4 as uuid } from 'uuid';
+import { cloneJson } from '../utils/cloneJson';
 
 import { ProseMirrorAPI } from '../pm/ProseMirrorAPI';
-import { EditorConfig, defaultConfig, EditorEvents, EventHandler, CollaborationConfig } from './EditorConfig';
+import {
+  EditorConfig,
+  defaultConfig,
+  EditorEvents,
+  EventHandler,
+  CollaborationConfig,
+  ReviewView,
+  REVIEW_VIEWS,
+  EDITOR_MODES,
+} from './EditorConfig';
 import { createSchema } from '../schema';
+import type { BeakExtension, EditorMode } from '../extensions';
+import { BlockRegistry, createDefaultBlockRegistry } from '../registry';
+import { EDITOR_MODE_PLUGIN_KEY } from '../plugins/editorModePlugin';
+import { SLASH_MENU_PLUGIN_KEY } from '../plugins/slashMenuPlugin';
 import {
   createPlugins,
   undo,
@@ -42,6 +59,7 @@ import {
   BEAKBLOCK_META_TRACK_CLEAR_LOG,
   BEAKBLOCK_META_TRACK_REMOVE,
   COMPLIANCE_LOCK_BYPASS_META,
+  BEAKBLOCK_META_LOAD_DOCUMENT,
 } from '../plugins';
 import type { DocumentVersion } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
@@ -63,6 +81,16 @@ import {
  * Provides a high-level API for block-based editing while exposing
  * all ProseMirror internals through the `pm` property.
  */
+/** Options for {@link BeakBlockEditor.setDocument}. */
+export interface SetDocumentOptions {
+  /**
+   * The content is already saved and may contain service-written state (for example signed
+   * signature blocks). Guard plugins skip their client-side checks for this load. Use it only for
+   * content the server has verified. Default `false`.
+   */
+  trustedLoad?: boolean;
+}
+
 export class BeakBlockEditor {
   /**
    * The ProseMirror API - PUBLIC ACCESS to all PM functionality.
@@ -102,8 +130,43 @@ export class BeakBlockEditor {
   /** Destroyed flag */
   private _destroyed = false;
 
+  /** Current editor mode */
+  private _mode: EditorMode;
+
+  /** Extensions passed in configuration */
+  private _extensions: BeakExtension[];
+
+  /** Whether Word-compatible keyboard behaviour is requested */
+  private _wordBehaviour: boolean;
+
+  /** Current review view for revision marks */
+  private _reviewView: ReviewView = 'markup';
+
+  /** Host-supplied resolver for field nodes */
+  private _fieldResolver: FieldResolver | null = null;
+
+  /**
+   * Block definitions for this editor (built-in and extension blocks).
+   * Use to validate documents or look up block capabilities.
+   */
+  public readonly blockRegistry: BlockRegistry;
+
   constructor(config: EditorConfig = {}) {
     this._config = { ...defaultConfig, ...config };
+    this._mode = config.mode ?? 'block';
+    if (!EDITOR_MODES.includes(this._mode)) {
+      throw new Error(`Unknown editor mode "${String(this._mode)}"`);
+    }
+    this._wordBehaviour = config.wordBehaviour ?? this._mode !== 'block';
+    this._extensions = config.extensions ?? [];
+
+    this.blockRegistry = createDefaultBlockRegistry();
+    for (const extension of this._extensions) {
+      for (const definition of extension.blocks ?? []) {
+        this.blockRegistry.register(definition, { replace: true });
+      }
+    }
+
     this.pm = new ProseMirrorAPI(this);
 
     // Auto-inject styles unless explicitly disabled
@@ -111,7 +174,16 @@ export class BeakBlockEditor {
       injectStyles();
     }
 
-    this._schema = createSchema(this._config.customNodes);
+    const extensionNodes: Record<string, NodeSpec> = {};
+    const extensionMarks: Record<string, MarkSpec> = {};
+    for (const extension of this._extensions) {
+      Object.assign(extensionNodes, extension.nodes ?? {});
+      Object.assign(extensionMarks, extension.marks ?? {});
+    }
+    this._schema = createSchema(
+      { ...extensionNodes, ...(this._config.customNodes ?? {}) },
+      { ...extensionMarks, ...(this._config.customMarks ?? {}) }
+    );
     this._initTrackChangesFromConfig();
     this._createEditor();
 
@@ -166,6 +238,10 @@ export class BeakBlockEditor {
     // Create the history plugin separately so we can toggle it at runtime
     this._historyPlugin = this._historyEnabled ? createHistoryPlugin() : null;
 
+    const extensionPlugins = this._extensions.flatMap((extension) =>
+      extension.plugins?.({ schema: this._schema, editor: this }) ?? []
+    );
+
     const plugins = createPlugins({
       schema: this._schema,
       toggleMark: (name) => this.pm.toggleMark(name),
@@ -174,7 +250,13 @@ export class BeakBlockEditor {
       complianceLock: this._config.complianceLock,
       dragDrop: this._config.dragDrop,
       history: false, // We manage history ourselves
-      additionalPlugins: [...this._coreManagedPlugins(), ...(this._config.prosemirror?.plugins ?? [])],
+      mode: this._mode,
+      wordBehaviour: this._wordBehaviour,
+      additionalPlugins: [
+        ...this._coreManagedPlugins(),
+        ...extensionPlugins,
+        ...(this._config.prosemirror?.plugins ?? []),
+      ],
     });
 
     const state = EditorState.create({ doc, schema: this._schema, plugins });
@@ -183,32 +265,54 @@ export class BeakBlockEditor {
       state,
       editable: () => this._config.editable !== false,
       dispatchTransaction: this._handleTransaction.bind(this),
-      attributes: {
-        class: 'beakblock-editor',
+      // Computed on each state update so setMode / setReviewView take effect
+      attributes: () => ({
+        class: `beakblock-editor beakblock-review-view-${this._reviewView}`,
         role: 'textbox',
         'aria-multiline': 'true',
-      },
-      nodeViews: {
-        ...(this._schema.nodes.tableOfContents
-          ? {
-              tableOfContents: (node, view, getPos) =>
-                new TableOfContentsNodeView(node, view, getPos),
-            }
-          : {}),
-        ...(this._schema.nodes.embed
-          ? {
-              embed: (node, view, getPos) => new EmbedNodeView(node, view, getPos),
-            }
-          : {}),
-        ...(this._schema.nodes.codeBlock
-          ? {
-              codeBlock: (node, view, getPos) => new CodeBlockNodeView(node, view, getPos),
-            }
-          : {}),
-        ...(userNodeViews ?? {}),
-      },
+        'data-beakblock-mode': this._mode,
+      }),
+      nodeViews: this._buildNodeViews(userNodeViews),
       ...viewConfig,
     });
+  }
+
+  /**
+   * Builds the node view map: built-in views, field view, extension views,
+   * then user-supplied views (which take precedence).
+   */
+  private _buildNodeViews(
+    userNodeViews?: Record<string, NodeViewConstructor>
+  ): Record<string, NodeViewConstructor> {
+    const extensionNodeViews: Record<string, NodeViewConstructor> = {};
+    for (const extension of this._extensions) {
+      Object.assign(extensionNodeViews, extension.nodeViews ?? {});
+    }
+    return {
+      ...(this._schema.nodes.tableOfContents
+        ? {
+            tableOfContents: (node, view, getPos) =>
+              new TableOfContentsNodeView(node, view, getPos),
+          }
+        : {}),
+      ...(this._schema.nodes.embed
+        ? {
+            embed: (node, view, getPos) => new EmbedNodeView(node, view, getPos),
+          }
+        : {}),
+      ...(this._schema.nodes.codeBlock
+        ? {
+            codeBlock: (node, view, getPos) => new CodeBlockNodeView(node, view, getPos),
+          }
+        : {}),
+      ...(this._schema.nodes.field
+        ? {
+            field: (node) => new FieldNodeView(node, () => this._fieldResolver),
+          }
+        : {}),
+      ...extensionNodeViews,
+      ...(userNodeViews ?? {}),
+    };
   }
 
   private _handleTransaction(tr: Transaction): void {
@@ -244,6 +348,89 @@ export class BeakBlockEditor {
   }
 
   // ===========================================================================
+  // MODES, REVIEW VIEW AND FIELDS
+  // ===========================================================================
+
+  /** Returns the current editor mode. */
+  getMode(): EditorMode {
+    return this._mode;
+  }
+
+  /**
+   * Switches the editor mode. Emits `modeChange`.
+   *
+   * In `office` and `controlled` modes the slash menu and drag handles are
+   * disabled. Document content is unchanged.
+   *
+   * @param mode - The mode to switch to
+   */
+  setMode(mode: EditorMode): void {
+    if (!EDITOR_MODES.includes(mode)) {
+      throw new Error(`Unknown editor mode "${String(mode)}"`);
+    }
+    const previousMode = this._mode;
+    if (mode === previousMode || this._destroyed) return;
+
+    this._mode = mode;
+    this._config.mode = mode;
+
+    const tr = this.pm.createTransaction();
+    tr.setMeta(EDITOR_MODE_PLUGIN_KEY, mode);
+    tr.setMeta('addToHistory', false);
+    if (mode !== 'block') {
+      // Close an open slash menu when block chrome is turned off
+      tr.setMeta(SLASH_MENU_PLUGIN_KEY, { close: true });
+    }
+    this.pm.dispatch(tr);
+
+    this._emit('modeChange', { mode, previousMode });
+  }
+
+  /** Returns the current review view used for revision marks. */
+  getReviewView(): ReviewView {
+    return this._reviewView;
+  }
+
+  /**
+   * Chooses how revision marks are displayed.
+   *
+   * - `'markup'`: insertions underlined, deletions struck through
+   * - `'final'`: deletions hidden, insertions shown as plain text
+   * - `'original'`: insertions hidden, deletions shown as plain text
+   *
+   * @param view - The review view
+   */
+  setReviewView(view: ReviewView): void {
+    if (!REVIEW_VIEWS.includes(view)) {
+      throw new Error(`Unknown review view "${String(view)}"`);
+    }
+    this._reviewView = view;
+    if (this._destroyed) return;
+    // Any transaction refreshes the root attributes
+    const tr = this.pm.createTransaction();
+    tr.setMeta('addToHistory', false);
+    this.pm.dispatch(tr);
+  }
+
+  /**
+   * Sets the resolver used to display `field` nodes. The resolver receives
+   * the field's attrs and returns the text to show, or `null` to use the
+   * field's fallback. Pass `null` to clear. Field views are redrawn.
+   *
+   * @example
+   * ```typescript
+   * editor.setFieldResolver((attrs) =>
+   *   attrs.fieldType === 'DOCPROPERTY' && attrs.name === 'docNumber' ? 'SOP-042' : null
+   * );
+   * ```
+   */
+  setFieldResolver(resolver: FieldResolver | null): void {
+    this._fieldResolver = resolver;
+    if (this._destroyed) return;
+    this._pmView.setProps({ nodeViews: this._buildNodeViews(this._config.prosemirror?.nodeViews) });
+  }
+
+  // ===========================================================================
   // DOCUMENT OPERATIONS
   // ===========================================================================
 
@@ -263,6 +450,11 @@ export class BeakBlockEditor {
   /**
    * Replace the entire document content.
    *
+   * By default the load is an ordinary edit, and plugins check it as one. Pass `trustedLoad: true`
+   * to load content that was already saved, such as a released document with signed signatures.
+   * Guard plugins then skip their client-side checks for this load. That is for display and UX
+   * only: the server must still verify the document (`verifyDocumentChange`).
+   *
    * @example
    * ```typescript
    * editor.setDocument([
@@ -271,14 +463,21 @@ export class BeakBlockEditor {
    * ]);
    * ```
    */
-  setDocument(blocks: Block[]): void {
+  setDocument(blocks: Block[], options: SetDocumentOptions = {}): void {
     const doc = blocksToDoc(this._schema, blocks);
+    const before = this.pm.doc;
     const tr = this.pm.createTransaction();
     tr.setMeta(BEAKBLOCK_META_SKIP_TRACK_CHANGES, true);
     tr.setMeta(BEAKBLOCK_META_TRACK_CLEAR_LOG, true);
     tr.setMeta(COMPLIANCE_LOCK_BYPASS_META, true);
+    if (options.trustedLoad === true) tr.setMeta(BEAKBLOCK_META_LOAD_DOCUMENT, true);
     tr.replaceWith(0, this.pm.doc.content.size, doc.content);
     this.pm.dispatch(tr);
+    // A rejected transaction leaves the same doc object in place. Report it rather than
+    // leaving the caller with the old document and no sign of why.
+    if (blocks.length > 0 && this.pm.doc === before) {
+      console.warn('BeakBlock: setDocument was rejected by a plugin; the previous document is still shown.');
+    }
   }
 
   // ===========================================================================
@@ -300,7 +499,7 @@ export class BeakBlockEditor {
       id: uuid(),
       createdAt: new Date().toISOString(),
       label: options?.label,
-      blocks: structuredClone(this.getDocument()),
+      blocks: cloneJson(this.getDocument()),
       meta: options?.meta,
     };
     await adapter.saveVersion(version);

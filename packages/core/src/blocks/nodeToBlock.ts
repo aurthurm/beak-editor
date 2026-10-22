@@ -7,7 +7,33 @@
 import { Node as PMNode, Mark } from 'prosemirror-model';
 import { v4 as uuid } from 'uuid';
 
-import type { Block, IconContent, InlineContent, LinkContent, StyledText, TextStyles } from './types';
+import type {
+  Block,
+  CustomInlineContent,
+  FieldContent,
+  IconContent,
+  InlineContent,
+  LinkContent,
+  RevisionStyle,
+  StyledText,
+  TextStyles,
+} from './types';
+import { OFFICE_PARAGRAPH_ATTR_NAMES } from '../schema/nodes/officeParagraph';
+
+/**
+ * Node types whose office paragraph attributes are omitted from props when unset.
+ */
+const OFFICE_PROP_NODE_TYPES = new Set(['paragraph', 'heading']);
+
+/**
+ * Optional Office table attributes omitted from props when unset.
+ */
+const TABLE_OPTIONAL_PROP_NAMES: Record<string, readonly string[]> = {
+  table: ['widthMode', 'widthValue', 'styleId', 'look'],
+  tableRow: ['isHeader', 'cantSplit', 'heightTwips'],
+  tableCell: ['widthTwips', 'borders', 'shading', 'padding', 'vAlign', 'hAlign'],
+  tableHeader: ['widthTwips', 'borders', 'shading', 'padding', 'vAlign', 'hAlign'],
+};
 
 /**
  * Container node types that have block children instead of inline content.
@@ -45,6 +71,18 @@ const CONTAINER_TYPES = new Set([
  * @param node - The ProseMirror node
  * @returns A Block object
  */
+/** Restores the original JSON of an `unknownBlock` atom. */
+function unknownBlockToBlock(node: PMNode): Block {
+  const block: Block = {
+    id: node.attrs.id || uuid(),
+    type: String(node.attrs.originalType),
+    props: JSON.parse(String(node.attrs.propsJson ?? '{}')) as Record<string, unknown>,
+  };
+  if (node.attrs.contentJson !== null) block.content = JSON.parse(String(node.attrs.contentJson));
+  if (node.attrs.childrenJson !== null) block.children = JSON.parse(String(node.attrs.childrenJson));
+  return block;
+}
+
 export function nodeToBlock(node: PMNode): Block {
   if (node.type.name === 'tableOfContents') {
     let items: unknown[] = [];
@@ -60,7 +98,41 @@ export function nodeToBlock(node: PMNode): Block {
     };
   }
 
-  const { id, ...props } = node.attrs;
+  if (node.type.name === 'unknownBlock') {
+    return unknownBlockToBlock(node);
+  }
+
+  const { id, ...rawProps } = node.attrs;
+  const props: Record<string, unknown> = { ...rawProps };
+
+  // Reverse of blockPropAliases: the aliased attr is written back under the block prop name.
+  const aliases = node.type.spec.blockPropAliases as Record<string, string> | undefined;
+  for (const [propName, attrName] of Object.entries(aliases ?? {})) {
+    if (!(attrName in props)) continue;
+    // An unset alias was never in the block's props, so it is not written back.
+    if (props[attrName] !== null && props[attrName] !== undefined) props[propName] = props[attrName];
+    delete props[attrName];
+  }
+
+  if (OFFICE_PROP_NODE_TYPES.has(node.type.name)) {
+    for (const name of OFFICE_PARAGRAPH_ATTR_NAMES) {
+      if (props[name] === null || props[name] === undefined) {
+        delete props[name];
+      }
+    }
+  }
+
+  // Office table attrs are omitted when unset; legacy colwidth/backgroundColor always kept.
+  const optionalKeys = TABLE_OPTIONAL_PROP_NAMES[node.type.name];
+  if (optionalKeys) {
+    for (const name of optionalKeys) {
+      if (props[name] === null || props[name] === undefined) delete props[name];
+    }
+  }
+
+  if (node.type.name === 'sectionBreak' && props.pageSetup == null) {
+    delete props.pageSetup;
+  }
 
   const block: Block = {
     id: id || uuid(),
@@ -107,12 +179,29 @@ export function nodeToBlock(node: PMNode): Block {
     return block;
   }
 
+  // Extension containers (any non-textblock with block children) keep their children
+  if (!node.isTextblock && !node.isAtom && node.childCount > 0 && node.firstChild!.isBlock) {
+    block.children = node.content.content.map((child) => nodeToBlock(child));
+    return block;
+  }
+
   // Extract inline content from text blocks
   if (node.isTextblock && node.content.size > 0) {
     block.content = nodeContentToInline(node);
   }
 
   return block;
+}
+
+/**
+ * Serializes an extension inline node (type, attrs, optional inline children).
+ *
+ * @param child - An inline, non-text node that is not built in
+ */
+function customInlineContent(child: PMNode): CustomInlineContent {
+  const item: CustomInlineContent = { type: child.type.name, props: { ...child.attrs } };
+  if (child.childCount > 0) item.content = nodeContentToInline(child);
+  return item;
 }
 
 /**
@@ -148,6 +237,19 @@ function nodeContentToInline(node: PMNode): InlineContent[] {
     if (child.type.name === 'hardBreak') {
       flushLink();
       content.push({ type: 'hardBreak' });
+      return;
+    }
+
+    if (child.type.name === 'field') {
+      flushLink();
+      const fieldItem: FieldContent = {
+        type: 'field',
+        fieldType: String(child.attrs.fieldType || 'PAGE'),
+        name: child.attrs.name != null ? String(child.attrs.name) : null,
+        ...(child.attrs.format ? { format: String(child.attrs.format) } : {}),
+        ...(child.attrs.fallback != null ? { fallback: String(child.attrs.fallback) } : {}),
+      };
+      content.push(fieldItem);
       return;
     }
 
@@ -191,6 +293,12 @@ function nodeContentToInline(node: PMNode): InlineContent[] {
         content: [textItem],
       };
     }
+
+    if (!child.isText) {
+      // Extension inline node: keep its type, attrs and any inline children
+      flushLink();
+      content.push(customInlineContent(child));
+    }
   });
 
   flushLink();
@@ -233,10 +341,34 @@ export function marksToStyles(marks: readonly Mark[]): TextStyles {
       case 'fontSize':
         styles.fontSize = Number(mark.attrs.size || 0) || undefined;
         break;
+      case 'insertion':
+        styles.revision = revisionFromMark('insert', mark.attrs);
+        break;
+      case 'deletion':
+        styles.revision = revisionFromMark('delete', mark.attrs);
+        break;
     }
   }
 
   return styles;
+}
+
+/**
+ * Builds a {@link RevisionStyle} from revision mark attrs, omitting null fields.
+ *
+ * @param kind - `'insert'` or `'delete'`
+ * @param attrs - Mark attrs
+ */
+function revisionFromMark(kind: 'insert' | 'delete', attrs: Record<string, unknown>): RevisionStyle {
+  return {
+    kind,
+    revisionId: String(attrs.revisionId ?? ''),
+    ...(attrs.authorId ? { authorId: String(attrs.authorId) } : {}),
+    ...(attrs.authorName ? { authorName: String(attrs.authorName) } : {}),
+    at: String(attrs.at ?? ''),
+    ...(attrs.aiGenerated ? { aiGenerated: true } : {}),
+    ...(attrs.groupId ? { groupId: String(attrs.groupId) } : {}),
+  };
 }
 
 /**

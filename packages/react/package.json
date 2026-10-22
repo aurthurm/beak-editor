@@ -32,18 +32,22 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "lint": "eslint src",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@amusendame/beakblock-core": "workspace:*",
-    "chart.js": "^4.5.1"
+    "chart.js": "^4.5.1",
+    "@amusendame/beakblock-commands": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
-    "vite-plugin-dts": "^4.4.0"
+    "vite-plugin-dts": "^4.4.0",
+    "jsdom": "^25.0.1",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

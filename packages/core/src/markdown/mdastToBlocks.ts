@@ -20,6 +20,7 @@ import { v4 as uuid } from 'uuid';
 import type { Block, InlineContent } from '../blocks/types';
 import type { CalloutType } from '../schema/nodes/callout';
 import { phrasingToInlineContent } from './phrasing';
+import { isStyledText } from '../blocks/inlineGuards';
 
 const CALLOUT_RE = /^\[(info|warning|success|error|note)\]\s*(.*)$/i;
 
@@ -171,7 +172,7 @@ function blockquoteToBlocks(bq: Blockquote): Block[] {
 
 function tryCalloutFromBlockquote(content: InlineContent[]): Block | null {
   const first = content[0];
-  if (!first || first.type !== 'text') return null;
+  if (!first || !isStyledText(first)) return null;
   const m = first.text.match(CALLOUT_RE);
   if (!m) return null;
   const variant = m[1].toLowerCase() as CalloutType;

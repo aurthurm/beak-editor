@@ -99,7 +99,7 @@ new BeakBlockEditor(config?: EditorConfig)
 
 // Document operations
 editor.getDocument(): Block[]
-editor.setDocument(blocks: Block[]): void
+editor.setDocument(blocks: Block[], options?: { trustedLoad?: boolean }): void
 editor.getBlock(id: string): Block | undefined
 editor.getSelectedBlocks(): Block[]
 
@@ -219,6 +219,7 @@ See [Versioning and track changes](../../docs/versioning.md) for adapter details
 - **`complianceLock`** — Optional read-only policy for blocks with **`attrs.locked`**. See **[Compliance lock](../../docs/compliance-lock.md)** for the policy matrix, **`COMPLIANCE_LOCK_BYPASS_META`**, and collaboration notes.
 - **`dragDrop`** — Optional **`DragDropConfig | false`** merged into **`createPlugins`**. Use **`headingLockBadge: 'all-headings'`** to show a **clickable** lock control on every heading (toggle uses bypass meta). Omit or pass **`false`** to disable the drag-drop plugin.
 - **`setDocument(blocks)`** — Full document replacement sets compliance **bypass** meta so programmatic reloads can change locked headings when the lock plugin is enabled.
+- **`setDocument(blocks, { trustedLoad: true })`** — Loads content that was already saved (for example a released document with signed signatures). It sets **`BEAKBLOCK_META_LOAD_DOCUMENT`**, and guard plugins (the QMS controlled-section checks and the permissions guard) skip their client-side checks for that load. The default is `false`: a load is then checked as an ordinary edit, and a rejected load keeps the old document and logs a `console.warn`. This is for display and UX only. The server must still run `verifyDocumentChange`.
 
 Types: **`EditorConfig`**, **`DragDropConfig`**, **`ComplianceLockPluginOptions`** are exported from `@amusendame/beakblock-core`.
 

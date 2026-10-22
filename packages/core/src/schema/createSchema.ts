@@ -6,7 +6,7 @@
  * @module
  */
 
-import { Schema, NodeSpec } from 'prosemirror-model';
+import { Schema, NodeSpec, MarkSpec } from 'prosemirror-model';
 
 import {
   docNode,
@@ -19,6 +19,7 @@ import {
   calloutNode,
   codeBlockNode,
   dividerNode,
+  unknownBlockNode,
   bulletListNode,
   orderedListNode,
   listItemNode,
@@ -33,6 +34,9 @@ import {
   checkListItemNode,
   embedNode,
   tableOfContentsNode,
+  pageBreakNode,
+  sectionBreakNode,
+  fieldNode,
 } from './nodes';
 import {
   boldMark,
@@ -44,6 +48,8 @@ import {
   textColorMark,
   backgroundColorMark,
   fontSizeMark,
+  insertionMark,
+  deletionMark,
 } from './marks';
 
 /**
@@ -62,6 +68,7 @@ export const DEFAULT_NODES = {
   callout: calloutNode,
   codeBlock: codeBlockNode,
   divider: dividerNode,
+  unknownBlock: unknownBlockNode,
   bulletList: bulletListNode,
   orderedList: orderedListNode,
   listItem: listItemNode,
@@ -76,12 +83,16 @@ export const DEFAULT_NODES = {
   checkListItem: checkListItemNode,
   embed: embedNode,
   tableOfContents: tableOfContentsNode,
+  pageBreak: pageBreakNode,
+  sectionBreak: sectionBreakNode,
+  field: fieldNode,
 };
 
 /**
  * Default mark specifications.
  *
- * Includes: bold, italic, underline, strikethrough, code, link, textColor, backgroundColor
+ * Includes: bold, italic, underline, strikethrough, code, link, textColor, backgroundColor,
+ * fontSize, and the revision marks insertion and deletion.
  */
 export const DEFAULT_MARKS = {
   bold: boldMark,
@@ -93,6 +104,8 @@ export const DEFAULT_MARKS = {
   textColor: textColorMark,
   backgroundColor: backgroundColorMark,
   fontSize: fontSizeMark,
+  insertion: insertionMark,
+  deletion: deletionMark,
 };
 
 /**
@@ -109,11 +122,16 @@ export const DEFAULT_MARKS = {
  * // schema.nodes.paragraph, schema.marks.bold, etc.
  * ```
  *
+ * @param customNodes - Extra node specs (added after the defaults)
+ * @param customMarks - Extra mark specs (added after the defaults)
  * @returns A ProseMirror Schema instance
  */
-export function createSchema(customNodes?: Record<string, NodeSpec>): Schema {
+export function createSchema(
+  customNodes?: Record<string, NodeSpec>,
+  customMarks?: Record<string, MarkSpec>
+): Schema {
   return new Schema({
     nodes: { ...DEFAULT_NODES, ...customNodes },
-    marks: DEFAULT_MARKS,
+    marks: { ...DEFAULT_MARKS, ...customMarks },
   });
 }

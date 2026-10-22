@@ -5,7 +5,103 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased — 2.0.0-alpha]
+
+BeakBlock 2.0 is in alpha on `feat/beakblock-2.0`. Existing `Block[]` content and 0.1.x APIs keep working. See
+[`docs/2.0/migration-guide.md`](docs/2.0/migration-guide.md), [`docs/2.0/status.md`](docs/2.0/status.md) and
+[`docs/adr/`](docs/adr/) for details and known limitations.
+
+### Added
+
+#### Core (`@amusendame/beakblock-core`)
+
+- **Editor modes** — `EditorConfig.mode` (`'block'` default, `'office'`, `'controlled'`), `getMode()`, `setMode()` with a `modeChange` event, and `data-beakblock-mode` on the root element. `wordBehaviour` (default on outside block mode).
+- **Extensions** — `EditorConfig.extensions` (`BeakExtension`: nodes, marks, plugins, node views, block definitions) and `editor.blockRegistry` (`BlockRegistry` with validation codes).
+- **Office paragraph properties** — `styleId`, `numbering`, `spacing`, `indent`, `keepNext`, `keepLines`, `pageBreakBefore`, `widowControl`, `tabs`, round-tripped through `Block.props`.
+- **Fields and revisions** — `field` inline node (`PAGE`, `NUMPAGES`, `DOCPROPERTY`, `REF`, `SEQ`, `DATE`, `LIMS`), `editor.setFieldResolver()`, and `insertion` and `deletion` marks. `editor.setReviewView('markup' | 'final' | 'original')`.
+- **Office tables** — `widthMode`, `widthValue`, `look` on tables; `isHeader`, `cantSplit`, `heightTwips` on rows; cell borders, shading, padding and alignment. Commands for row and column structure, merge and split, widths, borders, sort and distribute.
+- **Word keyboard** — `createWordKeymapPlugin()`: Ctrl+Enter page break, Ctrl+Shift+V plain paste, Ctrl+Alt+1–3 headings, Ctrl+Shift+N Normal, Tab list levels, smart quotes and AutoCorrect.
+
+#### Schema (`@amusendame/beakblock-schema`)
+
+- **`BeakDocument` v2** (`schemaVersion: 2`) with sections, a style sheet with `basedOn`, numbering definitions, page setup (A4, Letter, Legal, A3), and document properties.
+- **Migrations** — `migrateDocument()` (accepts `Block[]`, v1 wrapper or v2), `MigrationRegistry`, `blocksToDocument`, `documentToBlocks`, and `validateDocumentStructure()`.
+- **Units** — points and twips internally, with `ptToTwips`, `twipsToPt`, `twipsToPx`, `pxToTwips` and `mmToTwips`.
+
+#### IR (`@amusendame/beakblock-ir`)
+
+- **BeakDoc IR** (OOXML-shaped): `documentToIR`, `irToDocument`, `blocksToIR`, `validateIR`, and a Python twin in `packages/ir/python`.
+
+#### Commands (`@amusendame/beakblock-commands`)
+
+- **`CommandRegistry`** with policy checks, shortcuts, repeat-last (F4) and a keymap plugin; `createBuiltInCommands()` (31 ids) and `createDefaultRibbon()` (ribbon definition, no UI yet).
+
+#### Permissions (`@amusendame/beakblock-permissions`)
+
+- **Typed operations and scopes** (`OPERATION_SCOPES`, `classifyTransaction`), a **policy engine** (`createPolicyEngine`), a **client guard** (`createPermissionGuardPlugin`, for UX only) and the **server verifier** `verifyDocumentChange()`, which derives operations from the stored and submitted block trees.
+
+#### Review (`@amusendame/beakblock-review`)
+
+- **Durable track changes**: `createRevisionTrackingPlugin`, `acceptRevision`, `rejectRevision`, `acceptAll`, `rejectAll`, `listPendingRevisions`, `proposeChange`, `InMemoryRevisionStore`.
+- **Comments on stable anchors**: `InMemoryCommentThreadStore`, `createCommentAnchor`, `reanchorComments`, mentions.
+- **Compare and restore**: `compareRevisions`, `renderRedlineHTML`, `restoreSnapshotPreservingRevisions`, and `projectBlocks` for Original, Final and Markup views.
+
+#### Layout (`@amusendame/beakblock-layout`)
+
+- **Layout tree and pagination**: `layoutDocument`, `relayout` (identical to a full layout), keep rules, widow and orphan control, table row splitting, repeated header rows, per-page headers and footers, and field resolution.
+- **Measurers**: `createHeuristicMeasurer` (deterministic) and `createDomMeasurer`.
+- **Print and editor pages**: `renderPrintHTML` (A4 and other sizes, watermark, controlled-copy notice) and `createPaginationPlugin` (page boundaries as decorations; the document is never changed).
+
+#### DOCX (`@amusendame/beakblock-export-docx`, `@amusendame/beakblock-import-docx`)
+
+- **`exportDocx`, `exportDocxBlob`, `exportDocxWithReport`**: a DOCX writer for the IR subset (styles, numbering, runs, hyperlinks, fields, tracked changes, tables, content controls, sections, headers and footers, images). Byte-identical output across runs, and a loss report.
+- **`importDocx`**: DOCX to IR with `ooxmlPassthroughExtension()` for unsupported parts, `detectHeadings()`, and loss codes.
+
+#### Templates (`@amusendame/beakblock-templates`)
+
+- **Controlled templates**: `createTemplate`, `addSection`, `publishTemplate`, `instantiateDocument`, `validateAgainstTemplate`.
+- **Lifecycles**: section and document state machines, `freezeSectionRevision` (immutable section revisions).
+- **Release**: `composeDocument` (generated parts), `createRelease` (sha256 hashes), `bindSignature`, `attachRendition`, `verifyRelease`, `stampControlledCopy`, and `mapImportToTemplate`.
+
+#### QMS blocks (`@amusendame/beakblock-blocks-qms`)
+
+- **`qmsExtension()`**: `controlledSection` (with the section plugin; the permission guard is composed in when a policy context is supplied), signature, approval, revision history, controlled notice, acknowledgement and document identifier blocks, and QMS commands.
+
+#### Office blocks (`@amusendame/beakblock-blocks-office`)
+
+- **`officeBlocksExtension()`**: footnote, endnote, equation, caption, cross-reference, text box, shape, variable, conditional, repeating section, computed value and reusable content.
+
+#### Clinical blocks (`@amusendame/beakblock-blocks-clinical`)
+
+- **`clinicalExtension()`**: SOP step (with automatic numbering), safety warning, reagent table, test-method specification, specimen requirements, QC criteria and equipment reference.
+- **`formsExtension()`**: text, number, date, dropdown, checkbox, radio, calculated fields, repeatable rows and validated sections.
+
+#### AI (`@amusendame/beakblock-ai`)
+
+- **`createAICommandLayer()`**: nine `ai.*` commands. Every result is a tracked proposal, marked AI-generated and attributed. Policy is checked before the provider is called and again before the change is applied. `createFetchProvider`, `createMockProvider`.
+
+#### Tests and reports (`tests/conformance`, private)
+
+- **Conformance suites**: a 20-document synthetic corpus; round trips through the IR; editor load and round trip; DOCX structure, determinism and well-formedness; security (forged operations, guard bypass, replay and stale bases, tenant isolation, signature attributes, AI policy); table invariants (seeded random operations); layout stability, relayout equality and performance budgets; the Phase 4 vertical slice.
+- **Fidelity proxy** (`tests/conformance/scripts/fidelity.mjs`): DOCX to PDF with LibreOffice and comparison with layout page counts. Runs in CI.
+
+#### Documentation
+
+- **Architecture Decision Records** [`docs/adr/`](docs/adr/): ADR-0001 to ADR-0006 (print renderer, layout authority, collaboration topology, canonical format, units, fonts).
+- **2.0 docs** [`docs/2.0/`](docs/2.0/): migration guide, architecture with the parity checklist, and status against the roadmap.
+
+### Changed
+
+- The core editor's runtime format is still `Block[]`. `getDocument()` and `setDocument()` keep their signatures, and the 2.0 document model is available through `@amusendame/beakblock-schema`.
+
+### Deprecated
+
+- **Core track changes** (decoration-based `enableTrackChanges`, `getPendingTrackChanges`, `acceptTrackedChange`). Use `@amusendame/beakblock-review`.
+- **Compliance locks** (`complianceLock` and `attrs.locked` / `lockId`). Use `@amusendame/beakblock-permissions` with `@amusendame/beakblock-blocks-qms`. Client locks are UX only and do not replace server-side checks.
+
+### Known issues
+
+- The IR drops some custom inline nodes and empty checklists silently, and the editor does not load signed signature blocks through `setDocument`. The server verifier does not protect signature attributes. See [`docs/2.0/status.md`](docs/2.0/status.md#known-defects) for the full list and the tests that track each one.
 
 ## [0.1.2] - 2026-04-18
 

@@ -7,7 +7,7 @@
 import { Schema, Node as PMNode, Mark } from 'prosemirror-model';
 import { v4 as uuid } from 'uuid';
 
-import type { Block, InlineContent, TextStyles } from './types';
+import type { Block, BuiltinInlineContent, CustomInlineContent, InlineContent, TextStyles } from './types';
 
 /**
  * Converts a Block to a ProseMirror node.
@@ -38,13 +38,24 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
   const nodeType = schema.nodes[block.type];
 
   if (!nodeType) {
-    // Fallback to paragraph for unknown block types
-    console.warn(`Unknown block type: ${block.type}, falling back to paragraph`);
-    return schema.node('paragraph', { id: block.id || uuid() });
+    // Keep the original block as JSON so it serialises back unchanged.
+    const unknownType = schema.nodes.unknownBlock;
+    if (!unknownType) {
+      console.warn(`Unknown block type: ${block.type}, falling back to paragraph`);
+      return schema.node('paragraph', { id: block.id || uuid() });
+    }
+    warnUnknownOnce('block', block.type);
+    return unknownType.create({
+      id: block.id || uuid(),
+      originalType: block.type,
+      propsJson: JSON.stringify(block.props ?? {}),
+      contentJson: block.content === undefined ? null : JSON.stringify(block.content),
+      childrenJson: block.children === undefined ? null : JSON.stringify(block.children),
+    });
   }
 
   const attrs = {
-    ...block.props,
+    ...propsToAttrs(nodeType.spec.blockPropAliases, block.props),
     id: block.id || uuid(),
   };
 
@@ -103,7 +114,43 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
 
   // Standard blocks with inline content
   const content = inlineContentToNodes(schema, block.content);
+  // A node that holds blocks (for example a step's `block+`) gets its inline content wrapped in a paragraph.
+  if (!nodeType.inlineContent && nodeType.isBlock && content.length > 0 && schema.nodes.paragraph) {
+    const wrapped = schema.node('paragraph', { id: uuid() }, content);
+    return nodeType.createAndFill(attrs, [wrapped]) ?? nodeType.create(attrs, [wrapped]);
+  }
   return nodeType.create(attrs, content);
+}
+
+const warnedUnknown = new Set<string>();
+
+/** Logs an unregistered block or inline type once per type name. */
+function warnUnknownOnce(kind: 'block' | 'inline', type: string): void {
+  const key = `${kind}:${type}`;
+  if (warnedUnknown.has(key)) return;
+  warnedUnknown.add(key);
+  console.warn(
+    kind === 'block'
+      ? `BeakBlock: unregistered block type "${type}" is kept as an unknownBlock and is not rendered.`
+      : `BeakBlock: unknown inline type "${type}" was dropped from the content.`
+  );
+}
+
+/**
+ * Maps block props to node attrs. A prop named in `aliases` (block prop name to node attr name)
+ * is stored under the attr name, so it does not collide with a reserved attr such as `id`.
+ */
+export function propsToAttrs(
+  aliases: Record<string, string> | undefined,
+  props: Record<string, unknown>
+): Record<string, unknown> {
+  const attrs: Record<string, unknown> = { ...props };
+  for (const [propName, attrName] of Object.entries(aliases ?? {})) {
+    if (!(propName in attrs)) continue;
+    attrs[attrName] = attrs[propName];
+    delete attrs[propName];
+  }
+  return attrs;
 }
 
 /**
@@ -114,8 +161,11 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
  * @returns Array of ProseMirror nodes
  */
 export function inlineContentToNodes(schema: Schema, content: InlineContent[]): PMNode[] {
-  return content.flatMap((item) => {
+  return content.flatMap((raw) => {
+    const item = raw as BuiltinInlineContent;
     if (item.type === 'text') {
+      // ProseMirror rejects empty text nodes, so empty runs are dropped.
+      if (!item.text) return [];
       const marks = stylesToMarks(schema, item.styles);
       return [schema.text(item.text, marks)];
     }
@@ -130,15 +180,16 @@ export function inlineContentToNodes(schema: Schema, content: InlineContent[]): 
         target: item.target ?? null,
       });
 
-      return item.content.map((textItem) => {
+      return item.content.flatMap((textItem) => {
+        if (!textItem.text) return [];
         const textMarks = stylesToMarks(schema, textItem.styles);
-        return schema.text(textItem.text, [...textMarks, linkMark]);
+        return [schema.text(textItem.text, [...textMarks, linkMark])];
       });
     }
 
     if (item.type === 'icon') {
       const iconNodeType = schema.nodes.icon;
-      if (!iconNodeType) return [schema.text(item.symbol)];
+      if (!iconNodeType) return item.symbol ? [schema.text(item.symbol)] : [];
       return [iconNodeType.create({
         icon: item.icon,
         symbol: item.symbol,
@@ -152,7 +203,27 @@ export function inlineContentToNodes(schema: Schema, content: InlineContent[]): 
       return [br.create()];
     }
 
-    return [];
+    if (item.type === 'field') {
+      const fieldType = schema.nodes.field;
+      if (!fieldType) return item.fallback ? [schema.text(item.fallback)] : [];
+      return [fieldType.create({
+        id: uuid(),
+        fieldType: item.fieldType,
+        name: item.name ?? null,
+        format: item.format ?? null,
+        fallback: item.fallback ?? null,
+      })];
+    }
+
+    // Extension inline node: recreate from the schema by type name
+    const custom = raw as CustomInlineContent;
+    const nodeType = schema.nodes[custom.type];
+    if (!nodeType || !nodeType.isInline) {
+      warnUnknownOnce('inline', custom.type);
+      return [];
+    }
+    const children = custom.content ? inlineContentToNodes(schema, custom.content) : undefined;
+    return [nodeType.create(custom.props ?? {}, children)];
   });
 }
 
@@ -189,6 +260,23 @@ export function stylesToMarks(schema: Schema, styles: TextStyles): readonly Mark
   }
   if (styles.fontSize && schema.marks.fontSize) {
     marks.push(schema.marks.fontSize.create({ size: styles.fontSize }));
+  }
+  if (styles.revision) {
+    const revision = styles.revision;
+    const markName = revision.kind === 'insert' ? 'insertion' : 'deletion';
+    const markType = schema.marks[markName];
+    if (markType) {
+      marks.push(
+        markType.create({
+          revisionId: revision.revisionId,
+          authorId: revision.authorId ?? null,
+          authorName: revision.authorName ?? null,
+          at: revision.at,
+          aiGenerated: revision.aiGenerated === true,
+          groupId: revision.groupId ?? null,
+        })
+      );
+    }
   }
 
   return marks;

@@ -456,3 +456,107 @@ const handleCustomAction = () => {
 
 - [`examples/vite-vue`](../../examples/vite-vue) - Vite + Vue demo
 - [`examples/nuxt-vue`](../../examples/nuxt-vue) - Nuxt + Vue demo
+
+## Office shell
+
+The Office shell is a Word-style chrome for BeakBlock in `office` mode: ribbon, quick access
+toolbar, command search, navigation pane, rulers, styles, format painter, find and replace,
+zoom and view modes, and a status bar. Every control runs commands from a
+`CommandRegistry` (`@amusendame/beakblock-commands`); no button calls editor methods directly.
+
+### Example
+
+```vue
+<script setup lang="ts">
+import { shallowRef, onMounted, onBeforeUnmount } from 'vue';
+import {
+  BeakBlockView,
+  OfficeShell,
+  useBeakBlock,
+  useCommandRegistry,
+} from '@amusendame/beakblock-vue';
+
+const editor = useBeakBlock({ initialContent: [], mode: 'office' });
+const { registry } = useCommandRegistry(editor, { extraCommands: [] });
+const viewMode = shallowRef<'print' | 'draft' | 'outline' | 'preview'>('print');
+const zoom = shallowRef(1);
+</script>
+
+<template>
+  <OfficeShell
+    :editor="editor"
+    :registry="registry"
+    :view-mode="viewMode"
+    :zoom="zoom"
+    @update:view-mode="viewMode = $event"
+    @update:zoom="zoom = $event"
+  >
+    <BeakBlockView :editor="editor" />
+    <template #printPreview>
+      <!-- Render the paginated server rendition here -->
+    </template>
+  </OfficeShell>
+</template>
+```
+
+Mount `OfficeShell` with the editor and registry. It sets the editor to `office` mode when the
+editor becomes available (the `mode` prop changes the mode it applies, default `'office'`).
+
+### `useCommandRegistry(editorRef, options?)`
+
+Creates a `CommandRegistry` bound to the editor, registers the built-in commands plus
+`extraCommands`, installs the registry keymap plugin with `editor.pm.addPlugin`, and returns:
+
+- `registry`: a `shallowRef<CommandRegistry | null>`, set once the editor exists.
+- `version`: a `ref<number>` incremented on every editor transaction, for re-reading active
+  and enabled states.
+
+Options: `builtins` (default `true`), `extraCommands`, `policy` (a `PolicyCheck` or `null`).
+
+### Components
+
+| Component | Key props | Events |
+|---|---|---|
+| `OfficeShell` | `editor`, `registry`, `ribbon`, `mode` (default `'office'`), `navigation`, `navigationTabs`, `comments`, `pages`, `showRulers`, `showStatusBar`, `pageSetup`, `zoom`, `viewMode` (`print`/`draft`/`outline`/`preview`), `multiPage`, `focusMode`, `quickAccessCommands`, `commandSearch`, `pageInfo`, `language`, `presence`, `injectStyles`, `label` | `update:zoom`, `update:viewMode`, `update:multiPage`, `update:focusMode`, `update:navigation`, `update:pageSetup`, `command` |
+| `Ribbon` | `registry`, `ribbon` (defaults to `createDefaultRibbon()`), `editor`, `activeTab` | `update:activeTab`, `command` |
+| `QuickAccessToolbar` | `registry`, `commands`, `editor` | `command` |
+| `CommandSearch` | `registry`, `editor`, `open`, `limit`, `placeholder` | `update:open`, `execute` |
+| `NavigationPane` | `editor`, `registry`, `tabs`, `activeTab`, `comments`, `pages` | `update:activeTab`, `select-comment`, `select-page` |
+| `Ruler` | `editor`, `orientation` (`horizontal`/`vertical`), `pageSetup`, `zoom` | `update:pageSetup`, `indent-change` |
+| `StylesGallery` / `StylesPane` | `registry`, `editor`, `styles` | `apply` |
+| `FormatPainter` | `editor`, `sticky`, `label` | `update:active`, `apply` |
+| `FindReplace` | `editor`, `initialQuery`, `initialOptions` | `close`, `update:query` |
+| `ZoomControl` | `zoom`, `viewMode`, `multiPage`, `focusMode`, `showViewModes` | `update:zoom`, `update:viewMode`, `update:multiPage`, `update:focusMode`, `fit-width` |
+| `StatusBar` | `editor`, `pageInfo`, `sectionInfo`, `language`, `presence`, `wordCount` | none |
+
+Notes:
+
+- `Ribbon` skips command ids that are not registered, and shows contextual tabs (`table`,
+  `picture`, `chart`, `controlledSection`) only while the selection matches.
+- Keyboard: Alt+Q or Mod+Shift+P opens `CommandSearch`; F10 (or a lone Alt press) focuses the
+  ribbon; Left/Right/Home/End move between ribbon tabs.
+- `Ruler` indent markers commit on pointer release through `setNodeMarkup`, so each drag is
+  one undo step. Tab stops and table column markers are display-only.
+- `FindReplace` highlights every match with decorations, and "Replace all" runs in one
+  transaction.
+- `StatusBar` announces controlled-section ownership through a polite live region.
+
+### Pure helpers
+
+`findMatches(doc, query, options)`, `compileFindPattern`, `replaceMatches`, `selectMatch`,
+`indentFromPositions`, `setParagraphIndent`, `captureFormat`, `applyFormat`, `collectHeadings`,
+`collectSections`, `countWords`, `clampZoom`.
+
+### CSS
+
+The stylesheet is exported as `officeShellCSS` (framework-neutral, class prefix `bb-office-`).
+`OfficeShell` injects it into `document.head` once, under the id `bb-office-shell-styles`,
+unless `injectStyles` is `false`. To inject it yourself, call `injectOfficeShellStyles()`
+(returns `true` when it added the tag), or `removeOfficeShellStyles()` to remove it.
+
+### Editor references: use `shallowRef` or `markRaw`
+
+Editors are class instances with private state. Do not hold them in a deep `ref()` or pass
+them through a reactive wrapper: Vue then proxies the editor and ProseMirror throws
+`Applying a mismatched transaction`. Use `shallowRef` (as `useBeakBlock` does), or
+`markRaw(editor)` when you must pass one directly as a prop.

@@ -70,6 +70,9 @@ export type {
   ColorOption,
 } from './components';
 
+// Office shell (ribbon, rulers, navigation, find and replace, status bar)
+export * from './office';
+
 // Custom blocks
 export {
   createReactBlockSpec,

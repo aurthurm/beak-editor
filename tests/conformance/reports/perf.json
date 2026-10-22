@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-10-22T17:20:29.066Z",
+  "budgetsMs": {
+    "layout50": 3000,
+    "layout200": 10000
+  },
+  "timings": {
+    "layout_50p_ms": 13,
+    "pages_50p": 56,
+    "relayout_50p_tail_ms": 1,
+    "layout_200p_ms": 60,
+    "pages_200p": 221,
+    "relayout_200p_tail_ms": 2
+  }
+}

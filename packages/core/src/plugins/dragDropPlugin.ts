@@ -12,6 +12,7 @@ import { Plugin, PluginKey, EditorState, TextSelection } from 'prosemirror-state
 import { Decoration, DecorationSet, EditorView } from 'prosemirror-view';
 import { Node as PMNode } from 'prosemirror-model';
 import { SLASH_MENU_PLUGIN_KEY } from './slashMenuPlugin';
+import { isBlockChromeEnabled } from './editorModePlugin';
 import { COMPLIANCE_LOCK_BYPASS_META, nodeIsComplianceLocked } from './complianceLockPlugin';
 
 /**
@@ -534,6 +535,7 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
 
     // Add mousemove listener to the editor
     handleMouseMove = (event: MouseEvent) => {
+      if (editorView && !isBlockChromeEnabled(editorView.state)) return;
       const target = event.target as HTMLElement;
 
       // Check if we're over the side menu itself
@@ -727,6 +729,12 @@ export function createDragDropPlugin(config: DragDropConfig = {}): Plugin {
 
           // Ensure side menu exists (may not have been created if editor wasn't mounted)
           ensureSideMenu(view);
+
+          // Drag handles are disabled in office and controlled modes
+          if (!isBlockChromeEnabled(view.state)) {
+            sideMenuEl?.classList.remove(`${sideMenuClass}--visible`);
+            return;
+          }
 
           const state = DRAG_DROP_PLUGIN_KEY.getState(view.state);
           updateSideMenuPosition(view, state?.hoveredBlockPos ?? null);

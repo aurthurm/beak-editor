@@ -473,6 +473,54 @@ const brandBackgroundColors: ColorOption[] = [
 
 ---
 
+## Office shell
+
+Word-style chrome for `mode: 'office'`. Every control is driven by the command registry from `@amusendame/beakblock-commands`, so buttons never call the editor directly.
+
+```tsx
+import { useBeakBlock, BeakBlockView, OfficeShell } from '@amusendame/beakblock-react';
+
+function Editor() {
+  const editor = useBeakBlock({ initialContent: [] });
+  return (
+    <OfficeShell
+      editor={editor}
+      pageSetup={{ widthPt: 595.3, heightPt: 841.9, margins: { topPt: 72, rightPt: 72, bottomPt: 72, leftPt: 72 } }}
+      renderPrintPreview={() => <iframe title="Print preview" src="/rendition.pdf" />}
+    >
+      <BeakBlockView editor={editor} />
+    </OfficeShell>
+  );
+}
+```
+
+`OfficeShell` calls `editor.setMode('office')` unless `mode` says otherwise. It composes the title bar (quick access toolbar, command search, navigation toggle), ribbon, navigation pane, rulers, page canvas, status bar and view controls. Pass `registry` to share a registry, or `extraCommands` to add commands to the shell's own registry.
+
+### Building blocks
+
+| Export | Purpose |
+|---|---|
+| `useCommandRegistry(editor, { extraCommands?, includeBuiltins?, policyCheck?, installKeymap? })` | Creates a bound `CommandRegistry`, registers built-ins, installs its keymap plugin |
+| `Ribbon` | Tabs, groups and buttons from a `RibbonDefinition`. Unknown ids are skipped and empty tabs hidden. Contextual tabs follow `getContextualTabs`. Alt or F10 focuses it |
+| `QuickAccessToolbar` | `commands: string[]` rendered as icon buttons |
+| `CommandSearch` | "Tell me what you want to do". Alt+Q or Ctrl/Cmd+Shift+P focuses it |
+| `NavigationPane` | `tabs`: headings, sections, comments, search, pages. Takes `comments` and `pages` props |
+| `Ruler` | `orientation`, `pageSetup`, `zoom`. Draggable indent and tab markers, and table column boundaries. Edits run as one transaction |
+| `StylesGallery`, `StylesPane` | Quick styles and the full list. Styles run `paragraph.style.*` commands and/or set `styleId` |
+| `FormatPainter` | Copies marks and paragraph formatting. Single click arms it once, double click keeps it on, Esc cancels |
+| `FindReplace` | Match case, whole word, regex, highlight decorations, replace all in one transaction |
+| `ZoomControl`, `ViewModeControl` | Controlled zoom, plus Print Layout, Draft, Outline and Print Preview with page and focus toggles |
+| `StatusBar` | Page, word count, controlled-section owner and state (announced via a live region), language, presence |
+
+Pure helpers are exported for reuse and testing: `findMatches`, `buildSearchRegExp`, `expandReplacement`, `applyIndentDrag`, `addTabStop`, `moveTabStop`, `resizeColumn`, `ptToPx`, `pxToPt`.
+
+### Notes
+
+- The stylesheet is `officeShellCSS`, a framework-neutral string. `OfficeShell` injects it once. All classes use the `bb-office-` prefix.
+- `renderPrintPreview` is supplied by the app. The shell only hides the editing surface while preview is active.
+- The Outline view opens the navigation pane on the headings tab. It does not collapse body content.
+- Multi-page and page-width toggles change the page chrome only. Real pagination belongs to the layout package.
+
 ## Accessing ProseMirror
 
 The editor instance provides full ProseMirror access:

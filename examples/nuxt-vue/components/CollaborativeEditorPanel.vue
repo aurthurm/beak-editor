@@ -165,7 +165,8 @@ watch(
 
     onCleanup(() => {
       provider.off('status', onStatus);
-      ed.disableCollaboration();
+      // The editor may already be destroyed when the panel unmounts; its view is gone then.
+      if (!ed.isDestroyed) ed.disableCollaboration();
       provider.destroy();
       ydoc.destroy();
       providerRef.value = null;

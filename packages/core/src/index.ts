@@ -30,6 +30,7 @@
 // ===========================================================================
 
 export { BeakBlockEditor, defaultConfig } from './editor';
+export type { SetDocumentOptions } from './editor';
 export type {
   EditorConfig,
   EditorEvents,
@@ -148,7 +149,10 @@ export type {
   IconContent,
   HardBreakContent,
   InlineContent,
+  BuiltinInlineContent,
+  CustomInlineContent,
 } from './blocks';
+export { isBuiltinInline, isStyledText } from './blocks';
 
 // ===========================================================================
 // MARKDOWN
@@ -187,6 +191,34 @@ export {
   deleteColumnAtIndex,
 } from './commands';
 export type { TableContext } from './commands';
+export {
+  mergeCells,
+  splitCell,
+  setCellBorders,
+  setCellShading,
+  setCellPadding,
+  setCellVerticalAlign,
+  setCellHorizontalAlign,
+  setTableWidth,
+  setColumnWidthTwips,
+  distributeColumns,
+  toggleHeaderRow,
+  toggleRowCantSplit,
+  sortTableByColumn,
+  setTableStyle,
+  getColumnWidthsPx,
+} from './commands';
+export type { BorderEdge, SortDirection } from './commands';
+export type {
+  CellBorder,
+  CellBorders,
+  BorderStyle,
+  CellPadding,
+  CellVAlign,
+  CellHAlign,
+  TableLook,
+  TableWidthMode,
+} from './schema/nodes/tableOffice';
 
 // ===========================================================================
 // VERSIONING
@@ -205,6 +237,7 @@ export {
   BLOCK_ID_PLUGIN_KEY,
   createComplianceLockPlugin,
   COMPLIANCE_LOCK_BYPASS_META,
+BEAKBLOCK_META_LOAD_DOCUMENT,
   nodeIsComplianceLocked,
   lockedBlockIdOrder,
   buildTableOfContentsRefreshTransaction,
@@ -263,11 +296,24 @@ export {
 export type { BubbleMenuConfig, BubbleMenuState, BlockTypeInfo, TextAlign } from './plugins';
 
 // Table plugin
-export { createTablePlugin, TABLE_PLUGIN_KEY } from './plugins';
+export { createTablePlugin, createTablePlugins, TABLE_PLUGIN_KEY } from './plugins';
 export type { TablePluginConfig } from './plugins';
 
 // Keyboard shortcuts
 export { createKeyboardShortcutsPlugin, DEFAULT_KEYBOARD_SHORTCUTS } from './plugins';
+
+// Word keyboard behaviour (contracts §1.7)
+export { createWordKeymapPlugin, DEFAULT_AUTOCORRECT, WORD_KEYMAP_PLUGIN_KEY } from './plugins/wordKeymapPlugin';
+export type { WordKeymapOptions } from './plugins/wordKeymapPlugin';
+
+// Office paste (Word and Excel HTML)
+export {
+  createOfficePastePlugin,
+  normaliseOfficeHtml,
+  isOfficeHtml,
+  cssLengthToPt,
+  OFFICE_PASTE_PLUGIN_KEY,
+} from './paste/officePaste';
 export type { KeyboardShortcutsConfig, KeyboardShortcut } from './plugins';
 
 // Checklist plugin
@@ -362,3 +408,58 @@ export type {
 // ===========================================================================
 
 export { injectStyles, removeStyles, areStylesInjected } from './styles/injectStyles';
+
+// ===========================================================================
+// OFFICE NODES AND REVISION MARKS (BeakBlock 2.0)
+// ===========================================================================
+
+export {
+  pageBreakNode,
+  sectionBreakNode,
+  fieldNode,
+  FIELD_TYPES,
+  insertionMark,
+  deletionMark,
+  officeParagraphAttrs,
+  OFFICE_PARAGRAPH_ATTR_NAMES,
+} from './schema';
+export type {
+  PageSetup,
+  FieldType,
+  OfficeParagraphProps,
+  ParagraphNumbering,
+  ParagraphSpacing,
+  ParagraphIndent,
+  ParagraphTab,
+} from './schema';
+export type { FieldContent, RevisionStyle } from './blocks';
+export { FieldNodeView, resolveFieldText } from './nodeviews';
+export type { FieldResolver } from './nodeviews';
+
+// ===========================================================================
+// MODES, EXTENSIONS AND REVIEW VIEW
+// ===========================================================================
+
+export { EDITOR_MODES, REVIEW_VIEWS } from './editor';
+export type { ReviewView } from './editor';
+export { CHROME_DISABLED_MODES } from './extensions';
+export type { EditorMode, BeakExtension, BeakExtensionContext } from './extensions';
+export { createEditorModePlugin, getEditorMode, isBlockChromeEnabled, EDITOR_MODE_PLUGIN_KEY } from './plugins';
+
+// ===========================================================================
+// BLOCK REGISTRY
+// ===========================================================================
+
+export { BlockRegistry, createDefaultBlockRegistry } from './registry';
+export type {
+  BeakBlockDefinition,
+  BlockPrintContext,
+  BlockCapabilities,
+  BlockFamily,
+  BlockMigration,
+  ValidationContext,
+  ValidationIssue,
+  ValidationSeverity,
+} from './registry';
+
+export { cloneJson } from './utils/cloneJson';

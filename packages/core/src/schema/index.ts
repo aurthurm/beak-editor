@@ -36,6 +36,12 @@ export {
   getEmbedIframeSrc,
   normalizeEmbedAttrsFromUrl,
   parseEmbedUrl,
+  pageBreakNode,
+  sectionBreakNode,
+  fieldNode,
+  FIELD_TYPES,
+  officeParagraphAttrs,
+  OFFICE_PARAGRAPH_ATTR_NAMES,
 } from './nodes';
 export type {
   TextAlignment,
@@ -43,6 +49,13 @@ export type {
   ImageAlignment,
   EmbedProvider,
   TocHeadingItem,
+  PageSetup,
+  FieldType,
+  OfficeParagraphProps,
+  ParagraphNumbering,
+  ParagraphSpacing,
+  ParagraphIndent,
+  ParagraphTab,
 } from './nodes';
 
 // Re-export individual mark specs for extension authors
@@ -56,4 +69,6 @@ export {
   textColorMark,
   backgroundColorMark,
   fontSizeMark,
+  insertionMark,
+  deletionMark,
 } from './marks';

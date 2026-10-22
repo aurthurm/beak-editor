@@ -116,7 +116,7 @@ describe('track changes', () => {
     const id = pending[pending.length - 1]!.id;
     editor.rejectTrackedChange(id);
     const text = editor.getDocument()[0]?.content?.[0];
-    expect(text && text.type === 'text' ? text.text : '').toBe('hello');
+    expect(text && text.type === 'text' ? (text as { text: string }).text : '').toBe('hello');
     editor.destroy();
   });
 });

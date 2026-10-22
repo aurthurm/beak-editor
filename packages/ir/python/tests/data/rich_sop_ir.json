@@ -1,0 +1,2090 @@
+{
+  "irVersion": 1,
+  "id": "doc-mvhv3jlbft3x5fcl",
+  "properties": {},
+  "styles": {
+    "paragraph": {
+      "Normal": {
+        "id": "Normal",
+        "name": "Normal",
+        "basedOn": null,
+        "paraProps": {
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 8,
+            "line": 1.15,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 11
+        }
+      },
+      "Heading1": {
+        "id": "Heading1",
+        "name": "Heading 1",
+        "basedOn": "Normal",
+        "paraProps": {
+          "keepNext": true,
+          "keepLines": true,
+          "spacing": {
+            "beforePt": 18,
+            "afterPt": 4,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 16,
+          "bold": true,
+          "color": "1F3864"
+        },
+        "outlineLevel": 0,
+        "next": "Normal"
+      },
+      "Heading2": {
+        "id": "Heading2",
+        "name": "Heading 2",
+        "basedOn": "Normal",
+        "paraProps": {
+          "keepNext": true,
+          "keepLines": true,
+          "spacing": {
+            "beforePt": 12,
+            "afterPt": 4,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 14,
+          "bold": true,
+          "color": "1F3864"
+        },
+        "outlineLevel": 1,
+        "next": "Normal"
+      },
+      "Heading3": {
+        "id": "Heading3",
+        "name": "Heading 3",
+        "basedOn": "Normal",
+        "paraProps": {
+          "keepNext": true,
+          "keepLines": true,
+          "spacing": {
+            "beforePt": 12,
+            "afterPt": 4,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 12,
+          "bold": true,
+          "color": "1F3864"
+        },
+        "outlineLevel": 2,
+        "next": "Normal"
+      },
+      "Heading4": {
+        "id": "Heading4",
+        "name": "Heading 4",
+        "basedOn": "Normal",
+        "paraProps": {
+          "keepNext": true,
+          "keepLines": true,
+          "spacing": {
+            "beforePt": 12,
+            "afterPt": 4,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 11,
+          "color": "1F3864"
+        },
+        "outlineLevel": 3,
+        "next": "Normal"
+      },
+      "Heading5": {
+        "id": "Heading5",
+        "name": "Heading 5",
+        "basedOn": "Normal",
+        "paraProps": {
+          "keepNext": true,
+          "keepLines": true,
+          "spacing": {
+            "beforePt": 12,
+            "afterPt": 4,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 11,
+          "color": "1F3864"
+        },
+        "outlineLevel": 4,
+        "next": "Normal"
+      },
+      "Heading6": {
+        "id": "Heading6",
+        "name": "Heading 6",
+        "basedOn": "Normal",
+        "paraProps": {
+          "keepNext": true,
+          "keepLines": true,
+          "spacing": {
+            "beforePt": 12,
+            "afterPt": 4,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 11,
+          "italic": true,
+          "color": "1F3864"
+        },
+        "outlineLevel": 5,
+        "next": "Normal"
+      },
+      "Title": {
+        "id": "Title",
+        "name": "Title",
+        "basedOn": "Normal",
+        "paraProps": {
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 12,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Carlito",
+          "sizePt": 26,
+          "color": "1F3864"
+        }
+      },
+      "Caption": {
+        "id": "Caption",
+        "name": "Caption",
+        "basedOn": "Normal",
+        "paraProps": {
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 10,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "sizePt": 9,
+          "italic": true,
+          "color": "44546A"
+        }
+      },
+      "ListParagraph": {
+        "id": "ListParagraph",
+        "name": "List Paragraph",
+        "basedOn": "Normal",
+        "paraProps": {
+          "indent": {
+            "leftPt": 36
+          },
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 4,
+            "line": 1.15,
+            "lineRule": "auto"
+          }
+        }
+      },
+      "TOC1": {
+        "id": "TOC1",
+        "name": "TOC 1",
+        "basedOn": "Normal",
+        "paraProps": {
+          "indent": {
+            "leftPt": 0
+          },
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 5,
+            "line": 1,
+            "lineRule": "auto"
+          },
+          "tabs": [
+            {
+              "posPt": 451,
+              "kind": "right",
+              "leader": "dot"
+            }
+          ]
+        }
+      },
+      "TOC2": {
+        "id": "TOC2",
+        "name": "TOC 2",
+        "basedOn": "Normal",
+        "paraProps": {
+          "indent": {
+            "leftPt": 11
+          },
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 5,
+            "line": 1,
+            "lineRule": "auto"
+          },
+          "tabs": [
+            {
+              "posPt": 451,
+              "kind": "right",
+              "leader": "dot"
+            }
+          ]
+        }
+      },
+      "TOC3": {
+        "id": "TOC3",
+        "name": "TOC 3",
+        "basedOn": "Normal",
+        "paraProps": {
+          "indent": {
+            "leftPt": 22
+          },
+          "spacing": {
+            "beforePt": 0,
+            "afterPt": 5,
+            "line": 1,
+            "lineRule": "auto"
+          },
+          "tabs": [
+            {
+              "posPt": 451,
+              "kind": "right",
+              "leader": "dot"
+            }
+          ]
+        }
+      },
+      "Quote": {
+        "id": "Quote",
+        "name": "Quote",
+        "basedOn": "Normal",
+        "paraProps": {
+          "indent": {
+            "leftPt": 36,
+            "firstLinePt": 0
+          }
+        },
+        "runProps": {
+          "italic": true,
+          "color": "404040"
+        }
+      },
+      "Callout": {
+        "id": "Callout",
+        "name": "Callout",
+        "basedOn": "Normal",
+        "paraProps": {
+          "indent": {
+            "leftPt": 8
+          },
+          "spacing": {
+            "beforePt": 6,
+            "afterPt": 6,
+            "line": 1.15,
+            "lineRule": "auto"
+          }
+        }
+      },
+      "CalloutInfo": {
+        "id": "CalloutInfo",
+        "name": "Callout Info",
+        "basedOn": "Callout",
+        "runProps": {
+          "color": "1F4E79"
+        }
+      },
+      "CalloutWarning": {
+        "id": "CalloutWarning",
+        "name": "Callout Warning",
+        "basedOn": "Callout",
+        "runProps": {
+          "color": "9C5700"
+        }
+      },
+      "CalloutSuccess": {
+        "id": "CalloutSuccess",
+        "name": "Callout Success",
+        "basedOn": "Callout",
+        "runProps": {
+          "color": "375623"
+        }
+      },
+      "CalloutError": {
+        "id": "CalloutError",
+        "name": "Callout Error",
+        "basedOn": "Callout",
+        "runProps": {
+          "color": "9C0006"
+        }
+      },
+      "CalloutNote": {
+        "id": "CalloutNote",
+        "name": "Callout Note",
+        "basedOn": "Callout",
+        "runProps": {
+          "color": "404040"
+        }
+      },
+      "Code": {
+        "id": "Code",
+        "name": "Code",
+        "basedOn": null,
+        "paraProps": {
+          "spacing": {
+            "beforePt": 6,
+            "afterPt": 6,
+            "line": 1,
+            "lineRule": "auto"
+          }
+        },
+        "runProps": {
+          "font": "Liberation Mono",
+          "sizePt": 9
+        }
+      },
+      "Divider": {
+        "id": "Divider",
+        "name": "Divider",
+        "basedOn": "Normal",
+        "paraProps": {
+          "spacing": {
+            "beforePt": 6,
+            "afterPt": 6,
+            "line": 1,
+            "lineRule": "exact"
+          }
+        }
+      }
+    },
+    "character": {
+      "Code": {
+        "id": "Code",
+        "name": "Code",
+        "basedOn": null,
+        "runProps": {
+          "font": "Liberation Mono"
+        }
+      }
+    },
+    "table": {
+      "TableGrid": {
+        "id": "TableGrid",
+        "name": "Table Grid",
+        "basedOn": null,
+        "borders": {
+          "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "000000"
+          },
+          "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "000000"
+          },
+          "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "000000"
+          },
+          "insideH": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "000000"
+          },
+          "insideV": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "000000"
+          }
+        },
+        "cellPaddingPt": {
+          "top": 0,
+          "right": 5.4,
+          "bottom": 0,
+          "left": 5.4
+        },
+        "conditional": {
+          "firstRow": {
+            "shading": "D9E2F3",
+            "runProps": {
+              "bold": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "numbering": {
+    "abstract": {
+      "bullet": {
+        "id": "bullet",
+        "name": "Bullets",
+        "multiLevelType": "hybridMultilevel",
+        "levels": [
+          {
+            "level": 0,
+            "format": "bullet",
+            "text": "•",
+            "start": 1,
+            "indent": {
+              "leftPt": 18,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 1,
+            "format": "bullet",
+            "text": "◦",
+            "start": 1,
+            "indent": {
+              "leftPt": 36,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 2,
+            "format": "bullet",
+            "text": "▪",
+            "start": 1,
+            "indent": {
+              "leftPt": 54,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 3,
+            "format": "bullet",
+            "text": "•",
+            "start": 1,
+            "indent": {
+              "leftPt": 72,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 4,
+            "format": "bullet",
+            "text": "◦",
+            "start": 1,
+            "indent": {
+              "leftPt": 90,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 5,
+            "format": "bullet",
+            "text": "▪",
+            "start": 1,
+            "indent": {
+              "leftPt": 108,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 6,
+            "format": "bullet",
+            "text": "•",
+            "start": 1,
+            "indent": {
+              "leftPt": 126,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 7,
+            "format": "bullet",
+            "text": "◦",
+            "start": 1,
+            "indent": {
+              "leftPt": 144,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 8,
+            "format": "bullet",
+            "text": "▪",
+            "start": 1,
+            "indent": {
+              "leftPt": 162,
+              "hangingPt": 18
+            }
+          }
+        ]
+      },
+      "decimal": {
+        "id": "decimal",
+        "name": "Numbered",
+        "multiLevelType": "hybridMultilevel",
+        "levels": [
+          {
+            "level": 0,
+            "format": "decimal",
+            "text": "%1.",
+            "start": 1,
+            "indent": {
+              "leftPt": 18,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 1,
+            "format": "lowerLetter",
+            "text": "%2.",
+            "start": 1,
+            "indent": {
+              "leftPt": 36,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 2,
+            "format": "lowerRoman",
+            "text": "%3.",
+            "start": 1,
+            "indent": {
+              "leftPt": 54,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 3,
+            "format": "decimal",
+            "text": "%4.",
+            "start": 1,
+            "indent": {
+              "leftPt": 72,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 4,
+            "format": "lowerLetter",
+            "text": "%5.",
+            "start": 1,
+            "indent": {
+              "leftPt": 90,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 5,
+            "format": "lowerRoman",
+            "text": "%6.",
+            "start": 1,
+            "indent": {
+              "leftPt": 108,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 6,
+            "format": "decimal",
+            "text": "%7.",
+            "start": 1,
+            "indent": {
+              "leftPt": 126,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 7,
+            "format": "lowerLetter",
+            "text": "%8.",
+            "start": 1,
+            "indent": {
+              "leftPt": 144,
+              "hangingPt": 18
+            }
+          },
+          {
+            "level": 8,
+            "format": "lowerRoman",
+            "text": "%9.",
+            "start": 1,
+            "indent": {
+              "leftPt": 162,
+              "hangingPt": 18
+            }
+          }
+        ]
+      },
+      "heading": {
+        "id": "heading",
+        "name": "Heading outline",
+        "multiLevelType": "multilevel",
+        "levels": [
+          {
+            "level": 0,
+            "format": "decimal",
+            "text": "%1",
+            "start": 1,
+            "indent": {
+              "leftPt": 36,
+              "hangingPt": 36
+            },
+            "paraStyleId": "Heading1"
+          },
+          {
+            "level": 1,
+            "format": "decimal",
+            "text": "%1.%2",
+            "start": 1,
+            "indent": {
+              "leftPt": 42,
+              "hangingPt": 42
+            },
+            "paraStyleId": "Heading2"
+          },
+          {
+            "level": 2,
+            "format": "decimal",
+            "text": "%1.%2.%3",
+            "start": 1,
+            "indent": {
+              "leftPt": 48,
+              "hangingPt": 48
+            },
+            "paraStyleId": "Heading3"
+          },
+          {
+            "level": 3,
+            "format": "decimal",
+            "text": "%1.%2.%3.%4",
+            "start": 1,
+            "indent": {
+              "leftPt": 54,
+              "hangingPt": 54
+            },
+            "paraStyleId": "Heading4"
+          },
+          {
+            "level": 4,
+            "format": "decimal",
+            "text": "%1.%2.%3.%4.%5",
+            "start": 1,
+            "indent": {
+              "leftPt": 60,
+              "hangingPt": 60
+            },
+            "paraStyleId": "Heading5"
+          },
+          {
+            "level": 5,
+            "format": "decimal",
+            "text": "%1.%2.%3.%4.%5.%6",
+            "start": 1,
+            "indent": {
+              "leftPt": 66,
+              "hangingPt": 66
+            },
+            "paraStyleId": "Heading6"
+          }
+        ]
+      },
+      "checklist": {
+        "id": "checklist",
+        "name": "Checklist",
+        "multiLevelType": "singleLevel",
+        "levels": [
+          {
+            "level": 0,
+            "format": "bullet",
+            "text": "☐",
+            "start": 1,
+            "indent": {
+              "leftPt": 18,
+              "hangingPt": 18
+            }
+          }
+        ]
+      }
+    },
+    "instances": {
+      "1": {
+        "abstractId": "bullet"
+      },
+      "2": {
+        "abstractId": "decimal"
+      },
+      "3": {
+        "abstractId": "heading"
+      },
+      "4": {
+        "abstractId": "checklist"
+      }
+    }
+  },
+  "sections": [
+    {
+      "id": "sec-1",
+      "pageSetup": {
+        "size": {
+          "widthTwips": 11906,
+          "heightTwips": 16838
+        },
+        "orientation": "portrait",
+        "margins": {
+          "top": 1440,
+          "right": 1440,
+          "bottom": 1440,
+          "left": 1440,
+          "header": 720,
+          "footer": 720,
+          "gutter": 0
+        }
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading1",
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Purpose",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-purpose",
+            "props": {
+              "level": 1,
+              "textAlign": "left",
+              "locked": false,
+              "lockReason": null,
+              "lockId": null
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "This procedure describes ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "bold",
+              "props": {
+                "bold": true
+              }
+            },
+            {
+              "type": "run",
+              "text": " and ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "italic code",
+              "props": {
+                "italic": true,
+                "styleId": "Code"
+              }
+            },
+            {
+              "type": "run",
+              "text": " with ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "red",
+              "props": {
+                "color": "#C00000"
+              }
+            },
+            {
+              "type": "run",
+              "text": " and ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "marked",
+              "props": {
+                "shading": "#FFFF00",
+                "sizePt": 12
+              }
+            },
+            {
+              "type": "run",
+              "text": " and ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "struck",
+              "props": {
+                "underline": true,
+                "strike": true
+              }
+            },
+            {
+              "type": "run",
+              "text": ". See ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "the index",
+              "props": {
+                "bold": true
+              },
+              "link": {
+                "href": "https://example.com/sop-index",
+                "title": "SOP index",
+                "target": "_blank"
+              }
+            },
+            {
+              "type": "icon",
+              "icon": "warning",
+              "symbol": "⚠",
+              "size": 14
+            },
+            {
+              "type": "break",
+              "kind": "line"
+            },
+            {
+              "type": "field",
+              "fieldType": "DOCPROPERTY",
+              "instr": "DOCPROPERTY docNumber",
+              "cachedText": "SOP-001",
+              "name": "docNumber",
+              "fallback": "SOP-001"
+            },
+            {
+              "type": "run",
+              "text": " page ",
+              "props": {}
+            },
+            {
+              "type": "field",
+              "fieldType": "PAGE",
+              "instr": "PAGE",
+              "cachedText": "",
+              "name": null
+            },
+            {
+              "type": "run",
+              "text": " of ",
+              "props": {}
+            },
+            {
+              "type": "field",
+              "fieldType": "NUMPAGES",
+              "instr": "NUMPAGES",
+              "cachedText": "1",
+              "name": null,
+              "fallback": "1"
+            },
+            {
+              "type": "run",
+              "text": " ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "inserted",
+              "props": {},
+              "revision": {
+                "kind": "insert",
+                "id": "rev-1",
+                "author": "Asha",
+                "authorId": "u-1",
+                "at": "2026-01-02T10:00:00.000Z",
+                "aiGenerated": false
+              }
+            },
+            {
+              "type": "run",
+              "text": " ",
+              "props": {}
+            },
+            {
+              "type": "run",
+              "text": "deleted",
+              "props": {},
+              "revision": {
+                "kind": "delete",
+                "id": "rev-2",
+                "author": "Ben",
+                "at": "2026-01-03T09:30:00.000Z",
+                "aiGenerated": true
+              }
+            }
+          ],
+          "source": {
+            "blockType": "paragraph",
+            "blockId": "p-intro",
+            "props": {
+              "textAlign": "left"
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Normal",
+            "spacing": {
+              "beforePt": 6,
+              "afterPt": 6,
+              "line": 1.15,
+              "lineRule": "auto"
+            },
+            "indent": {
+              "leftPt": 18,
+              "firstLinePt": 9
+            },
+            "keepNext": true,
+            "keepLines": false,
+            "tabs": [
+              {
+                "posPt": 72,
+                "kind": "left"
+              }
+            ],
+            "align": "center"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Styled paragraph with paragraph properties.",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "paragraph",
+            "blockId": "p-styled",
+            "props": {
+              "textAlign": "center",
+              "styleId": "Normal",
+              "spacing": {
+                "beforePt": 6,
+                "afterPt": 6,
+                "line": 1.15,
+                "lineRule": "auto"
+              },
+              "indent": {
+                "leftPt": 18,
+                "firstLinePt": 9
+              },
+              "keepNext": true,
+              "keepLines": false,
+              "tabs": [
+                {
+                  "posPt": 72,
+                  "kind": "left"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading2",
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Scope",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-scope",
+            "props": {
+              "level": 2,
+              "textAlign": "left",
+              "locked": false,
+              "lockReason": null,
+              "lockId": null
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading3",
+            "align": "right"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Steps",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-steps",
+            "props": {
+              "level": 3,
+              "textAlign": "right",
+              "locked": true,
+              "lockReason": "approved",
+              "lockId": "lock-1"
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading4",
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Sub-steps",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-4",
+            "props": {
+              "level": 4,
+              "textAlign": "left",
+              "locked": false,
+              "lockReason": null,
+              "lockId": null
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading5",
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Notes",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-5",
+            "props": {
+              "level": 5,
+              "textAlign": "left",
+              "locked": false,
+              "lockReason": null,
+              "lockId": null
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading6",
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Details",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-6",
+            "props": {
+              "level": 6,
+              "textAlign": "left",
+              "locked": false,
+              "lockReason": null,
+              "lockId": null
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "1",
+              "level": 0
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "first bullet",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "listItem",
+            "blockId": "li-1",
+            "props": {},
+            "list": {
+              "role": "item",
+              "containerId": "bl-1",
+              "containerType": "bulletList",
+              "containerProps": {},
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "child paragraph under the first bullet",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "paragraph",
+            "blockId": "p-child-1",
+            "props": {
+              "textAlign": "left"
+            },
+            "list": {
+              "role": "childBlock",
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "1",
+              "level": 1
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "nested bullet",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "listItem",
+            "blockId": "li-2",
+            "props": {},
+            "list": {
+              "role": "item",
+              "containerId": "bl-2",
+              "containerType": "bulletList",
+              "containerProps": {},
+              "level": 1
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "1",
+              "level": 0
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "second bullet",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "listItem",
+            "blockId": "li-3",
+            "props": {},
+            "list": {
+              "role": "item",
+              "containerId": "bl-1",
+              "containerType": "bulletList",
+              "containerProps": {},
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "2",
+              "level": 0
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "third step",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "listItem",
+            "blockId": "oli-1",
+            "props": {},
+            "list": {
+              "role": "item",
+              "containerId": "ol-1",
+              "containerType": "orderedList",
+              "containerProps": {
+                "start": 3
+              },
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "2",
+              "level": 0
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "fourth step",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "listItem",
+            "blockId": "oli-2",
+            "props": {},
+            "list": {
+              "role": "item",
+              "containerId": "ol-1",
+              "containerType": "orderedList",
+              "containerProps": {
+                "start": 3
+              },
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "2",
+              "level": 1
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "sub step a",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "listItem",
+            "blockId": "oli-2a",
+            "props": {},
+            "list": {
+              "role": "item",
+              "containerId": "ol-2",
+              "containerType": "orderedList",
+              "containerProps": {
+                "start": 1
+              },
+              "level": 1
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "4",
+              "level": 0
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "gloves on",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "checkListItem",
+            "blockId": "cli-1",
+            "props": {
+              "checked": true
+            },
+            "list": {
+              "role": "item",
+              "containerId": "cl-1",
+              "containerType": "checkList",
+              "containerProps": {},
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "ListParagraph",
+            "numbering": {
+              "numId": "4",
+              "level": 0
+            }
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "area clean",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "checkListItem",
+            "blockId": "cli-2",
+            "props": {
+              "checked": false
+            },
+            "list": {
+              "role": "item",
+              "containerId": "cl-1",
+              "containerType": "checkList",
+              "containerProps": {},
+              "level": 0
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Quote"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "quoted text",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "blockquote",
+            "blockId": "bq-1",
+            "props": {}
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "CalloutWarning"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Safety warning: wear eye protection.",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "callout",
+            "blockId": "co-1",
+            "props": {
+              "calloutType": "warning"
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Code"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "const x = 1;\nconsole.log(x);",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "codeBlock",
+            "blockId": "cb-1",
+            "props": {
+              "language": "typescript"
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Divider"
+          },
+          "runs": [],
+          "source": {
+            "blockType": "divider",
+            "blockId": "dv-1",
+            "props": {}
+          }
+        },
+        {
+          "type": "image",
+          "src": "https://example.com/diagram.png",
+          "source": {
+            "blockType": "image",
+            "blockId": "img-1",
+            "props": {
+              "src": "https://example.com/diagram.png",
+              "alt": "Diagram",
+              "caption": "Figure 1",
+              "width": 320,
+              "alignment": "center"
+            }
+          },
+          "widthPt": 240,
+          "alt": "Diagram"
+        },
+        {
+          "type": "table",
+          "props": {},
+          "grid": [
+            4513,
+            4513
+          ],
+          "rows": [
+            {
+              "props": {},
+              "cells": [
+                {
+                  "props": {
+                    "gridSpan": 1,
+                    "widthTwips": 4513,
+                    "id": "col-1"
+                  },
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "props": {
+                        "align": "left"
+                      },
+                      "runs": [
+                        {
+                          "type": "run",
+                          "text": "left column",
+                          "props": {}
+                        }
+                      ],
+                      "source": {
+                        "blockType": "paragraph",
+                        "blockId": "p-col-1",
+                        "props": {
+                          "textAlign": "left"
+                        }
+                      }
+                    }
+                  ],
+                  "source": {
+                    "blockType": "column",
+                    "blockId": "col-1",
+                    "props": {
+                      "width": 50
+                    }
+                  }
+                },
+                {
+                  "props": {
+                    "gridSpan": 1,
+                    "widthTwips": 4513,
+                    "id": "col-2"
+                  },
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "props": {
+                        "align": "left"
+                      },
+                      "runs": [
+                        {
+                          "type": "run",
+                          "text": "right column",
+                          "props": {}
+                        }
+                      ],
+                      "source": {
+                        "blockType": "paragraph",
+                        "blockId": "p-col-2",
+                        "props": {
+                          "textAlign": "left"
+                        }
+                      }
+                    }
+                  ],
+                  "source": {
+                    "blockType": "column",
+                    "blockId": "col-2",
+                    "props": {
+                      "width": 50
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "source": {
+            "blockType": "columnList",
+            "blockId": "cols-1",
+            "props": {
+              "gap": 16
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {},
+          "runs": [
+            {
+              "type": "run",
+              "text": "https://www.youtube.com/watch?v=abc",
+              "props": {},
+              "link": {
+                "href": "https://www.youtube.com/watch?v=abc"
+              }
+            }
+          ],
+          "source": {
+            "blockType": "embed",
+            "blockId": "em-1",
+            "props": {
+              "url": "https://www.youtube.com/watch?v=abc",
+              "provider": "youtube",
+              "embedId": "abc",
+              "caption": "",
+              "width": null,
+              "height": null,
+              "aspectRatio": "16:9"
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {},
+          "runs": [
+            {
+              "type": "field",
+              "fieldType": "TOC",
+              "instr": "TOC \\o \"1-3\" \\h \\z \\u",
+              "name": null,
+              "cachedText": "Purpose"
+            }
+          ],
+          "source": {
+            "blockType": "tableOfContents",
+            "blockId": "toc-1",
+            "props": {
+              "items": [
+                {
+                  "id": "h-purpose",
+                  "level": 1,
+                  "text": "Purpose"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "table",
+          "props": {
+            "styleId": "TableGrid",
+            "widthMode": "pct",
+            "widthValue": 5000,
+            "look": {
+              "headerRow": true,
+              "bandedRows": true,
+              "firstColumn": false,
+              "lastRow": false
+            }
+          },
+          "grid": [
+            3000,
+            3000
+          ],
+          "rows": [
+            {
+              "props": {
+                "isHeader": true,
+                "cantSplit": true,
+                "heightTwips": 400,
+                "id": "tr-1"
+              },
+              "cells": [
+                {
+                  "props": {
+                    "gridSpan": 2,
+                    "shading": "#D9E2F3",
+                    "widthTwips": 6000,
+                    "id": "th-1"
+                  },
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "props": {
+                        "align": "left"
+                      },
+                      "runs": [
+                        {
+                          "type": "run",
+                          "text": "Step",
+                          "props": {}
+                        }
+                      ],
+                      "source": {
+                        "blockType": "paragraph",
+                        "blockId": "p-th-1",
+                        "props": {
+                          "textAlign": "left"
+                        }
+                      }
+                    }
+                  ],
+                  "source": {
+                    "blockType": "tableHeader",
+                    "blockId": "th-1",
+                    "props": {
+                      "colspan": 2,
+                      "rowspan": 1,
+                      "colwidth": [
+                        200,
+                        200
+                      ],
+                      "backgroundColor": "#D9E2F3"
+                    }
+                  }
+                }
+              ],
+              "source": {
+                "blockType": "tableRow",
+                "blockId": "tr-1",
+                "props": {
+                  "isHeader": true,
+                  "cantSplit": true,
+                  "heightTwips": 400
+                }
+              }
+            },
+            {
+              "props": {
+                "id": "tr-2"
+              },
+              "cells": [
+                {
+                  "props": {
+                    "gridSpan": 1,
+                    "vMerge": "restart",
+                    "widthTwips": 3000,
+                    "id": "td-1"
+                  },
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "props": {
+                        "align": "left"
+                      },
+                      "runs": [
+                        {
+                          "type": "run",
+                          "text": "merged vertically",
+                          "props": {}
+                        }
+                      ],
+                      "source": {
+                        "blockType": "paragraph",
+                        "blockId": "p-td-1",
+                        "props": {
+                          "textAlign": "left"
+                        }
+                      }
+                    }
+                  ],
+                  "source": {
+                    "blockType": "tableCell",
+                    "blockId": "td-1",
+                    "props": {
+                      "colspan": 1,
+                      "rowspan": 2,
+                      "colwidth": [
+                        200
+                      ],
+                      "backgroundColor": null
+                    }
+                  }
+                },
+                {
+                  "props": {
+                    "gridSpan": 1,
+                    "widthTwips": 3000,
+                    "id": "td-2"
+                  },
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "props": {
+                        "styleId": "ListParagraph",
+                        "numbering": {
+                          "numId": "1",
+                          "level": 0
+                        }
+                      },
+                      "runs": [
+                        {
+                          "type": "run",
+                          "text": "cell list item",
+                          "props": {}
+                        }
+                      ],
+                      "source": {
+                        "blockType": "listItem",
+                        "blockId": "li-cell-1",
+                        "props": {},
+                        "list": {
+                          "role": "item",
+                          "containerId": "bl-cell",
+                          "containerType": "bulletList",
+                          "containerProps": {},
+                          "level": 0
+                        }
+                      }
+                    }
+                  ],
+                  "source": {
+                    "blockType": "tableCell",
+                    "blockId": "td-2",
+                    "props": {
+                      "colspan": 1,
+                      "rowspan": 1,
+                      "colwidth": [
+                        200
+                      ],
+                      "backgroundColor": null
+                    }
+                  }
+                }
+              ],
+              "source": {
+                "blockType": "tableRow",
+                "blockId": "tr-2",
+                "props": {}
+              }
+            },
+            {
+              "props": {
+                "id": "tr-3"
+              },
+              "cells": [
+                {
+                  "props": {
+                    "gridSpan": 1,
+                    "vMerge": "continue"
+                  },
+                  "blocks": []
+                },
+                {
+                  "props": {
+                    "gridSpan": 1,
+                    "widthTwips": 3000,
+                    "id": "td-3"
+                  },
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "props": {
+                        "align": "left"
+                      },
+                      "runs": [
+                        {
+                          "type": "run",
+                          "text": "last row",
+                          "props": {}
+                        }
+                      ],
+                      "source": {
+                        "blockType": "paragraph",
+                        "blockId": "p-td-3",
+                        "props": {
+                          "textAlign": "left"
+                        }
+                      }
+                    }
+                  ],
+                  "source": {
+                    "blockType": "tableCell",
+                    "blockId": "td-3",
+                    "props": {
+                      "colspan": 1,
+                      "rowspan": 1,
+                      "colwidth": [
+                        200
+                      ],
+                      "backgroundColor": null
+                    }
+                  }
+                }
+              ],
+              "source": {
+                "blockType": "tableRow",
+                "blockId": "tr-3",
+                "props": {}
+              }
+            }
+          ],
+          "source": {
+            "blockType": "table",
+            "blockId": "tbl-1",
+            "props": {
+              "widthMode": "pct",
+              "widthValue": 5000,
+              "styleId": "TableGrid",
+              "look": {
+                "headerRow": true,
+                "bandedRows": true,
+                "firstColumn": false,
+                "lastRow": false
+              }
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {},
+          "runs": [
+            {
+              "type": "break",
+              "kind": "page"
+            }
+          ],
+          "source": {
+            "blockType": "pageBreak",
+            "blockId": "pb-1",
+            "props": {}
+          }
+        },
+        {
+          "type": "sdt",
+          "tag": "sec-scope-1",
+          "blocks": [
+            {
+              "type": "paragraph",
+              "props": {
+                "align": "left"
+              },
+              "runs": [
+                {
+                  "type": "run",
+                  "text": "Scope text inside a controlled section.",
+                  "props": {}
+                }
+              ],
+              "source": {
+                "blockType": "paragraph",
+                "blockId": "p-scope",
+                "props": {
+                  "textAlign": "left"
+                }
+              }
+            }
+          ],
+          "source": {
+            "blockType": "controlledSection",
+            "blockId": "cs-1",
+            "props": {
+              "sectionId": "sec-scope-1",
+              "title": "Scope",
+              "templateSectionId": "tpl-scope",
+              "policyRef": "pol-1",
+              "required": true,
+              "allowedBlocks": null,
+              "ownerName": "QA",
+              "workflowState": "draft"
+            }
+          },
+          "alias": "Scope"
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Figure ",
+              "props": {}
+            },
+            {
+              "type": "field",
+              "fieldType": "SEQ",
+              "instr": "SEQ Figure \\* ARABIC",
+              "cachedText": "",
+              "name": "Figure",
+              "format": "ARABIC"
+            },
+            {
+              "type": "run",
+              "text": " see ",
+              "props": {}
+            },
+            {
+              "type": "field",
+              "fieldType": "REF",
+              "instr": "REF h-purpose \\h",
+              "cachedText": "Purpose",
+              "name": "h-purpose",
+              "fallback": "Purpose"
+            },
+            {
+              "type": "run",
+              "text": " on ",
+              "props": {}
+            },
+            {
+              "type": "field",
+              "fieldType": "DATE",
+              "instr": "DATE \\@ \"d MMMM yyyy\"",
+              "cachedText": "",
+              "name": null,
+              "format": "d MMMM yyyy"
+            }
+          ],
+          "source": {
+            "blockType": "paragraph",
+            "blockId": "p-final",
+            "props": {
+              "textAlign": "left"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "sb-appendix",
+      "pageSetup": {
+        "size": {
+          "widthTwips": 16838,
+          "heightTwips": 11906
+        },
+        "orientation": "landscape",
+        "margins": {
+          "top": 1440,
+          "right": 1440,
+          "bottom": 1440,
+          "left": 1440,
+          "header": 720,
+          "footer": 720,
+          "gutter": 0
+        }
+      },
+      "body": [
+        {
+          "type": "paragraph",
+          "props": {
+            "styleId": "Heading1",
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Appendix",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "heading",
+            "blockId": "h-appendix",
+            "props": {
+              "level": 1,
+              "textAlign": "left",
+              "locked": false,
+              "lockReason": null,
+              "lockId": null
+            }
+          }
+        },
+        {
+          "type": "paragraph",
+          "props": {
+            "align": "left"
+          },
+          "runs": [
+            {
+              "type": "run",
+              "text": "Landscape appendix content.",
+              "props": {}
+            }
+          ],
+          "source": {
+            "blockType": "paragraph",
+            "blockId": "p-appendix",
+            "props": {
+              "textAlign": "left"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

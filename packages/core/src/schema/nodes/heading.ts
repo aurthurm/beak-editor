@@ -7,6 +7,12 @@
  */
 
 import type { NodeSpec, DOMOutputSpec, Node as PMNode } from 'prosemirror-model';
+import {
+  officeParagraphAttrs,
+  officeParagraphDomAttrs,
+  officeParagraphParseAttrs,
+  combinedBlockStyle,
+} from './officeParagraph';
 
 /**
  * Heading node spec.
@@ -34,6 +40,7 @@ function headingAttrsFromDom(dom: unknown, level: number): Record<string, unknow
     locked: lockedRaw === 'true',
     lockReason: el.getAttribute('data-beakblock-lock-reason') ?? el.dataset.beakblockLockReason ?? null,
     lockId: el.getAttribute('data-beakblock-lock-id') ?? el.dataset.beakblockLockId ?? null,
+    ...officeParagraphParseAttrs(el),
   };
 }
 
@@ -47,6 +54,7 @@ export const headingNode: NodeSpec = {
     locked: { default: false },
     lockReason: { default: null },
     lockId: { default: null },
+    ...officeParagraphAttrs,
   },
   parseDOM: [
     { tag: 'h1', getAttrs: (dom) => headingAttrsFromDom(dom, 1) },
@@ -57,9 +65,13 @@ export const headingNode: NodeSpec = {
     { tag: 'h6', getAttrs: (dom) => headingAttrsFromDom(dom, 6) },
   ],
   toDOM(node: PMNode): DOMOutputSpec {
-    const attrs: Record<string, string> = { 'data-block-id': node.attrs.id };
-    if (node.attrs.textAlign && node.attrs.textAlign !== 'left') {
-      attrs.style = `text-align: ${node.attrs.textAlign}`;
+    const attrs: Record<string, string> = {
+      'data-block-id': node.attrs.id,
+      ...officeParagraphDomAttrs(node.attrs),
+    };
+    const style = combinedBlockStyle(node.attrs.textAlign, node.attrs);
+    if (style) {
+      attrs.style = style;
     }
     if (node.attrs.locked) {
       attrs['data-beakblock-locked'] = 'true';

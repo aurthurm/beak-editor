@@ -13,3 +13,4 @@ export { linkMark } from './link';
 export { textColorMark } from './textColor';
 export { backgroundColorMark } from './backgroundColor';
 export { fontSizeMark } from './fontSize';
+export { insertionMark, deletionMark } from './revision';

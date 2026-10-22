@@ -1,18 +1,16 @@
 /**
- * Table node specification - Container for table rows.
+ * Table node specification - Office-class table container.
  *
- * A table contains multiple tableRow nodes that are displayed vertically.
- * Each row contains tableCell nodes.
+ * A table contains tableRow nodes. Column structure, merges and selection are
+ * handled by prosemirror-tables (`tableRole: 'table'`). Contract §1.6 adds
+ * width mode/value, table style id and conditional look flags.
  *
  * @example
  * ```json
  * {
  *   "type": "table",
- *   "attrs": { "id": "table-1" },
- *   "content": [
- *     { "type": "tableRow", "content": [...] },
- *     { "type": "tableRow", "content": [...] }
- *   ]
+ *   "props": { "widthMode": "fixed", "widthValue": 9360, "styleId": "GridTable4", "look": { "headerRow": true } },
+ *   "children": [{ "type": "tableRow", "props": {}, "children": [] }]
  * }
  * ```
  *
@@ -20,11 +18,10 @@
  */
 
 import { NodeSpec, DOMOutputSpec, Node as PMNode } from 'prosemirror-model';
+import { tableAttrsFromDom, tableDomAttrs, tableOfficeAttrs } from './tableOffice';
 
 /**
  * Table node spec for ProseMirror.
- *
- * Represents a table container.
  */
 export const tableNode: NodeSpec = {
   group: 'block',
@@ -36,29 +33,19 @@ export const tableNode: NodeSpec = {
   attrs: {
     /** Unique block identifier */
     id: { default: null },
+    ...tableOfficeAttrs,
   },
 
   parseDOM: [
     {
       tag: 'table',
       getAttrs(dom: HTMLElement): Record<string, unknown> {
-        const id = dom.getAttribute('data-block-id');
-        return {
-          id: id || null,
-        };
+        return tableAttrsFromDom(dom);
       },
     },
   ],
 
   toDOM(node: PMNode): DOMOutputSpec {
-    const attrs: Record<string, string> = {
-      class: 'ob-table',
-    };
-
-    if (node.attrs.id) {
-      attrs['data-block-id'] = node.attrs.id;
-    }
-
-    return ['table', attrs, ['tbody', 0]];
+    return ['table', tableDomAttrs(node.attrs), ['tbody', 0]];
   },
 };

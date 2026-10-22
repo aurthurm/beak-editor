@@ -18,7 +18,7 @@ import { createDragDropPlugin, DragDropConfig } from './dragDropPlugin';
 import { createSlashMenuPlugin, SlashMenuConfig } from './slashMenuPlugin';
 import { createBubbleMenuPlugin, BubbleMenuConfig } from './bubbleMenuPlugin';
 import { createMultiBlockSelectionPlugin, MultiBlockSelectionConfig } from './multiBlockSelectionPlugin';
-import { createTablePlugin, TablePluginConfig } from './tablePlugin';
+import { createTablePlugins, TablePluginConfig } from './tablePlugin';
 import { createKeyboardShortcutsPlugin, KeyboardShortcutsConfig } from './keyboardShortcutsPlugin';
 import { createChecklistPlugin, ChecklistPluginConfig } from './checklistPlugin';
 import { createListEnterPlugin } from './listEnterPlugin';
@@ -27,6 +27,10 @@ import { createMediaMenuPlugin } from './mediaMenuPlugin';
 import { createTableOfContentsPlugin } from './tableOfContentsPlugin';
 import { createMarkdownPastePlugin, type MarkdownPasteMode } from './markdownPastePlugin';
 import { createComplianceLockPlugin, type ComplianceLockPluginOptions } from './complianceLockPlugin';
+import { createEditorModePlugin } from './editorModePlugin';
+import { createWordKeymapPlugin } from './wordKeymapPlugin';
+import { createOfficePastePlugin } from '../paste/officePaste';
+import type { EditorMode } from '../extensions';
 
 /**
  * Options for creating plugins.
@@ -131,6 +135,20 @@ export interface CreatePluginsOptions {
    * @default false (disabled)
    */
   complianceLock?: false | ComplianceLockPluginOptions;
+
+  /**
+   * Editor mode. Block chrome (drag handles, slash menu) is inactive in
+   * `office` and `controlled` modes.
+   * @default 'block'
+   */
+  mode?: EditorMode;
+
+  /**
+   * Word-compatible keyboard behaviour (contracts §1.7): Word keymap, smart
+   * quotes and AutoCorrect. Requires `schema`.
+   * @default false
+   */
+  wordBehaviour?: boolean;
 }
 
 /**
@@ -179,6 +197,8 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
     additionalPlugins = [],
     markdownPaste,
     complianceLock,
+    mode = 'block',
+    wordBehaviour = false,
   } = options;
   const includeHistory = options.history !== false;
 
@@ -230,6 +250,8 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
     // Open links in a new tab/window when clicked inside the editor
     createLinkClickPlugin(),
 
+    ...(schema ? [createOfficePastePlugin()] : []),
+
     ...(schema && markdownPaste !== false
       ? [
           createMarkdownPastePlugin({
@@ -257,6 +279,11 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
       'Mod-y': redo,
       'Mod-Shift-z': redo,
     }));
+  }
+
+  // Word keymap goes before the default keymaps so its bindings win (contracts §1.7)
+  if (schema && wordBehaviour) {
+    plugins.splice(2, 0, createWordKeymapPlugin({ schema }));
   }
 
   // Add input rules for markdown shortcuts (requires schema)
@@ -292,7 +319,7 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
   // Add table editing plugin
   if (table !== false) {
     const tableConfig = typeof table === 'object' ? table : {};
-    plugins.push(createTablePlugin(tableConfig));
+    plugins.push(...createTablePlugins(tableConfig));
   }
 
   // Note: Checklist plugin is added earlier in the plugin array
@@ -302,6 +329,9 @@ export function createPlugins(options: CreatePluginsOptions = {}): Plugin[] {
   if (mediaMenu !== false) {
     plugins.push(createMediaMenuPlugin());
   }
+
+  // Editor mode state (read by slash menu and drag handles)
+  plugins.push(createEditorModePlugin(mode));
 
   // Add user plugins
   plugins.push(...additionalPlugins);

@@ -45,6 +45,24 @@ export type { EmbedProvider } from './embed';
 // Check list nodes
 export { checkListNode, checkListItemNode } from './checkList';
 
+// Unregistered blocks
+export { unknownBlockNode } from './unknownBlock';
+
 // Table of contents
 export { tableOfContentsNode } from './tableOfContents';
 export type { TocHeadingItem } from './tableOfContents';
+
+// Office nodes
+export { pageBreakNode } from './pageBreak';
+export { sectionBreakNode } from './sectionBreak';
+export type { PageSetup } from './sectionBreak';
+export { fieldNode, FIELD_TYPES } from './field';
+export type { FieldType } from './field';
+export { officeParagraphAttrs, OFFICE_PARAGRAPH_ATTR_NAMES } from './officeParagraph';
+export type {
+  OfficeParagraphProps,
+  ParagraphNumbering,
+  ParagraphSpacing,
+  ParagraphIndent,
+  ParagraphTab,
+} from './officeParagraph';

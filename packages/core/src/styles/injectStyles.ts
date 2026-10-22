@@ -17,6 +17,38 @@ let stylesInjected = false;
 const EDITOR_STYLES = `
 /* BeakBlock Editor Styles - Auto-injected */
 
+/* Office tables: cell-range selection (prosemirror-tables) and column resize handle */
+.beakblock-editor .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(59, 130, 246, 0.15);
+  pointer-events: none;
+}
+.beakblock-editor .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #3b82f6;
+  pointer-events: none;
+}
+.beakblock-editor.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+.beakblock-editor tr[data-is-header="true"] {
+  font-weight: 600;
+}
+
+/* Change bar: marks a block with pending revisions (left-margin bar) */
+.beakblock-change-bar {
+  border-left: 3px solid #c2410c;
+  padding-left: 8px;
+}
+
 .beakblock-container,
 .beakblock-editor,
 .beakblock-comment-shell {
@@ -3738,6 +3770,106 @@ th .ob-side-menu,
 .beakblock-toc__link:focus-visible {
   outline: 2px solid hsl(var(--ob-primary));
   outline-offset: 1px;
+}
+
+/* ==========================================================================
+   Revision marks (durable track changes)
+   ========================================================================== */
+
+.beakblock-ins {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.12);
+  text-decoration: underline;
+  text-decoration-color: #16a34a;
+}
+
+.beakblock-del {
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.1);
+  text-decoration: line-through;
+  text-decoration-color: #dc2626;
+}
+
+/* Final view: hide deletions, show insertions as plain text */
+.beakblock-review-view-final .beakblock-del {
+  display: none;
+}
+
+.beakblock-review-view-final .beakblock-ins {
+  color: inherit;
+  background: none;
+  text-decoration: none;
+}
+
+/* Original view: hide insertions, show deletions as plain text */
+.beakblock-review-view-original .beakblock-ins {
+  display: none;
+}
+
+.beakblock-review-view-original .beakblock-del {
+  color: inherit;
+  background: none;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Fields
+   ========================================================================== */
+
+.beakblock-field {
+  background: hsl(var(--ob-muted) / 0.5);
+  border-radius: calc(var(--ob-radius) * 0.3);
+  padding: 0 0.2em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Page and section breaks
+   ========================================================================== */
+
+.beakblock-page-break,
+.beakblock-section-break {
+  position: relative;
+  margin: 1.5rem 0;
+  height: 0;
+  border-top: 1px dashed hsl(var(--ob-border));
+  user-select: none;
+}
+
+.beakblock-section-break {
+  border-top-style: double;
+  border-top-width: 3px;
+}
+
+.beakblock-page-break::after,
+.beakblock-section-break::after {
+  position: absolute;
+  left: 50%;
+  top: -0.6em;
+  transform: translateX(-50%);
+  padding: 0 0.5rem;
+  background: hsl(var(--ob-background));
+  color: hsl(var(--ob-muted-foreground));
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.beakblock-page-break::after {
+  content: 'Page break';
+}
+
+.beakblock-section-break::after {
+  content: 'Section break';
+}
+
+/* ==========================================================================
+   Office mode: block chrome is disabled
+   ========================================================================== */
+
+[data-beakblock-mode='office'] .ob-side-menu,
+[data-beakblock-mode='controlled'] .ob-side-menu {
+  display: none !important;
 }
 `; 
 

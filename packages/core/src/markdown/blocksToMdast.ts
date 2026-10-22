@@ -22,6 +22,7 @@ import type {
   ThematicBreak,
 } from 'mdast';
 import type { Block, InlineContent, TextStyles } from '../blocks/types';
+import { isBuiltinInline } from '../blocks/inlineGuards';
 
 function escapeHtml(s: string): string {
   return s
@@ -41,6 +42,8 @@ function codePlain(content: InlineContent[] | undefined): string {
 
 function styledTextToPhrasing(text: string, styles: TextStyles): PhrasingContent[] {
   if (!text) return [];
+  // Text deleted under review is not part of the document content
+  if (styles.revision?.kind === 'delete') return [];
   if (styles.code) {
     return [{ type: 'inlineCode', value: text }];
   }
@@ -66,13 +69,20 @@ function styledTextToPhrasing(text: string, styles: TextStyles): PhrasingContent
 function inlineToPhrasing(content: InlineContent[] | undefined): PhrasingContent[] {
   if (!content?.length) return [];
   const out: PhrasingContent[] = [];
-  for (const item of content) {
+  for (const raw of content) {
+    if (!isBuiltinInline(raw)) continue;
+    const item = raw;
     if (item.type === 'hardBreak') {
       out.push({ type: 'break' });
       continue;
     }
     if (item.type === 'icon') {
       out.push({ type: 'text', value: item.symbol || item.icon });
+      continue;
+    }
+    if (item.type === 'field') {
+      // Fields degrade to their stored fallback text
+      if (item.fallback) out.push({ type: 'text', value: item.fallback });
       continue;
     }
     if (item.type === 'link') {
@@ -151,7 +161,10 @@ function blockToMdast(block: Block): RootContent[] {
       };
       return [c];
     }
-    case 'divider': {
+    case 'divider':
+    case 'pageBreak':
+    case 'sectionBreak': {
+      // Page and section breaks have no Markdown equivalent; render as a rule
       const hr: ThematicBreak = { type: 'thematicBreak' };
       return [hr];
     }

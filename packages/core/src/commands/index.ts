@@ -23,3 +23,21 @@ export {
   deleteColumnAtIndex,
 } from './tableCommands';
 export type { TableContext } from './tableCommands';
+export {
+  mergeCells,
+  splitCell,
+  setCellBorders,
+  setCellShading,
+  setCellPadding,
+  setCellVerticalAlign,
+  setCellHorizontalAlign,
+  setTableWidth,
+  setColumnWidthTwips,
+  distributeColumns,
+  toggleHeaderRow,
+  toggleRowCantSplit,
+  sortTableByColumn,
+  setTableStyle,
+  getColumnWidthsPx,
+} from './tableOfficeCommands';
+export type { BorderEdge, SortDirection } from './tableOfficeCommands';

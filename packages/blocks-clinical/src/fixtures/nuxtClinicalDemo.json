@@ -1,0 +1,1187 @@
+{
+ "blocks": [
+  {
+   "id": "cl-title",
+   "type": "heading",
+   "props": {
+    "level": 1
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "Clinical SOP: Gram stain",
+     "styles": {}
+    }
+   ]
+  },
+  {
+   "id": "cl-method",
+   "type": "testMethodSpec",
+   "props": {
+    "methodCode": "MTH-GS-01",
+    "version": "3",
+    "analyte": "Bacterial morphology",
+    "principle": "Differential staining by cell-wall structure"
+   },
+   "children": [
+    {
+     "id": "p-1",
+     "type": "paragraph",
+     "props": {
+      "styleId": "Normal"
+     },
+     "content": [
+      {
+       "type": "text",
+       "text": "Method summary: differential stain on heat-fixed smears, read under oil immersion.",
+       "styles": {}
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-warning",
+   "type": "safetyWarning",
+   "props": {
+    "level": "danger",
+    "hazardCodes": [
+     "H314",
+     "H318"
+    ],
+    "ppe": [
+     "gloves",
+     "eye protection",
+     "lab coat"
+    ]
+   },
+   "children": [
+    {
+     "id": "p-2",
+     "type": "paragraph",
+     "props": {
+      "styleId": "Normal"
+     },
+     "content": [
+      {
+       "type": "text",
+       "text": "Crystal violet and iodine are corrosive. Wear gloves and eye protection at the staining bench.",
+       "styles": {}
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-specimen",
+   "type": "specimenRequirements",
+   "props": {
+    "specimenType": "Sputum or pus swab",
+    "container": "Sterile screw-cap tube",
+    "volumeMl": 2,
+    "minVolumeMl": 0.5,
+    "stability": "4 h at room temperature, 24 h at 2–8 °C",
+    "rejectionCriteria": "Saliva-contaminated sputum, unlabelled container"
+   }
+  },
+  {
+   "id": "cap-reagent",
+   "type": "caption",
+   "props": {
+    "label": "Table"
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "Reagents used at the staining bench",
+     "styles": {}
+    }
+   ]
+  },
+  {
+   "id": "reagent-10",
+   "type": "reagentTable",
+   "props": {
+    "requiredColumns": [
+     "Reagent",
+     "Concentration",
+     "Unit",
+     "Lot",
+     "Expiry"
+    ]
+   },
+   "children": [
+    {
+     "id": "tbl-11",
+     "type": "table",
+     "props": {},
+     "children": [
+      {
+       "id": "tr-d",
+       "type": "tableRow",
+       "props": {
+        "isHeader": true
+       },
+       "children": [
+        {
+         "id": "tc-4",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "shading": "D9E2F3",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-3",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Reagent",
+             "styles": {
+              "bold": true
+             }
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-6",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "shading": "D9E2F3",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-5",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Concentration",
+             "styles": {
+              "bold": true
+             }
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-8",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "shading": "D9E2F3",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-7",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Unit",
+             "styles": {
+              "bold": true
+             }
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-a",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "shading": "D9E2F3",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-9",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Lot",
+             "styles": {
+              "bold": true
+             }
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-c",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "shading": "D9E2F3",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-b",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Expiry",
+             "styles": {
+              "bold": true
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "tr-o",
+       "type": "tableRow",
+       "props": {},
+       "children": [
+        {
+         "id": "tc-f",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-e",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Crystal violet",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-h",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-g",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "2 %",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-j",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-i",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "mg/mL",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-l",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-k",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "LOT-CV-22",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-n",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-m",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "—",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "tr-z",
+       "type": "tableRow",
+       "props": {},
+       "children": [
+        {
+         "id": "tc-q",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-p",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "Gram iodine",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-s",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-r",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "1 %",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-u",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-t",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "mg/mL",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-w",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-v",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "LOT-GI-18",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "id": "tc-y",
+         "type": "tableCell",
+         "props": {
+          "colspan": 1,
+          "rowspan": 1,
+          "vAlign": "top",
+          "borders": {
+           "top": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "right": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "bottom": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           },
+           "left": {
+            "style": "single",
+            "sizePt": 0.5,
+            "color": "808080"
+           }
+          }
+         },
+         "children": [
+          {
+           "id": "p-x",
+           "type": "paragraph",
+           "props": {
+            "styleId": "Normal"
+           },
+           "content": [
+            {
+             "type": "text",
+             "text": "—",
+             "styles": {}
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-steps-h",
+   "type": "heading",
+   "props": {
+    "level": 2
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "Steps",
+     "styles": {}
+    }
+   ]
+  },
+  {
+   "id": "cl-step-1",
+   "type": "sopStep",
+   "props": {
+    "stepNumber": null,
+    "critical": false,
+    "timeMinutes": 1
+   },
+   "children": [
+    {
+     "id": "cl-step-1-p",
+     "type": "paragraph",
+     "props": {},
+     "content": [
+      {
+       "type": "text",
+       "text": "Confirm the instrument before use. ",
+       "styles": {}
+      },
+      {
+       "type": "equipmentReference",
+       "props": {
+        "equipmentId": "LIMS-MIC-001",
+        "code": "MIC-001",
+        "name": "Light microscope",
+        "status": "active"
+       }
+      },
+      {
+       "type": "text",
+       "text": " is the reference microscope for this method. See ",
+       "styles": {}
+      },
+      {
+       "type": "crossReference",
+       "props": {
+        "targetId": "cap-reagent",
+        "display": "label"
+       }
+      },
+      {
+       "type": "text",
+       "text": ".",
+       "styles": {}
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-step-2",
+   "type": "sopStep",
+   "props": {
+    "stepNumber": null,
+    "critical": true,
+    "timeMinutes": 2
+   },
+   "children": [
+    {
+     "id": "cl-step-2-p",
+     "type": "paragraph",
+     "props": {},
+     "content": [
+      {
+       "type": "text",
+       "text": "Flood with crystal violet for 30 seconds, then rinse.",
+       "styles": {}
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-step-3",
+   "type": "sopStep",
+   "props": {
+    "stepNumber": null,
+    "critical": false,
+    "timeMinutes": 1
+   },
+   "children": [
+    {
+     "id": "cl-step-3-p",
+     "type": "paragraph",
+     "props": {},
+     "content": [
+      {
+       "type": "text",
+       "text": "Spin the specimen in ",
+       "styles": {}
+      },
+      {
+       "type": "equipmentReference",
+       "props": {
+        "equipmentId": "LIMS-CEN-004",
+        "code": "CEN-004",
+        "name": "Benchtop centrifuge",
+        "status": "active"
+       }
+      },
+      {
+       "type": "text",
+       "text": " before smearing. Stop if the centrifuge is out of service.",
+       "styles": {}
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-cond",
+   "type": "conditional",
+   "props": {
+    "expression": "biohazard"
+   },
+   "children": [
+    {
+     "id": "p-12",
+     "type": "paragraph",
+     "props": {
+      "styleId": "Normal"
+     },
+     "content": [
+      {
+       "type": "text",
+       "text": "Biohazard: all smears from this specimen are handled in a Class II cabinet.",
+       "styles": {}
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cl-qc",
+   "type": "qcCriteria",
+   "props": {
+    "analyte": "Gram control (E. coli)",
+    "level": "L2",
+    "target": 1.5,
+    "sd": 0.2,
+    "westgardRules": [
+     "1_2s",
+     "1_3s",
+     "R_4s"
+    ]
+   }
+  },
+  {
+   "id": "form-section",
+   "type": "validatedFormSection",
+   "props": {
+    "name": "run-record",
+    "title": "Run record"
+   },
+   "children": [
+    {
+     "id": "f-operator",
+     "type": "formText",
+     "props": {
+      "name": "operator",
+      "label": "Operator",
+      "required": true,
+      "value": ""
+     }
+    },
+    {
+     "id": "f-temp",
+     "type": "formNumber",
+     "props": {
+      "name": "temp",
+      "label": "Incubator temperature",
+      "unit": "°C",
+      "min": 20,
+      "max": 40,
+      "decimals": 1,
+      "value": "37.0",
+      "allowedUnits": [
+       "°C"
+      ]
+     }
+    },
+    {
+     "id": "f-sample",
+     "type": "formNumber",
+     "props": {
+      "name": "sample",
+      "label": "Sample volume",
+      "unit": "mL",
+      "min": 0,
+      "max": 10,
+      "decimals": 1,
+      "value": "2"
+     }
+    },
+    {
+     "id": "f-dilution",
+     "type": "formCalculated",
+     "props": {
+      "name": "dilution",
+      "label": "Dilution factor",
+      "expression": "sample * 5",
+      "decimals": 2,
+      "value": ""
+     }
+    },
+    {
+     "id": "f-date",
+     "type": "formDate",
+     "props": {
+      "name": "prepDate",
+      "label": "Preparation date",
+      "value": "2026-10-22"
+     }
+    },
+    {
+     "id": "f-stain",
+     "type": "formDropdown",
+     "props": {
+      "name": "stainLot",
+      "label": "Stain lot",
+      "options": [
+       "LOT-CV-22",
+       "LOT-CV-23"
+      ],
+      "value": ""
+     }
+    }
+   ]
+  },
+  {
+   "id": "cl-footnote-p",
+   "type": "paragraph",
+   "props": {},
+   "content": [
+    {
+     "type": "text",
+     "text": "Results are reported using the laboratory reporting scale",
+     "styles": {}
+    },
+    {
+     "type": "footnote",
+     "props": {
+      "text": "Reporting scale as defined in ISO 15189:2022, clause 7.3."
+     }
+    },
+    {
+     "type": "text",
+     "text": " for the laboratory ",
+     "styles": {}
+    },
+    {
+     "type": "variable",
+     "props": {
+      "name": "laboratory"
+     }
+    },
+    {
+     "type": "text",
+     "text": " (site ",
+     "styles": {}
+    },
+    {
+     "type": "variable",
+     "props": {
+      "name": "siteCode"
+     }
+    },
+    {
+     "type": "text",
+     "text": ").",
+     "styles": {}
+    }
+   ]
+  },
+  {
+   "id": "cl-eq",
+   "type": "equation",
+   "props": {
+    "latex": "D = V_{total} / V_{sample}"
+   }
+  }
+ ],
+ "variables": {
+  "biohazard": true,
+  "laboratory": "Microbiology",
+  "siteCode": "MB-02"
+ },
+ "records": [
+  {
+   "id": "LIMS-MIC-001",
+   "code": "MIC-001",
+   "name": "Light microscope (oil immersion)",
+   "status": "active"
+  },
+  {
+   "id": "LIMS-CEN-004",
+   "code": "CEN-004",
+   "name": "Benchtop centrifuge",
+   "status": "inactive"
+  },
+  {
+   "id": "LIMS-INC-002",
+   "code": "INC-002",
+   "name": "Incubator 37 °C",
+   "status": "active"
+  }
+ ]
+}

@@ -6,6 +6,7 @@
 
 import type { PhrasingContent } from 'mdast';
 import type { InlineContent, StyledText, TextStyles } from '../blocks/types';
+import { isBuiltinInline, isStyledText } from '../blocks/inlineGuards';
 
 function mergeStyles(base: TextStyles, extra: TextStyles): TextStyles {
   return { ...base, ...extra };
@@ -46,6 +47,7 @@ export function phrasingToInlineContent(nodes: PhrasingContent[], baseStyles: Te
           const inner = phrasingToInlineContent(node.children, styles);
           const linkRuns: StyledText[] = [];
           for (const piece of inner) {
+            if (!isBuiltinInline(piece)) continue;
             if (piece.type === 'text') {
               linkRuns.push({ type: 'text', text: piece.text, styles: { ...piece.styles } });
             } else if (piece.type === 'link') {
@@ -88,12 +90,12 @@ export function phrasingToInlineContent(nodes: PhrasingContent[], baseStyles: Te
 function mergeAdjacentText(items: InlineContent[]): InlineContent[] {
   const merged: InlineContent[] = [];
   for (const item of items) {
-    if (item.type !== 'text') {
+    if (!isStyledText(item)) {
       merged.push(item);
       continue;
     }
     const prev = merged[merged.length - 1];
-    if (prev && prev.type === 'text' && stylesEqual(prev.styles, item.styles)) {
+    if (prev && isStyledText(prev) && stylesEqual(prev.styles, item.styles)) {
       prev.text += item.text;
     } else {
       merged.push({ ...item, styles: { ...item.styles } });

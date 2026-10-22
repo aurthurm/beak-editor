@@ -13,7 +13,11 @@ export type {
   LinkContent,
   IconContent,
   HardBreakContent,
+  FieldContent,
+  RevisionStyle,
   InlineContent,
+  BuiltinInlineContent,
+  CustomInlineContent,
   Block,
   PartialBlock,
   BlockIdentifier,
@@ -23,3 +27,6 @@ export type {
 // Conversion functions
 export { blockToNode, inlineContentToNodes, stylesToMarks, blocksToDoc } from './blockToNode';
 export { nodeToBlock, marksToStyles, docToBlocks } from './nodeToBlock';
+
+// Inline type guards
+export { isBuiltinInline, isStyledText } from './inlineGuards';

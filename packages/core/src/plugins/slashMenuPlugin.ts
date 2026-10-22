@@ -7,6 +7,7 @@
  * @module
  */
 
+import { isBlockChromeEnabled } from './editorModePlugin';
 import { Plugin, PluginKey, EditorState, TextSelection, Selection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { setBlockType } from 'prosemirror-commands';
@@ -115,7 +116,7 @@ export function createSlashMenuPlugin(config: SlashMenuConfig = {}): Plugin {
         };
       },
 
-      apply(tr, state, _oldEditorState, newEditorState): SlashMenuState {
+      apply(tr, state, oldEditorState, newEditorState): SlashMenuState {
         // Check for explicit meta commands
         const meta = tr.getMeta(SLASH_MENU_PLUGIN_KEY);
         if (meta) {
@@ -129,6 +130,9 @@ export function createSlashMenuPlugin(config: SlashMenuConfig = {}): Plugin {
         if (!state.active) {
           // Only check on text input
           if (!tr.docChanged) return state;
+
+          // Block chrome is disabled in office and controlled modes
+          if (!isBlockChromeEnabled(oldEditorState)) return state;
 
           const { $from } = newEditorState.selection;
 

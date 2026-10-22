@@ -117,7 +117,10 @@ export function useBeakBlock(options: UseBeakBlockOptions = {}): BeakBlockEditor
       ...nodeViews,
     };
     if (Object.keys(mergedNodeViews).length > 0) {
-      newEditor.pm.view.setProps({ nodeViews: mergedNodeViews });
+      // Merge with the node views the editor already built from its extensions (office atoms,
+      // equipment references, and so on). Replacing the map would drop them.
+      const existingNodeViews = (newEditor.pm.view.props.nodeViews ?? {}) as Record<string, NodeViewConstructor>;
+      newEditor.pm.view.setProps({ nodeViews: { ...existingNodeViews, ...mergedNodeViews } });
     }
     setEditor(newEditor);
 

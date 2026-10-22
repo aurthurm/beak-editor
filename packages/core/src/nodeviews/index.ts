@@ -24,3 +24,5 @@ export const tableOfContentsNodeView: NodeViewConstructor = (node, view, getPos)
 export { CodeBlockNodeView } from './CodeBlockNodeView';
 export { EmbedNodeView } from './EmbedNodeView';
 export { TableOfContentsNodeView } from './TableOfContentsNodeView';
+export { FieldNodeView, resolveFieldText } from './FieldNodeView';
+export type { FieldResolver } from './FieldNodeView';

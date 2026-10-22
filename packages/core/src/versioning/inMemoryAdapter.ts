@@ -5,6 +5,7 @@
  */
 
 import type { DocumentVersion } from './types';
+import { cloneJson } from '../utils/cloneJson';
 import type { VersioningAdapter } from './types';
 
 /**
@@ -21,11 +22,11 @@ export class InMemoryVersioningAdapter implements VersioningAdapter {
 
   async getVersion(id: string): Promise<DocumentVersion | null> {
     const v = this.versions.get(id);
-    return v ? structuredClone(v) : null;
+    return v ? cloneJson(v) : null;
   }
 
   async saveVersion(version: DocumentVersion): Promise<void> {
-    this.versions.set(version.id, structuredClone(version));
+    this.versions.set(version.id, cloneJson(version));
   }
 
   async deleteVersion(id: string): Promise<void> {

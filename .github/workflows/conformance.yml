@@ -1,0 +1,61 @@
+name: Conformance
+
+on:
+  push:
+    branches: [main, 'feat/beakblock-2.0']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm --filter "./packages/*" run build
+
+      - name: Unit tests
+        run: pnpm --filter "./packages/*" run test
+
+      - name: Conformance tests (corpus, round trip, editor, DOCX, security, tables, layout, vertical slice)
+        run: pnpm --filter @amusendame/beakblock-conformance run test
+
+      - name: Install LibreOffice (headless layout oracle for the fidelity report)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice-writer --no-install-recommends
+
+      - name: Fidelity report (DOCX to PDF page counts vs heuristic layout)
+        run: node tests/conformance/scripts/fidelity.mjs
+
+      - name: Upload conformance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-reports
+          path: |
+            tests/conformance/reports/fidelity.md
+            tests/conformance/reports/fidelity.json
+            tests/conformance/reports/perf.json
+            tests/conformance/reports/corpus.json
+            tests/conformance/reports/fidelity/
+          if-no-files-found: warn
+          retention-days: 14

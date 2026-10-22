@@ -58,6 +58,8 @@ export function useBeakBlock(options: UseBeakBlockOptions = {}): Ref<BeakBlockEd
       ? { codeBlock: codeBlockNodeView }
       : {};
     const mergedNodeViews = {
+      // Keep views the editor already installed (e.g. from extensions).
+      ...(newEditor.pm.view.props.nodeViews ?? {}),
       ...tocViews,
       ...embedViews,
       ...codeBlockViews,
