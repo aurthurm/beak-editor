@@ -7,7 +7,6 @@
  * release and signature binding also run here. The in-memory store is for the demo only.
  */
 
-import { restoreServerGlobals } from './serverDomShim';
 import { NextResponse } from 'next/server';
 import type { Block } from '@amusendame/beakblock-core';
 import { verifyDocumentChange } from '@amusendame/beakblock-permissions';
@@ -42,8 +41,6 @@ import {
 } from '../../../v2/controlledShared';
 
 export const runtime = 'nodejs';
-// All imports above have loaded. Remove the DOM stub that let them load, so other routes see a server global scope.
-restoreServerGlobals();
 export const dynamic = 'force-dynamic';
 
 const SYSTEM = { userId: 'qms-service', roles: ['system'] };
