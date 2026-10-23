@@ -42,14 +42,18 @@ export const unknownBlockNode: NodeSpec = {
     },
   ],
   toDOM(node: PMNode): DOMOutputSpec {
+    const type = String(node.attrs.originalType ?? '');
     const attrs: Record<string, string> = {
       class: 'beakblock-unknown-block',
-      'data-unknown-block': String(node.attrs.originalType ?? ''),
+      contenteditable: 'false',
+      role: 'note',
+      'aria-label': `Unsupported block: ${type}`,
+      'data-unknown-block': type,
       'data-props': String(node.attrs.propsJson ?? '{}'),
     };
     if (node.attrs.id) attrs['data-block-id'] = String(node.attrs.id);
     if (node.attrs.contentJson !== null) attrs['data-content'] = String(node.attrs.contentJson);
     if (node.attrs.childrenJson !== null) attrs['data-children'] = String(node.attrs.childrenJson);
-    return ['div', attrs, `Unregistered block: ${String(node.attrs.originalType ?? '')}`];
+    return ['div', attrs, `Unsupported block: ${type}`];
   },
 };

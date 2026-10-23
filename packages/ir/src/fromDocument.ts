@@ -567,6 +567,7 @@ function convertUnknown(block: Block, ctx: ConvertContext): IRBlock {
   if (block.content !== undefined) raw.content = cloneValue(block.content);
   if (block.children !== undefined) raw.children = cloneValue(block.children);
   source.raw = raw;
+  source.unknown = true;
 
   return {
     type: 'paragraph',

@@ -1,41 +1,41 @@
 # BeakBlock 2.0 architecture
 
-Status: **2.0.0-alpha**, as of 2026-10-22. This document describes what exists in the repository. The target
+Status: **2.0.0-alpha**, as of 2026-10-23. This document describes what exists in the repository. The target
 design is in [`beakblock-2.0-roadmap.md`](../../beakblock-2.0-roadmap.md) (section 3 and section 7), and the
 binding package contracts are in [`contracts.md`](./contracts.md). Where the two differ, this file says so.
 Decisions are recorded in [`docs/adr/`](../adr/). Progress is in [`status.md`](./status.md).
 
 ## Package map
 
-Test counts are the suites on this branch (`pnpm --filter "./packages/*" run test`, 2026-10-22).
+Test counts are from the last full run (2026-10-23) and are approximate; they will drift as tests are added.
 
 | Roadmap package (section 7) | In repository | Status | What exists | Tests |
 | --- | --- | --- | --- | --- |
-| `core` | `packages/core` | ✅ | ProseMirror kernel: editor, schema, blocks, plugins, markdown, comments, versioning, Y.js (single document), office paste, Word keymap, legacy track changes and compliance locks (deprecated) | 175 |
-| `schema` | `packages/schema` | ✅ | `BeakDocument` v2, sections, style sheet, numbering, page setup, units, migrations, structural validation | 33 |
-| `ir` | `packages/ir` (+ `python/beakdoc_ir`) | ✅ | BeakDoc IR, `documentToIR`, `irToDocument`, `validateIR`, Python twin package | 40 |
-| `commands` | `packages/commands` | 🟡 | Command registry, 31 built-in ids, keymap normalisation, ribbon definition. No ribbon UI | 36 |
+| `core` | `packages/core` | ✅ | ProseMirror kernel: editor, schema, blocks, plugins, markdown, comments, versioning, Y.js (single document) with `collaboration.sync` seeding, office paste, Word keymap, stable block ids, legacy track changes and compliance locks (deprecated) | about 290 |
+| `schema` | `packages/schema` | ✅ | `BeakDocument` v2, sections, style sheet, numbering, page setup, units, migrations, structural validation | 43 |
+| `ir` | `packages/ir` (+ `python/beakdoc_ir`) | ✅ | BeakDoc IR, `documentToIR`, `irToDocument`, `validateIR`, Python twin package | 53 |
+| `commands` | `packages/commands` | 🟡 | Command registry, 31 built-in ids, keymap normalisation, ribbon definition. The React and Vue shells render it | 38 |
 | `blocks-basic` | not a package | 🟡 | Text, list and layout blocks live in `core` | (core) |
-| `blocks-office` | `packages/blocks-office` | ✅ | Equation, caption, text box, shape, variable, conditional, repeating section, computed value, reusable content, footnote, endnote, cross-reference | 35 |
-| `blocks-clinical` | `packages/blocks-clinical` | ✅ | SOP step, safety warning, reagent table, test-method spec, specimen requirements, QC criteria, equipment reference, form controls | 63 |
-| `blocks-qms` | `packages/blocks-qms` | ✅ | `controlledSection`, signature, approval, revision history, controlled notice, acknowledgement, document identifier | 44 |
-| `permissions` | `packages/permissions` | ✅ | Typed operations, scopes, policy engine, client guard, `verifyDocumentChange` (server) | 36 |
-| `templates` | `packages/templates` | ✅ | Templates, instantiation, validation, section and document lifecycles, composer, release manifests, controlled print stamp, mapping | 25 |
+| `blocks-office` | `packages/blocks-office` | ✅ | Equation, caption, text box, shape, variable, conditional, repeating section, computed value, reusable content, footnote, endnote, cross-reference | 38 |
+| `blocks-clinical` | `packages/blocks-clinical` | ✅ | SOP step, safety warning, reagent table, test-method spec, specimen requirements, QC criteria, equipment reference, form controls | 73 |
+| `blocks-qms` | `packages/blocks-qms` | ✅ | `controlledSection`, signature, approval, revision history, controlled notice, acknowledgement, document identifier | 48 |
+| `permissions` | `packages/permissions` | ✅ | Typed operations, scopes, policy engine, client guard, `verifyDocumentChange` (server), service-owned node types | 55 |
+| `templates` | `packages/templates` | ✅ | Templates, instantiation, validation, section and document lifecycles, composer, release manifests, controlled print stamp, mapping | 27 |
 | `layout` | `packages/layout` | ✅ | Layout tree, pagination, headers and footers per page, fields, incremental relayout, print HTML, pagination plugin | 59 |
 | `render-dom` | not a package | 🟡 | Page boundaries are widget decorations in the pagination plugin (`layout`) | (layout) |
 | `render-print` | not a package | 🟡 | `renderPrintHTML` in `layout`. No PDF writer | (layout) |
-| `export-docx` | `packages/export-docx` | ✅ | DOCX writer (subset), deterministic, loss report | 25 |
+| `export-docx` | `packages/export-docx` | ✅ | DOCX writer (subset), deterministic, loss report, LIMS fields as `DOCVARIABLE` | 29 |
 | `export-pdf` | not a package | ❌ | No PDF output inside the library. LibreOffice is used only in the CI fidelity script | — |
-| `import-docx` | `packages/import-docx` | ✅ | DOCX reader to IR, passthrough blocks, loss codes, heading detection | 27 |
-| `collaboration` | not a package | 🟡 | Y.js single-document binding in `core`. No per-section rooms and no service | (core) |
-| `review` | `packages/review` | ✅ | Durable track changes, review operations, comment threads and anchors, compare, views, snapshot restore | 37 |
-| `ai` | `packages/ai` | ✅ | AI command layer. Every output is a tracked proposal, policy checked twice | 24 |
-| `ui` | not a package | ❌ | No design system, ribbon, navigation pane or rulers | — |
-| `react` | `packages/react` | ✅ | Existing React bindings (0.1.x) | 18 |
-| `vue` | `packages/vue` | ✅ | Existing Vue bindings (0.1.x) | 46 |
-| `apps/` | `examples/` (0.1.x apps) | ❌ | No 2.0 playground, office demo or QMS demo | — |
+| `import-docx` | `packages/import-docx` | ✅ | DOCX reader to IR, passthrough blocks, loss codes, heading detection, LIMS fields | 29 |
+| `collaboration` | not a package | 🟡 | Y.js single-document binding in `core`, with seeding through `collaboration.sync`. No per-section rooms and no service | (core) |
+| `review` | `packages/review` | ✅ | Durable track changes, review operations, comment threads and anchors, compare, views, snapshot restore | 46 |
+| `ai` | `packages/ai` | ✅ | AI command layer. Every output is a tracked proposal, policy checked twice | 34 |
+| `ui` | not a package | 🟡 | React and Vue office shells (`packages/react/src/office`, `packages/vue/src/office`): ribbon, rulers, navigation pane, styles gallery, status bar, find and replace. No design system package | (in react, vue) |
+| `react` | `packages/react` | ✅ | React bindings, including the office shell | 71 |
+| `vue` | `packages/vue` | ✅ | Vue bindings, including the office shell | 97 |
+| `apps/` | `examples/` | ✅ | 2.0 scenarios in `examples/next-app/app/v2` and `examples/nuxt-vue/components/v2`, browser-verified. No standalone playground | — |
 | `services/collaboration` | not a package | ❌ | No authenticated sync service | — |
-| `tests/` | `tests/conformance` | ✅ | Synthetic corpus, round trip, editor, DOCX, security, tables, layout, fidelity script, vertical slice | 243 |
+| `tests/` | `tests/conformance` | ✅ | Synthetic corpus, round trip, editor, DOCX, security, tables, layout, fidelity script, vertical slice | about 245 |
 
 Lab-specific rules are in the extension packages (`blocks-clinical`, `blocks-qms`), not in the kernel, as the
 roadmap requires. Core imports nothing from them.

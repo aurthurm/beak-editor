@@ -15,6 +15,7 @@ import type {
   TextStyles,
   UnknownInlineContent,
 } from './types';
+import { splitUnknownAttrs } from './unknownContent';
 
 /**
  * Fills the defaults of an input block: a generated `id` when missing or empty,
@@ -85,10 +86,10 @@ export function blockToNode(schema: Schema, input: PartialBlock): PMNode {
     });
   }
 
-  const attrs = {
+  const attrs = splitUnknownAttrs(nodeType.spec.attrs ?? {}, {
     ...propsToAttrs(nodeType.spec.blockPropAliases, block.props),
     id: block.id || uuid(),
-  };
+  });
 
   // List items: first paragraph from inline `content`, then optional nested blocks
   if (block.type === 'listItem') {
@@ -166,8 +167,8 @@ function warnUnknownOnce(kind: 'block' | 'inline', type: string): void {
   warnedUnknown.add(key);
   console.warn(
     kind === 'block'
-      ? `BeakBlock: unregistered block type "${type}" is kept as an unknownBlock and is not rendered.`
-      : `BeakBlock: unknown inline type "${type}" was dropped from the content.`
+      ? `BeakBlock: unregistered block type "${type}" is kept as an unsupported placeholder (unknownBlock) and is not editable.`
+      : `BeakBlock: unregistered inline type "${type}" is kept as an unsupported placeholder (unknownInline) and is not editable.`
   );
 }
 
@@ -254,11 +255,21 @@ export function inlineContentToNodes(schema: Schema, content: InlineContent[]): 
     const custom = raw as UnknownInlineContent;
     const nodeType = schema.nodes[custom.type];
     if (!nodeType || !nodeType.isInline) {
+      // Keep the item as an atom holding its JSON, so it serialises back unchanged.
+      const unknownType = schema.nodes.unknownInline;
       warnUnknownOnce('inline', custom.type);
-      return [];
+      if (!unknownType) return [];
+      return [
+        unknownType.create({
+          originalType: custom.type,
+          propsJson: custom.props === undefined ? null : JSON.stringify(custom.props),
+          contentJson: custom.content === undefined ? null : JSON.stringify(custom.content),
+        }),
+      ];
     }
     const children = custom.content ? inlineContentToNodes(schema, custom.content) : undefined;
-    return [nodeType.create(custom.props ?? {}, children)];
+    const attrs = splitUnknownAttrs(nodeType.spec.attrs ?? {}, { ...(custom.props ?? {}) });
+    return [nodeType.create(attrs, children)];
   });
 }
 

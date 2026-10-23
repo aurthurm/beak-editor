@@ -33,6 +33,8 @@ import { history as createHistoryPlugin } from 'prosemirror-history';
 import { v4 as uuid } from 'uuid';
 import { cloneJson } from '../utils/cloneJson';
 import { seedRoomOnce } from './collaborationSeed';
+import { collectUnknownContentIssues } from '../blocks/unknownContent';
+import type { ValidationIssue } from '../registry/types';
 
 import { ProseMirrorAPI } from '../pm/ProseMirrorAPI';
 import {
@@ -455,6 +457,21 @@ export class BeakBlockEditor {
   }
 
   /**
+   * Lists the content in the current document that the editor does not understand: unregistered
+   * block types (kept as read-only placeholders), unregistered inline items and props that no
+   * block type declares. Each issue names the block it concerns. The content is kept unchanged in
+   * {@link getDocument}; this only reports it.
+   *
+   * @example
+   * ```typescript
+   * for (const issue of editor.getLoadDiagnostics()) console.warn(issue.code, issue.blockId);
+   * ```
+   */
+  getLoadDiagnostics(): ValidationIssue[] {
+    return collectUnknownContentIssues(this.pm.doc);
+  }
+
+  /**
    * Replace the entire document content.
    *
    * By default the load is an ordinary edit, and plugins check it as one. Pass `trustedLoad: true`
@@ -484,7 +501,10 @@ export class BeakBlockEditor {
     // leaving the caller with the old document and no sign of why.
     if (blocks.length > 0 && this.pm.doc === before) {
       console.warn('BeakBlock: setDocument was rejected by a plugin; the previous document is still shown.');
+      return;
     }
+    const issues = this.getLoadDiagnostics();
+    if (issues.length > 0) this._emit('loadDiagnostics', { issues });
   }
 
   // ===========================================================================

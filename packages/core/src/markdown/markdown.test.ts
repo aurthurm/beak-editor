@@ -71,3 +71,24 @@ describe('looksLikeMarkdown', () => {
     expect(looksLikeMarkdown('Just a sentence.')).toBe(false);
   });
 });
+
+describe('blocksToMarkdown: unregistered content', () => {
+  it('writes an unregistered block with no text as its JSON in a fenced block', () => {
+    const block = { id: 'h-1', type: 'hologram', props: { depth: 4 } };
+    const md = blocksToMarkdown([block as never]);
+    expect(md).toContain('```beakblock-unknown');
+    expect(md).toContain('"type": "hologram"');
+    expect(md).toContain('"depth": 4');
+  });
+
+  it('writes an unregistered inline item as its JSON in inline code', () => {
+    const block = {
+      id: 'p-1',
+      type: 'paragraph',
+      props: {},
+      content: [{ type: 'text', text: 'Read ', styles: {} }, { type: 'mystery', props: { code: 'X-9' } }],
+    };
+    const md = blocksToMarkdown([block as never]);
+    expect(md).toContain('`{"type":"mystery","props":{"code":"X-9"}}`');
+  });
+});

@@ -71,6 +71,11 @@ export interface IRSource {
   list?: IRListMembership;
   /** Extension: original content/children kept verbatim for opaque block types. */
   raw?: { content?: unknown[]; children?: unknown[] };
+  /**
+   * Extension: true when the block type has no IR representation or `toIR` hook. Only its text is
+   * represented; the rest is in `props` and `raw`, and exporters that cannot write it should report it.
+   */
+  unknown?: boolean;
 }
 
 /** Table cell and row level look flags. */

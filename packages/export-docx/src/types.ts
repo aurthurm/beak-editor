@@ -42,6 +42,7 @@ export type BorderSpec = NonNullable<NonNullable<TableStyle['borders']>[keyof No
  * - `unknown-numbering`: a paragraph references a numbering instance that is not defined.
  * - `empty-table`: a table had no rows and was omitted.
  * - `inline-degraded`: a custom inline node was written as its plain-text fallback (info level).
+ * - `unknown-block`: an unregistered block type was written as its text only; its props were not exported (info level).
  */
 export type ExportLossCode =
   | 'image-remote'
@@ -52,6 +53,7 @@ export type ExportLossCode =
   | 'field-target-missing'
   | 'inline-degraded'
   | 'unknown-numbering'
+  | 'unknown-block'
   | 'empty-table';
 
 /** One thing the export could not represent exactly. */

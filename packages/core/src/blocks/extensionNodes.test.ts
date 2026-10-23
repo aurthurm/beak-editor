@@ -6,7 +6,7 @@ import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import type { NodeSpec } from 'prosemirror-model';
 import { createSchema } from '../schema';
 import { blocksToDoc, docToBlocks } from './index';
-import type { Block } from './types';
+import type { Block, InlineContent } from './types';
 
 // Register the test-only `mention` inline node so it joins the InlineContent union.
 declare module './types' {
@@ -64,18 +64,19 @@ describe('extension inline nodes', () => {
     expect(out[0]!.content).toEqual(sample[0]!.content);
   });
 
-  it('drops inline nodes that are not in the schema', () => {
+  it('keeps inline nodes that are not in the schema as unknownInline items', () => {
     const plain = createSchema();
+    const mention = { type: 'mention', props: { userId: 'x' } } as unknown as InlineContent;
     const blocks: Block[] = [
       {
         id: 'p',
         type: 'paragraph',
         props: {},
-        content: [text('a'), { type: 'mention', props: { userId: 'x' } }, text('b')],
+        content: [text('a'), mention, text('b')],
       },
     ];
     const out = docToBlocks(blocksToDoc(plain, blocks));
-    expect(out[0]!.content).toEqual([text('ab')]);
+    expect(out[0]!.content).toEqual([text('a'), mention, text('b')]);
   });
 });
 

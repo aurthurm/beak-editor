@@ -102,6 +102,7 @@ BeakBlock 2.0 is in alpha. Existing `Block[]` content and 0.1.x APIs keep workin
 - **Block ids** are unique and stable. Enter, list-item splits, paste and duplicate ids in loaded content no longer produce two blocks with the same id. The block that keeps the original text keeps the id, and remote Yjs changes are never re-identified. Paragraphs inside list items and table cells get a deterministic id (`${ownerId}/p`), so repeated `getDocument()` calls and version diffs no longer report spurious changes.
 - **Ctrl+Enter** splits the paragraph around the page break, or adds a new paragraph after it at the end of a block, as in Word.
 - **Live collaboration** no longer opens blank in a fresh room: `ySyncPlugin` used to replace the initial content with the empty shared fragment.
+- **Unknown content is kept, not dropped.** Unregistered block types load as `unknownBlock` placeholders, unknown inline nodes as `unknownInline` chips, and undeclared props are stored in `unknownProps`; all round-trip through `getDocument()`. `editor.getLoadDiagnostics()` and the `loadDiagnostics` event report them.
 - **QMS extension** injects its stylesheet by default (`injectStyles: false` to opt out), like the Office and Clinical extensions.
 
 ### Deprecated
@@ -111,7 +112,7 @@ BeakBlock 2.0 is in alpha. Existing `Block[]` content and 0.1.x APIs keep workin
 
 ### Known issues
 
-- The IR drops some custom inline nodes and empty checklists silently, and the editor does not load signed signature blocks through `setDocument`. The server verifier does not protect signature attributes. See [`docs/2.0/status.md`](docs/2.0/status.md#known-defects) for the full list and the tests that track each one.
+- No conformance defects are pinned at present. DOCX export writes the text of unregistered blocks and reports an info `unknown-block` loss, and Markdown export keeps unregistered blocks only when they have no text. See [`docs/2.0/status.md`](docs/2.0/status.md#known-defects) for what is fixed and what is not done.
 
 ## [0.1.2] - 2026-04-18
 

@@ -39,7 +39,7 @@ complete and what is not.
 - `new BeakBlockEditor(config)` with no new options behaves as in 0.1.x. The new `mode` option defaults to
   `'block'`, which keeps block chrome (drag handles, slash menu). `wordBehaviour` defaults to `false` in block
   mode.
-- Core's own test suite (175 tests) passes on this branch. Every other package's suite also passes. Run them
+- Core's own test suite (about 290 tests) passes in this repository. Every other package's suite also passes. Run them
   with `pnpm --filter "./packages/*" run test`.
 - Breaking changes, if any are introduced before 2.0.0 final, will be listed in `CHANGELOG.md`.
 
@@ -245,22 +245,13 @@ const html = renderPrintHTML(ir, layout, { title: 'SOP-LAB-0012', controlledCopy
 
 ## Known limitations to plan around
 
-These are the defects found by the conformance suite on the 2.0 alpha. Each one has a test that fails
-while the defect exists (`it.fails`), so the list is kept honest. The full status is in [`status.md`](./status.md).
+The defects the conformance suite found on the 2.0 alpha are fixed (see the "Fixed in 2.0 alpha" table in
+[`status.md`](./status.md)). The limitations that remain are below. The full status is in [`status.md`](./status.md).
 
 | Area | Limitation | Workaround |
 | --- | --- | --- |
-| IR | Custom inline nodes (footnote, cross-reference, variables, document identifier, inline equations) are dropped silently by `documentToIR`. | Keep those documents in `Block[]` until fixed, or check the round trip before migrating. |
-| IR | An empty `checkList` block is dropped. | Give checklists at least one item. |
-| IR | Lists nested deeper than eight levels emit numbering levels that do not exist (validation error). | Keep nesting to eight levels or fewer. |
-| Editor | `setDocument` silently rejects the whole document if it contains a signed `signatureBlock`. The editor then shows an empty paragraph. | Load released documents through the signature service path (a transaction with the service meta). |
-| Editor | `sopStep` and `safetyWarning` take block children. Inline text on these types is dropped, and the step-numbering plugin then throws `RangeError`. | Put text in a child paragraph. |
-| Editor | Unregistered block types (for example a block from a newer build) load as empty paragraphs, silently. | Register every block type your documents use before loading. |
-| Editor | QMS atoms lose `props.id` when it differs from the block id. | Use the block id as the identifier. |
-| Editor | `caption` `number` is read by the definition but is not a node attribute, so it is dropped. | Let the `SEQ` field carry the number. |
-| Permissions | The server verifier does not protect `signatureBlock`, `approvalBlock` or `revisionHistory` attributes. A principal with `document.editUncontrolled` can change them. | Reject submissions that change signature blocks in your own save path until fixed. |
-| DOCX | LIMS fields are written as their fallback text and read back as plain text. | Use `DOCPROPERTY` or `REF` fields where a round trip matters. |
-| DOCX | Footnote bodies, floating objects, multi-column, watermarks and page-number restart are not written. Control characters are removed. Bookmark names are sanitised. | Read `report.losses` after each export. |
-| Tables | Random merge and delete sequences can leave a cell's `colwidth` shorter than its `colspan` (not yet minimised). Grids stay valid. | Recompute widths from the grid after a merge. |
+| DOCX | Footnote bodies are not exported (the export reports `footnote-unsupported`). Floating objects, multi-column, watermarks and page-number restart are not written. Control characters are removed. Bookmark names are sanitised. | Read `report.losses` after each export. |
+| DOCX | A `REF` field whose target has no bookmark is reported as `field-target-missing`. | Check `report.losses` for `field-target-missing`. |
 | Layout | Floating objects, text wrapping, multi-column, footnote allocation, and per-section page-number restart are not laid out. | Expect page counts to drift for those documents. |
+| Collaboration | Single-document Y.js only. No reconnect policy and no offline conflict policy. | Test reconnect and offline behaviour in your own application. |
 | Fonts | Font files are not bundled. The heuristic measurer approximates metrics. | Bundle Carlito, Caladea and Liberation yourself until they ship. |

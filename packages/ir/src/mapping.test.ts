@@ -316,6 +316,27 @@ describe('unknown block types', () => {
     expect(paragraph.type).toBe('paragraph');
     expect(paragraph.runs).toEqual([expect.objectContaining({ type: 'run', text: 'projected' })]);
     expect(paragraph.source).toMatchObject({ blockType: 'hologram', blockId: 'mystery-1', props: { depth: 3 } });
+    expect(paragraph.source?.unknown).toBe(true);
+  });
+
+  it('keeps an unknown inline item as a custom inline with its props and content', () => {
+    const block = {
+      id: 'p-mystery',
+      type: 'paragraph',
+      props: {},
+      content: [
+        text('Inline: '),
+        { type: 'mystery', props: { code: 'X-9' } },
+        text(' continues.'),
+      ] as unknown as Block['content'],
+    } as Block;
+    const paragraph = bodyOf([block])[0] as IRParagraph;
+    expect(paragraph.runs).toEqual([
+      expect.objectContaining({ type: 'run', text: 'Inline: ' }),
+      expect.objectContaining({ type: 'custom', inlineType: 'mystery', props: { code: 'X-9' } }),
+      expect.objectContaining({ type: 'run', text: ' continues.' }),
+    ]);
+    expect(paragraph.source?.unknown).toBeUndefined();
   });
 
   it('reconstructs unknown blocks exactly', () => {

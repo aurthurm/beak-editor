@@ -461,6 +461,27 @@ describe('LIMS fields and custom inline nodes', () => {
     expect(xml).toMatch(/<w:b\/><\/w:rPr><w:t xml:space="preserve">note<\/w:t>/);
     expect(xml).toContain('>See <');
   });
+
+  it('reports an unregistered block as a loss, since only its text is written', async () => {
+    const ir = irWithBody([
+      {
+        type: 'paragraph',
+        props: {},
+        runs: [{ type: 'run', text: 'projected', props: {} }],
+        source: { blockType: 'hologram', blockId: 'h-1', props: { depth: 4 }, unknown: true },
+      } as IRBlock,
+    ]);
+    const { report } = await exportDocxWithReport(ir);
+    expect(report.losses).toEqual([expect.objectContaining({ code: 'unknown-block', blockId: 'h-1', severity: 'info' })]);
+  });
+
+  it('reports nothing for a registered paragraph', async () => {
+    const ir = irWithBody([
+      { type: 'paragraph', props: {}, runs: [{ type: 'run', text: 'plain', props: {} }], source: { blockType: 'paragraph', blockId: 'p-1', props: {} } } as IRBlock,
+    ]);
+    const { report } = await exportDocxWithReport(ir);
+    expect(report.losses).toEqual([]);
+  });
 });
 
 describe('paragraph line spacing units', () => {

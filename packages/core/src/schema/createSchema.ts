@@ -20,6 +20,8 @@ import {
   codeBlockNode,
   dividerNode,
   unknownBlockNode,
+  unknownInlineNode,
+  withUnknownPropsAttr,
   bulletListNode,
   orderedListNode,
   listItemNode,
@@ -69,6 +71,7 @@ export const DEFAULT_NODES = {
   codeBlock: codeBlockNode,
   divider: dividerNode,
   unknownBlock: unknownBlockNode,
+  unknownInline: unknownInlineNode,
   bulletList: bulletListNode,
   orderedList: orderedListNode,
   listItem: listItemNode,
@@ -130,8 +133,12 @@ export function createSchema(
   customNodes?: Record<string, NodeSpec>,
   customMarks?: Record<string, MarkSpec>
 ): Schema {
+  const nodes: Record<string, NodeSpec> = { ...DEFAULT_NODES, ...customNodes };
+  for (const [name, spec] of Object.entries(nodes)) {
+    nodes[name] = withUnknownPropsAttr(name, spec);
+  }
   return new Schema({
-    nodes: { ...DEFAULT_NODES, ...customNodes },
+    nodes,
     marks: { ...DEFAULT_MARKS, ...customMarks },
   });
 }

@@ -355,6 +355,16 @@ export class DocxWriter {
 
   private paragraph(p: IRParagraph, sectPr?: string): string {
     const blockId = p.source?.blockId;
+    if (p.source?.unknown) {
+      // The block type is not known to the exporter: only its text is written, its props are not.
+      // The text is present, so this is a degraded rendering (info), not a missing one.
+      this.loss(
+        'unknown-block',
+        `Unregistered block "${p.source.blockType}" was written as its text only; its props were not exported`,
+        blockId,
+        'info',
+      );
+    }
     const numPr = this.numPr(p.props.numbering, blockId);
     const inner = paragraphPropsInner(p.props, { pStyle: p.props.styleId, numPr });
     const bookmark = this.bookmark(blockId);

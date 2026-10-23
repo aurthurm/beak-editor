@@ -19,6 +19,8 @@ import type {
   UnknownInlineContent,
 } from './types';
 import { OFFICE_PARAGRAPH_ATTR_NAMES } from '../schema/nodes/officeParagraph';
+import { UNKNOWN_PROPS_ATTR } from '../schema/nodes/unknownProps';
+import { parseUnknownProps, propsFromAttrs, unknownInlineToItem } from './unknownContent';
 
 /**
  * Node types whose office paragraph attributes are omitted from props when unset.
@@ -94,7 +96,7 @@ export function nodeToBlock(node: PMNode): Block {
     return {
       id: String(node.attrs.id || uuid()),
       type: 'tableOfContents',
-      props: { items },
+      props: { items, ...parseUnknownProps(node.attrs[UNKNOWN_PROPS_ATTR]) },
     };
   }
 
@@ -102,7 +104,8 @@ export function nodeToBlock(node: PMNode): Block {
     return unknownBlockToBlock(node);
   }
 
-  const { id, ...rawProps } = node.attrs;
+  const { id, ...attrsWithoutId } = node.attrs;
+  const { [UNKNOWN_PROPS_ATTR]: unknownPropsJson, ...rawProps } = attrsWithoutId;
   const props: Record<string, unknown> = { ...rawProps };
 
   // Reverse of blockPropAliases: the aliased attr is written back under the block prop name.
@@ -133,6 +136,9 @@ export function nodeToBlock(node: PMNode): Block {
   if (node.type.name === 'sectionBreak' && props.pageSetup == null) {
     delete props.pageSetup;
   }
+
+  // Props the schema does not declare were stored as JSON; they go back exactly as loaded.
+  Object.assign(props, parseUnknownProps(unknownPropsJson));
 
   const block: Block = {
     id: id || uuid(),
@@ -199,7 +205,7 @@ export function nodeToBlock(node: PMNode): Block {
  * @param child - An inline, non-text node that is not built in
  */
 function customInlineContent(child: PMNode): UnknownInlineContent {
-  const item: UnknownInlineContent = { type: child.type.name, props: { ...child.attrs } };
+  const item: UnknownInlineContent = { type: child.type.name, props: propsFromAttrs(child.attrs) };
   if (child.childCount > 0) item.content = nodeContentToInline(child);
   return item;
 }
@@ -297,8 +303,11 @@ function nodeContentToInline(node: PMNode): InlineContent[] {
     if (!child.isText) {
       // Extension inline node: keep its type, attrs and any inline children
       flushLink();
+      // Unregistered inline items were kept as JSON; they go back as the original object.
       // Unregistered extension nodes pass through as loose objects; see UnknownInlineContent.
-      content.push(customInlineContent(child) as InlineContent);
+      content.push(
+        (child.type.name === 'unknownInline' ? unknownInlineToItem(child) : customInlineContent(child)) as InlineContent
+      );
     }
   });
 

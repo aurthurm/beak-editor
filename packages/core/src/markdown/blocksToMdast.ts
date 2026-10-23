@@ -9,6 +9,7 @@ import type {
   Blockquote,
   Code,
   Heading,
+  InlineCode,
   List,
   ListItem,
   Paragraph,
@@ -23,6 +24,9 @@ import type {
 } from 'mdast';
 import type { Block, InlineContent, TextStyles } from '../blocks/types';
 import { isBuiltinInline } from '../blocks/inlineGuards';
+
+/** Fence language used for blocks that have no text and are written as their JSON. */
+export const UNKNOWN_BLOCK_FENCE = 'beakblock-unknown';
 
 function escapeHtml(s: string): string {
   return s
@@ -70,7 +74,12 @@ function inlineToPhrasing(content: InlineContent[] | undefined): PhrasingContent
   if (!content?.length) return [];
   const out: PhrasingContent[] = [];
   for (const raw of content) {
-    if (!isBuiltinInline(raw)) continue;
+    if (!isBuiltinInline(raw)) {
+      // An inline item the exporter does not know (an unregistered type) is written as its JSON.
+      const unknown: InlineCode = { type: 'inlineCode', value: JSON.stringify(raw) };
+      out.push(unknown);
+      continue;
+    }
     const item = raw;
     if (item.type === 'hardBreak') {
       out.push({ type: 'break' });
@@ -229,6 +238,16 @@ function blockToMdast(block: Block): RootContent[] {
     default:
       if (block.children?.length) {
         return block.children.flatMap((c) => blockToMdast(c));
+      }
+      // A block with no text (for example an unregistered block type) has nothing to show as a
+      // paragraph, so its JSON is written as a fenced block instead of being lost.
+      if (!block.content?.length) {
+        const fenced: Code = {
+          type: 'code',
+          lang: UNKNOWN_BLOCK_FENCE,
+          value: JSON.stringify(block, null, 2),
+        };
+        return [fenced];
       }
       return [
         {

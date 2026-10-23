@@ -32,10 +32,7 @@ function allExtensions(): BeakExtension[] {
 }
 
 /** Known editor defects that make the whole document fail, keyed by corpus id. */
-const KNOWN_EDITOR_BUGS: Record<string, string> = {
-  'pathological-unknown-types':
-    'unregistered block types (hologram, telemetry) load as empty paragraphs and unknown inline nodes are dropped, silently',
-};
+const KNOWN_EDITOR_BUGS: Record<string, string> = {};
 
 /**
  * Corpus documents that were released and saved with signed signatures. They load with

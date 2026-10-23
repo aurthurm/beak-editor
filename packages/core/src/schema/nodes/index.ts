@@ -47,6 +47,8 @@ export { checkListNode, checkListItemNode } from './checkList';
 
 // Unregistered blocks
 export { unknownBlockNode } from './unknownBlock';
+export { unknownInlineNode } from './unknownInline';
+export { UNKNOWN_PROPS_ATTR, withUnknownPropsAttr } from './unknownProps';
 
 // Table of contents
 export { tableOfContentsNode } from './tableOfContents';

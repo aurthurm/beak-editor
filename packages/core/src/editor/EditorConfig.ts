@@ -13,6 +13,7 @@ import type { Block, PartialBlock } from '../blocks/types';
 import type { InputRulesConfig } from '../plugins/inputRules';
 import type { DocumentVersion, VersioningAdapter } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
+import type { ValidationIssue } from '../registry/types';
 import type { ComplianceLockPluginOptions } from '../plugins/complianceLockPlugin';
 import type { DragDropConfig } from '../plugins/dragDropPlugin';
 import type { BeakExtension, EditorMode } from '../extensions';
@@ -133,6 +134,11 @@ export interface EditorEvents {
   trackChange: { entry: TrackedChangeRecord };
   /** The editor mode changed (see {@link BeakBlockEditor.setMode}) */
   modeChange: { mode: EditorMode; previousMode: EditorMode };
+  /**
+   * A whole-document load was accepted and contains content the editor does not understand. The
+   * issues are the same as {@link BeakBlockEditor.getLoadDiagnostics}. Not emitted for a clean load.
+   */
+  loadDiagnostics: { issues: ValidationIssue[] };
 }
 
 /**
