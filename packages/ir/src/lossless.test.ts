@@ -1,4 +1,4 @@
-import type { Block } from '@amusendame/beakblock-core';
+import type { Block, InlineContent } from '@amusendame/beakblock-core';
 import { blocksToDocument, documentToBlocks } from '@amusendame/beakblock-schema';
 import { describe, expect, it } from 'vitest';
 
@@ -27,6 +27,8 @@ describe('custom inline nodes', () => {
     id: 'p-inline',
     type: 'paragraph',
     props: {},
+    // Extension inline nodes are not registered in core's CustomInlineContentRegistry, so the
+    // list is cast. The IR mapping under test is runtime behaviour.
     content: [
       { type: 'text', text: 'SOP-QA-0101 ', styles: {} },
       { type: 'documentIdentifier', props: { id: 'docid-1', property: 'docNumberRevision', fallback: 'SOP-QA-0101 r3' } },
@@ -35,7 +37,7 @@ describe('custom inline nodes', () => {
       { type: 'variable', props: { name: 'operatorName', format: null } },
       { type: 'mystery', props: { code: 'X-9' } },
       { type: 'text', text: ' end', styles: {} },
-    ],
+    ] as unknown as InlineContent[],
   };
 
   it('maps custom inline nodes to IR custom inlines with a plain-text fallback', () => {

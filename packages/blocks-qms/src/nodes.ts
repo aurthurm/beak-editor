@@ -9,6 +9,15 @@
 
 import type { DOMOutputSpec, NodeSpec, Node as PMNode } from 'prosemirror-model';
 
+// Register the QMS inline atom so `InlineContent` narrows on `type === 'documentIdentifier'`.
+declare module '@amusendame/beakblock-core' {
+  interface CustomInlineContentRegistry {
+    documentIdentifier: {
+      props: { id?: string | null; property?: string; fallback?: string | null };
+    };
+  }
+}
+
 /** Parses a JSON-encoded attribute from the DOM, falling back to a default. */
 function parseJsonAttr<T>(value: string | null, fallback: T): T {
   if (value === null || value === '') return fallback;

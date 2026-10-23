@@ -139,6 +139,7 @@ export async function saveSectionApproval(record: SectionApprovalRecord): Promis
     const tx = db.transaction(APPROVALS_STORE, 'readwrite');
     tx.oncomplete = (): void => resolve();
     tx.onerror = (): void => reject(tx.error ?? new Error('write approval'));
-    tx.objectStore(APPROVALS_STORE).put(normalizeSectionApprovalRecord(record));
+    // Plain JSON copy: records built from reactive state carry Vue proxies that IndexedDB cannot clone.
+    tx.objectStore(APPROVALS_STORE).put(JSON.parse(JSON.stringify(normalizeSectionApprovalRecord(record))));
   });
 }

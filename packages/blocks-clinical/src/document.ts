@@ -160,7 +160,7 @@ export function validateClinicalDocument(blocks: Block[], options: ClinicalDocum
     for (const { block, path } of all) {
       for (const item of block.content ?? []) {
         if (item.type === 'equipmentReference') {
-          issues.push(...equipmentIssues((item as { props?: Record<string, unknown> }).props ?? {}, options.equipmentCache, path));
+          issues.push(...equipmentIssues(item.props, options.equipmentCache, path));
         }
       }
     }

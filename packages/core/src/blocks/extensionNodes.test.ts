@@ -7,6 +7,13 @@ import type { NodeSpec } from 'prosemirror-model';
 import { createSchema } from '../schema';
 import { blocksToDoc, docToBlocks } from './index';
 import type { Block } from './types';
+
+// Register the test-only `mention` inline node so it joins the InlineContent union.
+declare module './types' {
+  interface CustomInlineContentRegistry {
+    mention: { props: { userId: string; label?: string } };
+  }
+}
 import { BeakBlockEditor } from '../editor/Editor';
 
 const mentionSpec: NodeSpec = {

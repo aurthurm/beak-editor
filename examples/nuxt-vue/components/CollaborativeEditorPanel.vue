@@ -2,7 +2,7 @@
 import { computed, nextTick, ref, watch } from 'vue';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { ySyncPlugin, yCursorPlugin, yUndoPlugin } from 'y-prosemirror';
+import { prosemirrorToYXmlFragment, ySyncPlugin, yCursorPlugin, yUndoPlugin } from 'y-prosemirror';
 import type { Transaction } from 'prosemirror-state';
 import {
   BeakBlockView,
@@ -18,7 +18,7 @@ import {
   useEditorContent,
 } from '@amusendame/beakblock-vue';
 import { createCommentPlugin, InMemoryCommentStore } from '@amusendame/beakblock-core';
-import type { BeakBlockEditor, Block } from '@amusendame/beakblock-core';
+import type { BeakBlockEditor, Block, PartialBlock } from '@amusendame/beakblock-core';
 
 const emit = defineEmits<{
   ai: [mode: 'bubble' | 'slash'];
@@ -69,7 +69,7 @@ const wsDisplay = computed(() => {
 const commentStore = new InMemoryCommentStore();
 const customBlocks = [createChartBlockSpec()];
 
-const collabSeed: Block[] = [
+const collabSeed: PartialBlock[] = [
   {
     type: 'paragraph',
     content: [
@@ -149,8 +149,10 @@ watch(
     });
 
     const fragment = ydoc.getXmlFragment('prosemirror');
+    // Plugins attach after the provider syncs; an empty room is seeded with the editor's initial content.
     ed.enableCollaboration({
       plugins: [ySyncPlugin(fragment), yCursorPlugin(provider.awareness), yUndoPlugin()],
+      sync: { provider, ydoc, fragment, seed: (doc) => prosemirrorToYXmlFragment(doc, fragment) },
     });
 
     void nextTick(() => {

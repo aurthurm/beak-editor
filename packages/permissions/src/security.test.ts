@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { verifyDocumentChange } from './verify';
-import type { Block } from '@amusendame/beakblock-core';
+import type { Block, InlineContent } from '@amusendame/beakblock-core';
 import type { PolicyContext } from './types';
 
 const text = (id: string, value: string): Block => ({
@@ -259,7 +259,8 @@ describe('server-side verification: service-owned nodes', () => {
         props: {},
         content: [
           { type: 'text', text: 'SOP ', styles: {} },
-          { type: 'documentIdentifier', props: { id: 'docid-1', fallback: value } },
+          // Extension inline node, not registered in core's CustomInlineContentRegistry.
+          { type: 'documentIdentifier', props: { id: 'docid-1', fallback: value } } as unknown as InlineContent,
         ],
       },
     ];

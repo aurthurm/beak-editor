@@ -21,9 +21,10 @@
  * @module
  */
 
-import { Plugin, PluginKey, EditorState, Transaction } from 'prosemirror-state';
+import { Plugin, PluginKey, EditorState, Transaction, TextSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { Schema, NodeType } from 'prosemirror-model';
+import { Fragment } from 'prosemirror-model';
 import { keydownHandler } from 'prosemirror-keymap';
 import { liftListItem, sinkListItem } from 'prosemirror-schema-list';
 
@@ -148,11 +149,52 @@ export function createWordKeymapPlugin(options: WordKeymapOptions): Plugin {
   /** Set by Mod-Shift-v when the Clipboard API is unavailable. */
   let plainPasteArmed = false;
 
+  /**
+   * Inserts a page break the way Word does. The break always sits between two blocks, and the caret
+   * ends up in a block after it:
+   * - Mid-paragraph: the paragraph splits, the break goes between the halves, the caret starts the second half.
+   * - End of a block: the break goes after the block, followed by a new empty paragraph holding the caret.
+   * - Start of a block (including an empty one): the break goes before the block, the caret stays at its start.
+   *
+   * Textblocks nested in containers (table cells, list items, columns) keep the plain insertion.
+   */
   const insertPageBreak: Command = (state, dispatch) => {
-    if (!pageBreak) return false;
+    if (!pageBreak || !paragraph) return false;
     if (inTable(state)) return false;
     if (dispatch) {
-      const tr = state.tr.replaceSelectionWith(pageBreak.create(), false);
+      const tr = state.tr;
+      const brk = pageBreak.create();
+      if (!tr.selection.empty) tr.deleteSelection();
+      const { $from } = tr.selection;
+      const parent = $from.parent;
+      const atTopLevel = $from.depth === 1;
+
+      if (!parent.isTextblock || !atTopLevel) {
+        tr.replaceSelectionWith(pageBreak.create(), false);
+        dispatch(tr.scrollIntoView());
+        return true;
+      }
+
+      const offset = $from.parentOffset;
+      if (offset === 0) {
+        // Break before the block; the caret moves with the block it was in.
+        const caret = $from.pos;
+        tr.insert($from.before(), brk);
+        tr.setSelection(TextSelection.create(tr.doc, caret + brk.nodeSize));
+      } else if (offset === parent.content.size) {
+        // Break after the block, then a new empty paragraph that takes the caret.
+        const after = $from.after();
+        const next = paragraph.create();
+        tr.insert(after, Fragment.from([brk, next]));
+        tr.setSelection(TextSelection.create(tr.doc, after + brk.nodeSize + 1));
+      } else {
+        // Split so the break lands between two paragraphs; the second half gets a fresh id.
+        const splitAt = $from.pos;
+        tr.split(splitAt, 1, [{ type: paragraph, attrs: { ...parent.attrs, id: null } }]);
+        const boundary = splitAt + 1;
+        tr.insert(boundary, brk);
+        tr.setSelection(TextSelection.create(tr.doc, boundary + brk.nodeSize + 1));
+      }
       dispatch(tr.scrollIntoView());
     }
     return true;

@@ -74,7 +74,9 @@ function sectionRange(editor: BeakBlockEditor, sectionId: string): { from: numbe
       if (range) return false;
       if (child.isTextblock && child.textContent.length > 0) {
         const start = pos + 1 + childPos + 1;
-        range = { from: start, to: start + Math.min(child.textContent.length, 40) };
+        const text = child.textContent;
+        const sentenceEnd = text.search(/[.!?](\s|$)/);
+        range = { from: start, to: start + (sentenceEnd >= 0 ? sentenceEnd + 1 : text.length) };
         return false;
       }
       return true;

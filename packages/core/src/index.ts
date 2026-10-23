@@ -36,6 +36,11 @@ export type {
   EditorEvents,
   EventHandler,
   CollaborationConfig,
+  CollaborationSyncConfig,
+  CollaborationSyncSource,
+  CollaborationDocLike,
+  CollaborationFragmentLike,
+  CollaborationMapLike,
   TrackChangesConfig,
   ComplianceLockPluginOptions,
 } from './editor';
@@ -137,7 +142,7 @@ export {
 // BLOCKS
 // ===========================================================================
 
-export { blockToNode, nodeToBlock, blocksToDoc, docToBlocks } from './blocks';
+export { blockToNode, nodeToBlock, blocksToDoc, docToBlocks, normalizeBlock } from './blocks';
 export type {
   Block,
   PartialBlock,
@@ -151,6 +156,8 @@ export type {
   InlineContent,
   BuiltinInlineContent,
   CustomInlineContent,
+CustomInlineContentRegistry,
+UnknownInlineContent,
 } from './blocks';
 export { isBuiltinInline, isStyledText } from './blocks';
 

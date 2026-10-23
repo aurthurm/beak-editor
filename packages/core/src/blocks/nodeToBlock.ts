@@ -9,7 +9,6 @@ import { v4 as uuid } from 'uuid';
 
 import type {
   Block,
-  CustomInlineContent,
   FieldContent,
   IconContent,
   InlineContent,
@@ -17,6 +16,7 @@ import type {
   RevisionStyle,
   StyledText,
   TextStyles,
+  UnknownInlineContent,
 } from './types';
 import { OFFICE_PARAGRAPH_ATTR_NAMES } from '../schema/nodes/officeParagraph';
 
@@ -198,8 +198,8 @@ export function nodeToBlock(node: PMNode): Block {
  *
  * @param child - An inline, non-text node that is not built in
  */
-function customInlineContent(child: PMNode): CustomInlineContent {
-  const item: CustomInlineContent = { type: child.type.name, props: { ...child.attrs } };
+function customInlineContent(child: PMNode): UnknownInlineContent {
+  const item: UnknownInlineContent = { type: child.type.name, props: { ...child.attrs } };
   if (child.childCount > 0) item.content = nodeContentToInline(child);
   return item;
 }
@@ -297,7 +297,8 @@ function nodeContentToInline(node: PMNode): InlineContent[] {
     if (!child.isText) {
       // Extension inline node: keep its type, attrs and any inline children
       flushLink();
-      content.push(customInlineContent(child));
+      // Unregistered extension nodes pass through as loose objects; see UnknownInlineContent.
+      content.push(customInlineContent(child) as InlineContent);
     }
   });
 

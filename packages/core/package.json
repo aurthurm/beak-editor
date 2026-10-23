@@ -39,6 +39,7 @@
     "dev": "vite build --watch",
     "lint": "eslint src",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit -p .",
     "test:watch": "vitest",
     "clean": "rm -rf dist"
   },

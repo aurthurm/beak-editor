@@ -7,7 +7,37 @@
 import { Schema, Node as PMNode, Mark } from 'prosemirror-model';
 import { v4 as uuid } from 'uuid';
 
-import type { Block, BuiltinInlineContent, CustomInlineContent, InlineContent, TextStyles } from './types';
+import type {
+  Block,
+  BuiltinInlineContent,
+  InlineContent,
+  PartialBlock,
+  TextStyles,
+  UnknownInlineContent,
+} from './types';
+
+/**
+ * Fills the defaults of an input block: a generated `id` when missing or empty,
+ * `props: {}` when missing, and the same for every child block.
+ *
+ * @param block - A block as supplied by the caller
+ * @returns A complete {@link Block}
+ */
+export function normalizeBlock(block: PartialBlock): Block {
+  const { children, ...rest } = block;
+  const out: Block = { ...rest, id: rest.id || uuid(), props: rest.props ?? {} };
+  if (children !== undefined) out.children = children.map(normalizeBlock);
+  return out;
+}
+
+/**
+ * Id of the paragraph that holds a container's inline text (a list item's first paragraph or a table
+ * cell's text block). It is derived from the owner's id, so loading the same blocks always yields the
+ * same ids and reading the document never mints a new one.
+ */
+export function implicitParagraphId(ownerId: string): string {
+  return `${ownerId}/p`;
+}
 
 /**
  * Converts a Block to a ProseMirror node.
@@ -34,7 +64,8 @@ import type { Block, BuiltinInlineContent, CustomInlineContent, InlineContent, T
  * @param block - The block to convert
  * @returns A ProseMirror Node
  */
-export function blockToNode(schema: Schema, block: Block): PMNode {
+export function blockToNode(schema: Schema, input: PartialBlock): PMNode {
+  const block = normalizeBlock(input);
   const nodeType = schema.nodes[block.type];
 
   if (!nodeType) {
@@ -63,7 +94,7 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
   if (block.type === 'listItem') {
     const paraContent =
       block.content && block.content.length > 0 ? inlineContentToNodes(schema, block.content) : [];
-    const parts: PMNode[] = [schema.node('paragraph', { id: uuid() }, paraContent)];
+    const parts: PMNode[] = [schema.node('paragraph', { id: implicitParagraphId(String(attrs.id)) }, paraContent)];
     if (block.children && block.children.length > 0) {
       for (const child of block.children) {
         parts.push(blockToNode(schema, child));
@@ -98,7 +129,11 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
 
   // Handle table cells - they need block content (default to paragraph if only inline content)
   if ((block.type === 'tableCell' || block.type === 'tableHeader') && block.content && !block.children) {
-    const paragraph = schema.node('paragraph', null, inlineContentToNodes(schema, block.content));
+    const paragraph = schema.node(
+      'paragraph',
+      { id: implicitParagraphId(String(attrs.id)) },
+      inlineContentToNodes(schema, block.content)
+    );
     return nodeType.create(attrs, [paragraph]);
   }
 
@@ -116,7 +151,7 @@ export function blockToNode(schema: Schema, block: Block): PMNode {
   const content = inlineContentToNodes(schema, block.content);
   // A node that holds blocks (for example a step's `block+`) gets its inline content wrapped in a paragraph.
   if (!nodeType.inlineContent && nodeType.isBlock && content.length > 0 && schema.nodes.paragraph) {
-    const wrapped = schema.node('paragraph', { id: uuid() }, content);
+    const wrapped = schema.node('paragraph', { id: implicitParagraphId(String(attrs.id)) }, content);
     return nodeType.createAndFill(attrs, [wrapped]) ?? nodeType.create(attrs, [wrapped]);
   }
   return nodeType.create(attrs, content);
@@ -216,7 +251,7 @@ export function inlineContentToNodes(schema: Schema, content: InlineContent[]): 
     }
 
     // Extension inline node: recreate from the schema by type name
-    const custom = raw as CustomInlineContent;
+    const custom = raw as UnknownInlineContent;
     const nodeType = schema.nodes[custom.type];
     if (!nodeType || !nodeType.isInline) {
       warnUnknownOnce('inline', custom.type);
@@ -289,7 +324,7 @@ export function stylesToMarks(schema: Schema, styles: TextStyles): readonly Mark
  * @param blocks - Array of blocks (optional)
  * @returns A ProseMirror document node
  */
-export function blocksToDoc(schema: Schema, blocks?: Block[]): PMNode {
+export function blocksToDoc(schema: Schema, blocks?: PartialBlock[]): PMNode {
   if (!blocks || blocks.length === 0) {
     // Create empty paragraph as default content
     return schema.node('doc', null, [

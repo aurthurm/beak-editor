@@ -118,15 +118,49 @@ export interface FieldContent {
 }
 
 /**
- * Union of all inline content types.
+ * Registry of extension (custom) inline node types.
+ *
+ * Extensions add their inline node types by augmenting this interface. Each
+ * key is the ProseMirror node name; the value holds the extra fields for that
+ * node (`props`, `content`). The `type` discriminant is added automatically.
+ *
+ * Because every registered type has a literal `type`, `InlineContent` narrows
+ * with plain comparisons (`if (item.type === 'text') item.styles`).
+ *
+ * @example
+ * ```typescript
+ * declare module '@amusendame/beakblock-core' {
+ *   interface CustomInlineContentRegistry {
+ *     mention: { props: { userId: string } };
+ *   }
+ * }
+ * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface CustomInlineContentRegistry {}
+
 /**
- * Inline node from an extension (any inline node type not built in).
+ * Inline node from an extension registered in {@link CustomInlineContentRegistry}.
  *
  * `props` holds the node attrs; `content` holds inline children for nodes
  * with inline content (omitted for atoms).
  */
-export interface CustomInlineContent {
+export type CustomInlineContent = {
+  [K in keyof CustomInlineContentRegistry]: {
+    type: K;
+    props?: Record<string, unknown>;
+    content?: InlineContent[];
+  } & CustomInlineContentRegistry[K];
+}[keyof CustomInlineContentRegistry];
+
+/**
+ * Loose shape for an inline node whose type is not in the registry.
+ *
+ * Use it only at runtime boundaries (for example when reading a node type the
+ * editor does not know about). It is not part of {@link InlineContent}, so it
+ * does not defeat discriminated narrowing.
+ */
+export interface UnknownInlineContent {
   type: string;
   props?: Record<string, unknown>;
   content?: InlineContent[];
@@ -140,6 +174,7 @@ export type BuiltinInlineContent =
   | HardBreakContent
   | FieldContent;
 
+/** Any inline content item: built-in kinds or registered extension kinds. */
 export type InlineContent = BuiltinInlineContent | CustomInlineContent;
 
 /**
@@ -182,14 +217,34 @@ export interface Block<
 }
 
 /**
- * Partial block for insertion/updates (id is optional).
+ * Block accepted as input (initial content, `setDocument`, `insertBlocks`).
  *
- * Used when creating new blocks - the ID will be auto-generated if not provided.
+ * Only `type` is required. A missing `id` is generated, a missing `props` becomes `{}`,
+ * and `children` are normalized the same way. Use {@link Block} for blocks read back
+ * from the editor, where both fields are always present.
+ *
+ * @example
+ * ```typescript
+ * const input: PartialBlock[] = [
+ *   { type: 'paragraph', content: [{ type: 'text', text: 'Hello', styles: {} }] },
+ * ];
+ * ```
  */
-export type PartialBlock<
+export interface PartialBlock<
   TType extends string = string,
   TProps extends Record<string, unknown> = Record<string, unknown>
-> = Omit<Block<TType, TProps>, 'id'> & { id?: string };
+> {
+  /** Optional identifier. Generated when omitted or empty. */
+  id?: string;
+  /** Block type (paragraph, heading, etc.) */
+  type: TType;
+  /** Block-specific properties. Defaults to `{}`. */
+  props?: TProps;
+  /** Inline content (for blocks with text) */
+  content?: InlineContent[];
+  /** Child blocks (for container blocks like columns). Normalized recursively. */
+  children?: PartialBlock[];
+}
 
 /**
  * Block identifier - can be a block ID string or block object.

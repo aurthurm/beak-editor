@@ -8,8 +8,8 @@
 
 import type { Plugin } from 'prosemirror-state';
 import type { NodeViewConstructor } from 'prosemirror-view';
-import type { MarkSpec, NodeSpec } from 'prosemirror-model';
-import type { Block } from '../blocks/types';
+import type { MarkSpec, NodeSpec, Node as ProseMirrorNode } from 'prosemirror-model';
+import type { Block, PartialBlock } from '../blocks/types';
 import type { InputRulesConfig } from '../plugins/inputRules';
 import type { DocumentVersion, VersioningAdapter } from '../versioning/types';
 import type { TrackedChangeRecord } from '../plugins/trackChangesPlugin';
@@ -42,12 +42,73 @@ export const EDITOR_MODES: readonly EditorMode[] = ['block', 'office', 'controll
  * };
  * ```
  */
+/**
+ * The part of a y-websocket (or compatible) provider that seeding needs.
+ * `synced` is true once the provider has received the server's state.
+ */
+export interface CollaborationSyncSource {
+  readonly synced?: boolean;
+  on(event: 'sync', listener: (isSynced: boolean) => void): unknown;
+  off(event: 'sync', listener: (isSynced: boolean) => void): unknown;
+}
+
+/** Minimal Y.Map surface used for the per-room seed marker. */
+export interface CollaborationMapLike {
+  has(key: string): boolean;
+  get(key: string): unknown;
+  set(key: string, value: unknown): unknown;
+  observe(listener: () => void): void;
+  unobserve(listener: () => void): void;
+}
+
+/** Minimal Y.XmlFragment surface used to detect and undo a lost seed race. */
+export interface CollaborationFragmentLike {
+  readonly length: number;
+  toArray(): unknown[];
+  delete(index: number, length?: number): void;
+}
+
+/** Minimal Y.Doc surface used for transactions and the seed marker map. */
+export interface CollaborationDocLike {
+  transact(fn: () => void, origin?: unknown): void;
+  getMap(name: string): CollaborationMapLike;
+}
+
+/**
+ * Sync-gated collaboration setup.
+ *
+ * When provided, collaboration plugins are not attached until the provider
+ * has synced, so the editor never binds to a fragment that has not yet
+ * received the room's state. If the room is empty after sync, `seed` writes
+ * the editor's current document into the shared fragment, at most once per room.
+ */
+export interface CollaborationSyncConfig {
+  /** Provider whose `sync` event signals that the room state has arrived. */
+  provider: CollaborationSyncSource;
+  /** The Y.Doc that owns `fragment`. */
+  ydoc: CollaborationDocLike;
+  /** The shared XML fragment that ySyncPlugin is bound to. */
+  fragment: CollaborationFragmentLike;
+  /**
+   * Writes `doc` into `fragment`, typically
+   * `(doc) => prosemirrorToYXmlFragment(doc, fragment)` from y-prosemirror.
+   * Omit to never seed (the room starts empty when it is empty).
+   */
+  seed?: (doc: ProseMirrorNode) => void;
+}
+
 export interface CollaborationConfig {
   /**
    * ProseMirror plugins for collaboration (e.g., from y-prosemirror).
    * Typically includes ySyncPlugin, yCursorPlugin, and yUndoPlugin.
    */
   plugins: Plugin[];
+  /**
+   * Optional sync gate and seeding. Strongly recommended for any room that
+   * may be shared by more than one client, including the first client to join.
+   * See {@link CollaborationSyncConfig}.
+   */
+  sync?: CollaborationSyncConfig;
 }
 
 /**
@@ -98,7 +159,7 @@ export type EventHandler<T> = (data: T) => void;
  * const config: EditorConfig = {
  *   element: document.getElementById('editor'),
  *   initialContent: [
- *     { id: '1', type: 'paragraph', props: {}, content: [] }
+ *     { type: 'paragraph', content: [{ type: 'text', text: 'Hello', styles: {} }] }
  *   ],
  *   editable: true,
  *   autoFocus: 'end',
@@ -116,7 +177,7 @@ export interface EditorConfig {
    * Initial document content as blocks.
    * If not provided, starts with an empty paragraph.
    */
-  initialContent?: Block[];
+  initialContent?: PartialBlock[];
 
   /**
    * Whether the editor is editable.

@@ -4,7 +4,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { BeakBlockEditor, type Block, type InlineContent } from '@amusendame/beakblock-core';
+import { BeakBlockEditor, type Block } from '@amusendame/beakblock-core';
 import { clinicalExtension } from '../clinical/extension';
 import { formsExtension } from '../forms/extension';
 import { officeBlocksExtension, refreshOfficeBlocks } from '@amusendame/beakblock-blocks-office';
@@ -31,7 +31,7 @@ function demoBlocks(procedureType: string): Block[] {
         }),
       ],
     }),
-    P('cl-intro', [plain('Equipment: '), { type: 'equipmentReference', props: { equipmentId: 'EQ-101' } } as unknown as InlineContent, plain('.')]),
+    P('cl-intro', [plain('Equipment: '), { type: 'equipmentReference', props: { equipmentId: 'EQ-101' } }, plain('.')]),
     b({ id: 'cl-step-1', type: 'sopStep', props: { critical: true, timeMinutes: 3 }, children: [P('cl-step-1-p', 'Fix the smear.')] }),
     b({ id: 'cl-step-2', type: 'sopStep', props: { critical: false, timeMinutes: 1 }, children: [P('cl-step-2-p', 'Flood with crystal violet.')] }),
     b({ id: 'cl-step-3', type: 'sopStep', props: { critical: false, timeMinutes: 0.5 }, children: [P('cl-step-3-p', 'Rinse with water.')] }),
@@ -40,9 +40,9 @@ function demoBlocks(procedureType: string): Block[] {
     b({ id: 'cl-f-calc', type: 'formCalculated', props: { name: 'totalMl', label: 'Total', expression: 'dose * 2', decimals: 2 } }),
     P('cl-note', [
       plain('Gram-positive cells retain crystal violet.'),
-      { type: 'footnote', props: { id: 'fn-1', text: 'Adapted from the reference method.' } } as unknown as InlineContent,
+      { type: 'footnote', props: { id: 'fn-1', text: 'Adapted from the reference method.' } },
       plain(' See '),
-      { type: 'crossReference', props: { targetId: 'cl-cap-1', display: 'text' } } as unknown as InlineContent,
+      { type: 'crossReference', props: { targetId: 'cl-cap-1', display: 'text' } },
       plain(' for the reagent set.'),
     ]),
     b({ id: 'cl-cap-1', type: 'caption', props: { label: 'Table' }, content: [plain('Reagents and expiry dates')] }),

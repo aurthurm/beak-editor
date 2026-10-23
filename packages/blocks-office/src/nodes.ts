@@ -12,6 +12,27 @@
 
 import type { NodeSpec, DOMOutputSpec, Node as PMNode } from 'prosemirror-model';
 
+// Register the office inline atoms so `InlineContent` narrows on their `type`.
+// Props mirror the node attrs; attrs with a `null` default are nullable.
+declare module '@amusendame/beakblock-core' {
+  interface CustomInlineContentRegistry {
+    footnote: { props: { id?: string | null; text?: string } };
+    endnote: { props: { id?: string | null; text?: string } };
+    inlineEquation: { props: { id?: string | null; latex?: string } };
+    crossReference: { props: { id?: string | null; targetId?: string; display?: string } };
+    variable: { props: { id?: string | null; name?: string; format?: string | null } };
+    computedValue: {
+      props: {
+        id?: string | null;
+        expression?: string;
+        format?: string;
+        decimals?: number;
+        unit?: string | null;
+      };
+    };
+  }
+}
+
 const ID_ATTR = { default: null };
 
 /** Footnote reference (inline atom). Numbered per document order by the plugin. */

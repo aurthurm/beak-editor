@@ -14,6 +14,21 @@ import type { DOMOutputSpec, NodeSpec, Node as PMNode } from 'prosemirror-model'
 import { attrsToDataAttr, labelledRowsDom, readDataAttrs } from '../dom';
 import { DEFAULT_REAGENT_COLUMNS } from './constants';
 
+// Register the inline atom so `InlineContent` narrows on `type === 'equipmentReference'`.
+declare module '@amusendame/beakblock-core' {
+  interface CustomInlineContentRegistry {
+    equipmentReference: {
+      props: {
+        id?: string | null;
+        equipmentId?: string | null;
+        code?: string | null;
+        name?: string | null;
+        status?: string | null;
+      };
+    };
+  }
+}
+
 const toNumberOrNull = (value: string | null): number | null => {
   if (value === null || value === '') return null;
   const parsed = Number(value);

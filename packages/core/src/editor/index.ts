@@ -12,6 +12,11 @@ export type {
   EditorEvents,
   EventHandler,
   CollaborationConfig,
+  CollaborationSyncConfig,
+  CollaborationSyncSource,
+  CollaborationDocLike,
+  CollaborationFragmentLike,
+  CollaborationMapLike,
   TrackChangesConfig,
   ReviewView,
 } from './EditorConfig';

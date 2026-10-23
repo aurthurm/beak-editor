@@ -7,6 +7,7 @@ import { TextSelection } from 'prosemirror-state';
 
 import { createCommentAnchor, createCommentAnchorFromSelection, reanchorComments } from './comments';
 import type { AnchoredComment } from './types';
+import { flattenBlocks } from './util';
 
 const blocks: Block[] = [
   {
@@ -156,5 +157,42 @@ describe('createCommentAnchorFromSelection', () => {
       offset: 11,
     });
     editor.destroy();
+  });
+});
+
+describe('comment anchors across a block split', () => {
+  it('a comment on p1 stays on the node that holds the original text after Enter at the start of the block', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const editor = new BeakBlockEditor({
+      element: container,
+      injectStyles: false,
+      initialContent: [
+        { id: 'p1', type: 'paragraph', props: {}, content: [{ type: 'text', text: 'Wear gloves at all times', styles: {} }] },
+      ],
+    });
+    try {
+      const anchor = createCommentAnchor(editor.getDocument(), 'p1', 5, 11);
+      expect(anchor.quote).toBe('gloves');
+
+      // Caret at the start of the paragraph: the original text moves to the second node.
+      let contentStart = -1;
+      editor.pm.doc.descendants((node, pos) => {
+        if (contentStart < 0 && node.isTextblock) contentStart = pos + 1;
+        return contentStart < 0;
+      });
+      editor.pm.dispatch(editor.pm.state.tr.split(contentStart));
+
+      const blocks = editor.getDocument();
+      expect(blocks.map((b) => b.id)[0]).not.toBe('p1');
+      const [out] = reanchorComments(blocks, [{ id: 'c1', anchor, thread: [], status: 'open' }]);
+      expect(out!.orphaned).toBe(false);
+      expect(out!.anchor.blockId).toBe('p1');
+      const kept = flattenBlocks(blocks).find((f) => f.block.id === 'p1');
+      expect(kept?.block.content).toEqual([{ type: 'text', text: 'Wear gloves at all times', styles: {} }]);
+    } finally {
+      editor.destroy();
+      container.remove();
+    }
   });
 });

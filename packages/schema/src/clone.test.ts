@@ -13,8 +13,8 @@ function reactive<T>(value: T): T {
 }
 
 const blocks: Block[] = [
-  { id: 'p-1', type: 'paragraph', props: { textAlign: 'left' }, content: [{ type: 'text', text: 'Hello' }] } as Block,
-  { id: 'h-1', type: 'heading', props: { level: 1 }, content: [{ type: 'text', text: 'Title' }] } as Block,
+  { id: 'p-1', type: 'paragraph', props: { textAlign: 'left' }, content: [{ type: 'text', text: 'Hello', styles: {} }] } as Block,
+  { id: 'h-1', type: 'heading', props: { level: 1 }, content: [{ type: 'text', text: 'Title', styles: {} }] } as Block,
 ];
 
 describe('cloning reactive block data', () => {

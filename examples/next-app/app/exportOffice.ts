@@ -3,7 +3,7 @@
  * Not part of `@amusendame/beakblock-core`.
  */
 
-import { blocksToMarkdown, isBuiltinInline, type Block, type InlineContent } from '@amusendame/beakblock-core';
+import { blocksToMarkdown, type Block, type InlineContent } from '@amusendame/beakblock-core';
 import type { ExternalHyperlink as DocxExternalHyperlink, Paragraph as DocxParagraph, TextRun as DocxTextRun } from 'docx';
 
 function inlinesToRuns(docx: typeof import('docx'), content: InlineContent[] | undefined): Array<DocxTextRun | DocxExternalHyperlink> {
@@ -11,8 +11,6 @@ function inlinesToRuns(docx: typeof import('docx'), content: InlineContent[] | u
 
   const out: Array<DocxTextRun | DocxExternalHyperlink> = [];
   for (const item of content) {
-    // Extension inline nodes (CustomInlineContent) have `type: string`, so narrow to built-in kinds first.
-    if (!isBuiltinInline(item)) continue;
     if (item.type === 'text') {
       out.push(
         new docx.TextRun({

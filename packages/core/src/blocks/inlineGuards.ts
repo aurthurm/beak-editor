@@ -1,7 +1,9 @@
 /**
- * Type guards for inline content. Extension inline nodes (`CustomInlineContent`)
- * share the `type: string` shape, so consumers that switch on built-in kinds
- * narrow with these guards first.
+ * Type guards for inline content.
+ *
+ * `InlineContent` narrows with plain `item.type === '...'` checks, so these
+ * guards are optional for typed code. They remain useful for untyped runtime
+ * data (for example JSON from storage) and for filtering out extension nodes.
  *
  * @module
  */

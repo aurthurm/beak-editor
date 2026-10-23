@@ -32,6 +32,7 @@ import type { MarkSpec, NodeSpec } from 'prosemirror-model';
 import { history as createHistoryPlugin } from 'prosemirror-history';
 import { v4 as uuid } from 'uuid';
 import { cloneJson } from '../utils/cloneJson';
+import { seedRoomOnce } from './collaborationSeed';
 
 import { ProseMirrorAPI } from '../pm/ProseMirrorAPI';
 import {
@@ -120,6 +121,12 @@ export class BeakBlockEditor {
 
   /** Collaboration plugins currently active */
   private _collaborationPlugins: Plugin[] = [];
+  /** True between enableCollaboration and disableCollaboration (including the pending sync wait). */
+  private _collabEnabled = false;
+  /** Cancels a pending wait for provider sync, if one is in progress. */
+  private _collabCancelPendingSync: (() => void) | null = null;
+  /** Stops the seed race observer, if the room was seeded by this client. */
+  private _collabSeedCleanup: (() => void) | null = null;
 
   /** Track changes plugin instance when enabled */
   private _trackChangesPlugin: Plugin | null = null;
@@ -463,7 +470,7 @@ export class BeakBlockEditor {
    * ]);
    * ```
    */
-  setDocument(blocks: Block[], options: SetDocumentOptions = {}): void {
+  setDocument(blocks: PartialBlock[], options: SetDocumentOptions = {}): void {
     const doc = blocksToDoc(this._schema, blocks);
     const before = this.pm.doc;
     const tr = this.pm.createTransaction();
@@ -724,7 +731,7 @@ export class BeakBlockEditor {
     }
 
     const nodes = blocks.map((block) =>
-      blockToNode(this._schema, { ...block, id: block.id || uuid() } as Block)
+      blockToNode(this._schema, block)
     );
 
     const tr = this.pm.createTransaction();
@@ -876,11 +883,24 @@ export class BeakBlockEditor {
   }
 
   /**
+   * Whether collaboration was requested but is still waiting for the
+   * provider to sync (see `CollaborationConfig.sync`).
+   */
+  get isCollaborationPending(): boolean {
+    return this._collabEnabled && this._collaborationPlugins.length === 0;
+  }
+
+  /**
    * Enable real-time collaboration using y.js.
    *
    * This automatically disables the built-in history plugin
    * (y-prosemirror provides its own undo manager).
    * The editor is reconfigured in place — no reload needed.
+   *
+   * When `config.sync` is provided, collaboration plugins are attached only
+   * after the provider reports `sync`. If the room is empty at that point,
+   * `config.sync.seed` writes the current document into the shared fragment,
+   * at most once per room. Without `sync`, plugins attach immediately.
    *
    * @param config - Collaboration configuration with y-prosemirror plugins
    *
@@ -888,7 +908,7 @@ export class BeakBlockEditor {
    * ```typescript
    * import * as Y from 'yjs';
    * import { WebsocketProvider } from 'y-websocket';
-   * import { ySyncPlugin, yCursorPlugin, yUndoPlugin } from 'y-prosemirror';
+   * import { ySyncPlugin, yCursorPlugin, yUndoPlugin, prosemirrorToYXmlFragment } from 'y-prosemirror';
    *
    * const ydoc = new Y.Doc();
    * const provider = new WebsocketProvider('ws://localhost:1234', 'room', ydoc);
@@ -900,30 +920,82 @@ export class BeakBlockEditor {
    *     yCursorPlugin(provider.awareness),
    *     yUndoPlugin(),
    *   ],
+   *   sync: {
+   *     provider,
+   *     ydoc,
+   *     fragment,
+   *     seed: (doc) => prosemirrorToYXmlFragment(doc, fragment),
+   *   },
    * });
    * ```
    */
   enableCollaboration(config: CollaborationConfig): void {
-    if (this._collaborationPlugins.length > 0) {
+    if (this._collabEnabled) {
       this.disableCollaboration();
     }
 
     // Disable history — y-prosemirror has its own undo manager
     this.disableHistory();
+    this._collabEnabled = true;
 
-    // Store and add collaboration plugins
-    this._collaborationPlugins = [...config.plugins];
+    const plugins = [...config.plugins];
+    const sync = config.sync;
+    if (!sync) {
+      this._activateCollaboration(plugins);
+      return;
+    }
 
-    const plugins = [...this._collaborationPlugins, ...this._pmView.state.plugins];
-    const newState = this._pmView.state.reconfigure({ plugins });
+    const start = (): void => {
+      this._collabCancelPendingSync = null;
+      if (this._destroyed || !this._collabEnabled) return;
+      if (sync.seed) {
+        this._collabSeedCleanup = seedRoomOnce({
+          ydoc: sync.ydoc,
+          fragment: sync.fragment,
+          doc: this._pmView.state.doc,
+          seed: sync.seed,
+        });
+      }
+      this._activateCollaboration(plugins);
+    };
+
+    if (sync.provider.synced) {
+      start();
+      return;
+    }
+
+    const onSync = (isSynced: boolean): void => {
+      if (!isSynced) return;
+      sync.provider.off('sync', onSync);
+      start();
+    };
+    this._collabCancelPendingSync = () => sync.provider.off('sync', onSync);
+    sync.provider.on('sync', onSync);
+  }
+
+  /** Attach collaboration plugins to the view (after any sync gate has passed). */
+  private _activateCollaboration(plugins: Plugin[]): void {
+    if (this._destroyed) return;
+    this._collaborationPlugins = plugins;
+    const next = [...this._collaborationPlugins, ...this._pmView.state.plugins];
+    const newState = this._pmView.state.reconfigure({ plugins: next });
     this._pmView.updateState(newState);
+  }
+
+  /** Stop any pending sync wait and seed observer. Does not touch the view. */
+  private _teardownCollabPending(): void {
+    this._collabCancelPendingSync?.();
+    this._collabCancelPendingSync = null;
+    this._collabSeedCleanup?.();
+    this._collabSeedCleanup = null;
   }
 
   /**
    * Disable real-time collaboration.
    *
-   * Removes all collaboration plugins and re-enables the built-in
-   * history plugin. The editor is reconfigured in place — no reload needed.
+   * Removes all collaboration plugins (or cancels a pending sync wait) and
+   * re-enables the built-in history plugin. The editor is reconfigured in
+   * place — no reload needed.
    *
    * @example
    * ```typescript
@@ -931,14 +1003,18 @@ export class BeakBlockEditor {
    * ```
    */
   disableCollaboration(): void {
-    if (this._collaborationPlugins.length === 0) return;
+    if (!this._collabEnabled) return;
+    this._collabEnabled = false;
+    this._teardownCollabPending();
 
-    const collabSet = new Set(this._collaborationPlugins);
-    const plugins = this._pmView.state.plugins.filter(p => !collabSet.has(p));
-    this._collaborationPlugins = [];
+    if (this._collaborationPlugins.length > 0) {
+      const collabSet = new Set(this._collaborationPlugins);
+      const plugins = this._pmView.state.plugins.filter(p => !collabSet.has(p));
+      this._collaborationPlugins = [];
 
-    const newState = this._pmView.state.reconfigure({ plugins });
-    this._pmView.updateState(newState);
+      const newState = this._pmView.state.reconfigure({ plugins });
+      this._pmView.updateState(newState);
+    }
 
     // Re-enable built-in history
     this.enableHistory();
@@ -1479,7 +1555,7 @@ export class BeakBlockEditor {
   toJSON(): Block[] { return this.getDocument(); }
 
   /** Load document from JSON (alias for setDocument). */
-  fromJSON(blocks: Block[]): void { this.setDocument(blocks); }
+  fromJSON(blocks: PartialBlock[]): void { this.setDocument(blocks); }
 
   // ===========================================================================
   // EVENTS
@@ -1550,6 +1626,7 @@ export class BeakBlockEditor {
   destroy(): void {
     if (this._destroyed) return;
     this._destroyed = true;
+    this._teardownCollabPending();
     this._pmView.destroy();
     this._listeners.clear();
   }

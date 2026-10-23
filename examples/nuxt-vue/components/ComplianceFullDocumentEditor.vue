@@ -275,6 +275,11 @@ const compareFrom = ref('');
 const compareTo = ref('');
 const compareLines = ref<BlockDiffLine[]>([]);
 const compareBusy = ref(false);
+const compareRan = ref(false);
+watch([compareFrom, compareTo], () => {
+  compareRan.value = false;
+  compareLines.value = [];
+});
 
 const customSlashItems = useCustomSlashMenuItems(editor, customBlocks);
 const content = useEditorContent(editor);
@@ -409,6 +414,7 @@ const onCompareVersions = async () => {
     const vb = await ed.getVersion(b);
     if (!va || !vb) return;
     compareLines.value = diffBlockTrees(va.blocks, vb.blocks, a.slice(0, 8), b.slice(0, 8));
+    compareRan.value = true;
   } finally {
     compareBusy.value = false;
   }
@@ -576,7 +582,7 @@ defineExpose({
           </button>
         </div>
         <pre v-if="compareLines.length" class="compliance-section__diff-out">{{ compareLines.map((l) => `[${l.kind}] ${l.path}: ${l.summary}`).join('\n') }}</pre>
-        <p v-else-if="!compareBusy && compareFrom && compareTo && compareFrom !== compareTo" class="compliance-section__diff-empty">
+        <p v-else-if="compareRan && !compareBusy && compareLines.length === 0" class="compliance-section__diff-empty">
           No structural differences by block id.
         </p>
       </details>

@@ -18,6 +18,8 @@ export type {
   InlineContent,
   BuiltinInlineContent,
   CustomInlineContent,
+  CustomInlineContentRegistry,
+  UnknownInlineContent,
   Block,
   PartialBlock,
   BlockIdentifier,
@@ -25,7 +27,7 @@ export type {
 } from './types';
 
 // Conversion functions
-export { blockToNode, inlineContentToNodes, stylesToMarks, blocksToDoc } from './blockToNode';
+export { blockToNode, inlineContentToNodes, stylesToMarks, blocksToDoc, normalizeBlock } from './blockToNode';
 export { nodeToBlock, marksToStyles, docToBlocks } from './nodeToBlock';
 
 // Inline type guards

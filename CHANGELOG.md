@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased — 2.0.0-alpha]
 
-BeakBlock 2.0 is in alpha on `feat/beakblock-2.0`. Existing `Block[]` content and 0.1.x APIs keep working. See
+BeakBlock 2.0 is in alpha. Existing `Block[]` content and 0.1.x APIs keep working. See
 [`docs/2.0/migration-guide.md`](docs/2.0/migration-guide.md), [`docs/2.0/status.md`](docs/2.0/status.md) and
 [`docs/adr/`](docs/adr/) for details and known limitations.
 
@@ -93,6 +93,16 @@ BeakBlock 2.0 is in alpha on `feat/beakblock-2.0`. Existing `Block[]` content an
 ### Changed
 
 - The core editor's runtime format is still `Block[]`. `getDocument()` and `setDocument()` keep their signatures, and the 2.0 document model is available through `@amusendame/beakblock-schema`.
+- **Input blocks** (`PartialBlock`): `initialContent`, `setDocument`, `fromJSON`, `blocksToDoc` and `insertBlocks` accept blocks without `id` or `props`, including nested children. `normalizeBlock()` fills them in. Breaking for types: `PartialBlock.props` is now optional.
+- **Inline content narrowing**: extensions register inline node types by augmenting `CustomInlineContentRegistry`, so `if (c.type === 'text') c.styles` narrows without guards. The Office, QMS and Clinical packages register theirs. Breaking for types: an unregistered custom inline object is no longer `InlineContent` (use `UnknownInlineContent` at runtime boundaries), and text runs require `styles`.
+- **Collaboration seeding**: `collaboration.sync` (`provider`, `ydoc`, `fragment`, `seed`) defers binding until the provider syncs, then seeds an empty room once. A room marker prevents reseeding, and concurrent seeds converge on one copy. Without `sync`, behaviour is unchanged.
+
+### Fixed
+
+- **Block ids** are unique and stable. Enter, list-item splits, paste and duplicate ids in loaded content no longer produce two blocks with the same id. The block that keeps the original text keeps the id, and remote Yjs changes are never re-identified. Paragraphs inside list items and table cells get a deterministic id (`${ownerId}/p`), so repeated `getDocument()` calls and version diffs no longer report spurious changes.
+- **Ctrl+Enter** splits the paragraph around the page break, or adds a new paragraph after it at the end of a block, as in Word.
+- **Live collaboration** no longer opens blank in a fresh room: `ySyncPlugin` used to replace the initial content with the empty shared fragment.
+- **QMS extension** injects its stylesheet by default (`injectStyles: false` to opt out), like the Office and Clinical extensions.
 
 ### Deprecated
 

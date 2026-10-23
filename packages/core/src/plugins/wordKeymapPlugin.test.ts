@@ -261,3 +261,98 @@ describe('Word keymap does not affect block mode behaviour', () => {
     container.remove();
   });
 });
+
+describe('Word keyboard: Ctrl+Enter page break (contracts §1.7)', () => {
+  let view: EditorView;
+  afterEach(() => {
+    view?.destroy();
+    view?.dom.parentElement?.remove();
+  });
+
+  const twoParagraphs = () => docWith(() => [p('Hello world'), p('Next')]);
+
+  it('mid-paragraph: splits the paragraph, puts the break between the halves and places the caret at the start of the second half', () => {
+    view = make(twoParagraphs());
+    cursorAt(view, 'Hello world', 5);
+    expect(key(view, { key: 'Enter', ctrlKey: true })).toBe(true);
+
+    const doc = view.state.doc;
+    expect(doc.childCount).toBe(4);
+    expect(doc.child(0).textContent).toBe('Hello');
+    expect(doc.child(1).type.name).toBe('pageBreak');
+    expect(doc.child(2).textContent).toBe(' world');
+    expect(doc.child(3).textContent).toBe('Next');
+    const { $from, empty } = view.state.selection;
+    expect(empty).toBe(true);
+    expect($from.parent).toBe(doc.child(2));
+    expect($from.parentOffset).toBe(0);
+
+    view.dispatch(view.state.tr.insertText('Z'));
+    expect(view.state.doc.child(2).textContent).toBe('Z world');
+  });
+
+  it('end of block: inserts the break then a new empty paragraph holding the caret', () => {
+    view = make(twoParagraphs());
+    cursorAt(view, 'Hello world');
+    expect(key(view, { key: 'Enter', ctrlKey: true })).toBe(true);
+
+    const doc = view.state.doc;
+    expect(doc.childCount).toBe(4);
+    expect(doc.child(0).textContent).toBe('Hello world');
+    expect(doc.child(1).type.name).toBe('pageBreak');
+    expect(doc.child(2).type.name).toBe('paragraph');
+    expect(doc.child(2).textContent).toBe('');
+    expect(doc.child(3).textContent).toBe('Next');
+    const { $from } = view.state.selection;
+    expect($from.parent).toBe(doc.child(2));
+
+    view.dispatch(view.state.tr.insertText('Z'));
+    expect(view.state.doc.child(2).textContent).toBe('Z');
+    expect(view.state.doc.child(3).textContent).toBe('Next');
+  });
+
+  it('end of a heading: typed text goes into the new paragraph, not the next existing one', () => {
+    const h1 = schema.nodes.heading.create({ level: 1, styleId: 'Heading1' }, schema.text('Title'));
+    view = make(docWith(() => [h1, p('Prepare a thin layer')]));
+    cursorAt(view, 'Title');
+    expect(key(view, { key: 'Enter', ctrlKey: true })).toBe(true);
+    view.dispatch(view.state.tr.insertText('Z'));
+    const doc = view.state.doc;
+    expect(doc.child(1).type.name).toBe('pageBreak');
+    expect(doc.child(2).textContent).toBe('Z');
+    expect(doc.child(3).textContent).toBe('Prepare a thin layer');
+  });
+
+  it('start of block: puts the break before the block and keeps the caret at the start of that block', () => {
+    view = make(twoParagraphs());
+    cursorAt(view, 'Hello world', 0);
+    expect(key(view, { key: 'Enter', ctrlKey: true })).toBe(true);
+
+    const doc = view.state.doc;
+    expect(doc.childCount).toBe(3);
+    expect(doc.child(0).type.name).toBe('pageBreak');
+    expect(doc.child(1).textContent).toBe('Hello world');
+    expect(doc.child(2).textContent).toBe('Next');
+    const { $from, empty } = view.state.selection;
+    expect(empty).toBe(true);
+    expect($from.parent).toBe(doc.child(1));
+    expect($from.parentOffset).toBe(0);
+
+    view.dispatch(view.state.tr.insertText('Z'));
+    expect(view.state.doc.child(1).textContent).toBe('ZHello world');
+  });
+
+  it('does not insert a page break inside a table cell', () => {
+    const doc = docWith(() => [
+      schema.nodes.table.create(null, [
+        schema.nodes.tableRow.create(null, [
+          schema.nodes.tableCell.create(null, [p('cell')]),
+        ]),
+      ]),
+    ]);
+    view = make(doc);
+    cursorAt(view, 'cell');
+    expect(key(view, { key: 'Enter', ctrlKey: true })).toBe(false);
+    expect(view.state.doc.toString()).not.toContain('pageBreak');
+  });
+});

@@ -256,6 +256,7 @@ const lossSummary = computed(() => {
   gap: 12px;
 }
 .dx-file {
+  position: relative;
   border: 1px dashed #9aa6b8;
   border-radius: 6px;
   padding: 5px 10px;
@@ -263,9 +264,18 @@ const lossSummary = computed(() => {
   cursor: pointer;
   background: #fff;
 }
+/* Native input stays in the DOM (keyboard + label click still open the picker); only the label text is shown. */
 .dx-file input {
-  font-size: 12px;
-  max-width: 200px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.dx-file:focus-within {
+  outline: 2px solid #2b579a;
+  outline-offset: 2px;
 }
 .dx-btn {
   border: 1px solid #c9c4bb;

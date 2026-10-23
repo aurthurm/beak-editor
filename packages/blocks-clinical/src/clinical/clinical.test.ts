@@ -20,7 +20,7 @@ import { block, createEditor, findBlock, flush, reagentTable, step, warning } fr
 
 /** Inline equipment reference as it appears in block JSON. */
 const equipmentRef = (props: Record<string, unknown>): InlineContent =>
-  ({ type: 'equipmentReference', props } as unknown as InlineContent);
+  ({ type: 'equipmentReference', props });
 
 const codes = (issues: Array<{ code: string }>) => issues.map((issue) => issue.code);
 

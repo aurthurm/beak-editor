@@ -5,7 +5,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRe
 import { createPortal } from 'react-dom';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { yCursorPlugin, ySyncPlugin, yUndoPlugin } from 'y-prosemirror';
+import { prosemirrorToYXmlFragment, yCursorPlugin, ySyncPlugin, yUndoPlugin } from 'y-prosemirror';
 import {
   AIModal,
   BeakBlockView,
@@ -29,8 +29,6 @@ import {
   InMemoryCommentStore,
   blocksToMarkdown,
   createCommentPlugin,
-  isBuiltinInline,
-  isStyledText,
   type AIContext,
   type BeakBlockEditor,
   type Block,
@@ -103,8 +101,8 @@ const documentTabs = [
 function blockText(block: Block): string {
   return block.content
     ?.map((item) => {
-      if (isStyledText(item)) return item.text;
-      if (isBuiltinInline(item) && item.type === 'link') return blockInlineText(item.content);
+      if (item.type === 'text') return item.text;
+      if (item.type === 'link') return blockInlineText(item.content);
       return '';
     })
     .join('')
@@ -114,8 +112,8 @@ function blockText(block: Block): string {
 function blockInlineText(items: ReadonlyArray<InlineContent>): string {
   return items
     .map((item) => {
-      if (isStyledText(item)) return item.text;
-      if (isBuiltinInline(item) && item.type === 'link') return blockInlineText(item.content);
+      if (item.type === 'text') return item.text;
+      if (item.type === 'link') return blockInlineText(item.content);
       return '';
     })
     .join('');
@@ -233,8 +231,10 @@ const ComplianceExampleEditor = forwardRef<
     initialBlocks: Block[];
     editorClassName?: string;
     onBlocksChange?: (blocks: Block[]) => void;
+    onAi?: (mode: 'bubble' | 'slash') => void;
+    onComment?: () => void;
   }
->(function ComplianceExampleEditor({ initialBlocks, editorClassName, onBlocksChange }, ref) {
+>(function ComplianceExampleEditor({ initialBlocks, editorClassName, onBlocksChange, onAi, onComment }, ref) {
   const commentStore = useMemo(() => new InMemoryCommentStore(), []);
   const lastBlocksSnapshotRef = useRef('');
   const editor = useBeakBlock({
@@ -264,8 +264,8 @@ const ComplianceExampleEditor = forwardRef<
       <CommentRail editor={editor} store={commentStore} currentUserId="amusendame">
         <BeakBlockView editor={editor} className={editorClassName ?? 'editor-view'} />
       </CommentRail>
-      <SlashMenu editor={editor} customItems={customSlashItems} onAI={() => {}} />
-      <BubbleMenu editor={editor} onComment={() => {}} onAI={() => {}} />
+      <SlashMenu editor={editor} customItems={customSlashItems} onAI={() => onAi?.('slash')} />
+      <BubbleMenu editor={editor} onComment={() => onComment?.()} onAI={() => onAi?.('bubble')} />
       <TableMenu editor={editor} />
       <TableHandles editor={editor} />
       <MediaMenu editor={editor} />
@@ -336,9 +336,7 @@ const CollaborationPanel = forwardRef<
   const editor = useBeakBlock({
     initialContent: [
       {
-        id: 'collab-intro',
         type: 'paragraph',
-        props: {},
         content: [
           {
             type: 'text',
@@ -394,8 +392,10 @@ const CollaborationPanel = forwardRef<
       color: `hsl(${Math.abs(provider.awareness.clientID) % 360} 70% 55%)`,
     });
 
+    // Plugins attach after the provider syncs; an empty room is seeded with the editor's initial content.
     ed.enableCollaboration({
       plugins: [ySyncPlugin(fragment), yCursorPlugin(provider.awareness), yUndoPlugin()],
+      sync: { provider, ydoc, fragment, seed: (doc) => prosemirrorToYXmlFragment(doc, fragment) },
     });
 
     return () => {
@@ -453,8 +453,10 @@ const ComplianceWorkspace = forwardRef<
   {
     onBlocksChange?: (blocks: Block[]) => void;
     onInspectorChange?: (payload: { blocks: Block[]; manifest: ComplianceManifest | null }) => void;
+    onAi?: (mode: 'bubble' | 'slash') => void;
+    onComment?: () => void;
   }
->(function ComplianceWorkspace({ onBlocksChange, onInspectorChange }, ref) {
+>(function ComplianceWorkspace({ onBlocksChange, onInspectorChange, onAi, onComment }, ref) {
   const [mode, setMode] = useState<'document' | 'templates'>('document');
   const [templateId, setTemplateId] = useState(COMPLIANCE_SEED_TEMPLATES[0]?.id ?? '');
   const [templates, setTemplates] = useState(COMPLIANCE_SEED_TEMPLATES);
@@ -666,6 +668,8 @@ const ComplianceWorkspace = forwardRef<
           <ComplianceExampleEditor
             ref={ref}
             key={selectedTemplateId}
+            onAi={onAi}
+            onComment={onComment}
             initialBlocks={mergedBlocks.length > 0 ? mergedBlocks : activeTemplate?.blocks ?? []}
             editorClassName="editor-view"
             onBlocksChange={(next) => {
@@ -901,6 +905,8 @@ export function BeakBlockShowcase(): ReactElement {
                   }}
                   onBlocksChange={handleComplianceBlocksChange}
                   onInspectorChange={(payload) => setComplianceInspector(payload)}
+                  onAi={openAiModal}
+                  onComment={() => setCommentOpen(true)}
                 />
               </div>
 
@@ -933,8 +939,7 @@ export function BeakBlockShowcase(): ReactElement {
         </p>
       </footer>
 
-      {viewMode !== 'compliance' ? (
-        <>
+      <>
           <AIModal
             open={aiOpen}
             editor={modalTargetEditor}
@@ -961,8 +966,7 @@ export function BeakBlockShowcase(): ReactElement {
             subtitle="Leave threads, replies, reactions, or mark notes resolved."
             onClose={() => setCommentOpen(false)}
           />
-        </>
-      ) : null}
+      </>
     </div>
   );
 }
