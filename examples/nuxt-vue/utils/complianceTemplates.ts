@@ -7,7 +7,7 @@ import {
   nextIndexAfterComplianceSlice,
   sliceComplianceDocumentTree,
 } from '~/utils/complianceFullDocument';
-import { TEMPLATES_STORE, openComplianceDb } from '~/utils/complianceDb';
+import { TEMPLATES_STORE, dbDelete, dbGet, dbGetAll, dbPut } from '~/utils/complianceDb';
 
 /** Stable id for the seeded Gram stain demo template (one-time seed when store is empty). */
 export const GRAM_STAIN_TEMPLATE_ID = 'tpl-seed-gram-stain-sop';
@@ -123,52 +123,25 @@ function normalizeTemplate(row: unknown): ComplianceTemplateRecord | null {
 }
 
 export async function listTemplates(): Promise<ComplianceTemplateRecord[]> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(TEMPLATES_STORE, 'readonly');
-    const req = tx.objectStore(TEMPLATES_STORE).getAll();
-    req.onerror = (): void => reject(req.error ?? new Error('list templates'));
-    req.onsuccess = (): void => {
-      const raw = req.result as unknown[];
-      const out = raw.map(normalizeTemplate).filter((x): x is ComplianceTemplateRecord => x != null);
-      out.sort((a, b) => a.name.localeCompare(b.name));
-      resolve(out);
-    };
-  });
+  const raw = await dbGetAll<unknown>(TEMPLATES_STORE);
+  const out = raw.map(normalizeTemplate).filter((x): x is ComplianceTemplateRecord => x != null);
+  out.sort((a, b) => a.name.localeCompare(b.name));
+  return out;
 }
 
 export async function getTemplate(id: string): Promise<ComplianceTemplateRecord | null> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(TEMPLATES_STORE, 'readonly');
-    const req = tx.objectStore(TEMPLATES_STORE).get(id);
-    req.onerror = (): void => reject(req.error ?? new Error('get template'));
-    req.onsuccess = (): void => resolve(normalizeTemplate(req.result));
-  });
+  return normalizeTemplate(await dbGet<unknown>(TEMPLATES_STORE, id));
 }
 
 export async function putTemplate(record: ComplianceTemplateRecord): Promise<void> {
-  const db = await openComplianceDb();
-  const row: ComplianceTemplateRecord = {
+  await dbPut(TEMPLATES_STORE, {
     ...record,
     updatedAt: record.updatedAt || new Date().toISOString(),
-  };
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(TEMPLATES_STORE, 'readwrite');
-    tx.oncomplete = (): void => resolve();
-    tx.onerror = (): void => reject(tx.error ?? new Error('put template'));
-    tx.objectStore(TEMPLATES_STORE).put(row);
   });
 }
 
 export async function deleteTemplate(id: string): Promise<void> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(TEMPLATES_STORE, 'readwrite');
-    tx.oncomplete = (): void => resolve();
-    tx.onerror = (): void => reject(tx.error ?? new Error('delete template'));
-    tx.objectStore(TEMPLATES_STORE).delete(id);
-  });
+  await dbDelete(TEMPLATES_STORE, id);
 }
 
 export function buildGramStainSeedTemplate(): ComplianceTemplateRecord {

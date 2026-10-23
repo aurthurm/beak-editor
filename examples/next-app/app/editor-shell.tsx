@@ -48,6 +48,19 @@ import {
 import { sendAIRequest } from './ai.client';
 import { BEAKBLOCK_V2_SCENARIOS, BeakBlock2Panel, isBeakBlock2Scenario, type BeakBlock2ScenarioId } from './v2/BeakBlock2Panel';
 
+/** Cursor color for a collaborator. y-prosemirror only accepts `#rrggbb`, so the hue is converted from HSL. */
+function cursorColor(clientId: number): string {
+  const hue = Math.abs(clientId) % 360;
+  const s = 0.7;
+  const l = 0.55;
+  const channel = (n: number) => {
+    const k = (n + hue / 30) % 12;
+    const value = l - s * Math.min(l, 1 - l) * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+    return Math.round(value * 255).toString(16).padStart(2, '0');
+  };
+  return `#${channel(0)}${channel(8)}${channel(4)}`;
+}
+
 type DocumentTabId =
   | 'generic'
   | 'cv'
@@ -389,7 +402,7 @@ const CollaborationPanel = forwardRef<
     provider.on('status', onStatus);
     provider.awareness.setLocalStateField('user', {
       name: displayName.trim() || 'Anonymous',
-      color: `hsl(${Math.abs(provider.awareness.clientID) % 360} 70% 55%)`,
+      color: cursorColor(provider.awareness.clientID),
     });
 
     // Plugins attach after the provider syncs; an empty room is seeded with the editor's initial content.

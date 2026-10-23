@@ -1,4 +1,4 @@
-import { APPROVALS_STORE, openComplianceDb } from './complianceDb';
+import { APPROVALS_STORE, dbGetAll, dbPut } from './complianceDb';
 
 export type SectionApprovalState = 'draft' | 'in_review' | 'approved';
 
@@ -95,51 +95,30 @@ export function applySectionApprovalTransition(
 }
 
 export async function loadAllSectionApprovals(): Promise<Record<string, SectionApprovalRecord>> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(APPROVALS_STORE, 'readonly');
-    const req = tx.objectStore(APPROVALS_STORE).getAll();
-    req.onerror = (): void => reject(req.error ?? new Error('read approvals'));
-    req.onsuccess = (): void => {
-      const out: Record<string, SectionApprovalRecord> = {};
-      for (const row of req.result as SectionApprovalRecord[]) {
-        if (row?.sectionKey) out[row.sectionKey] = normalizeSectionApprovalRecord(row);
-      }
-      resolve(out);
-    };
-  });
+  const rows = await dbGetAll<SectionApprovalRecord>(APPROVALS_STORE);
+  const out: Record<string, SectionApprovalRecord> = {};
+  for (const row of rows) {
+    if (row?.sectionKey) out[row.sectionKey] = normalizeSectionApprovalRecord(row);
+  }
+  return out;
 }
 
 /** Approvals for one compliance document; keys are section lockIds; each record.sectionKey is the full storage key. */
 export async function loadSectionApprovalsForDocument(
   documentInstanceId: string
 ): Promise<Record<string, SectionApprovalRecord>> {
-  const db = await openComplianceDb();
   const prefix = `${documentInstanceId}::`;
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(APPROVALS_STORE, 'readonly');
-    const req = tx.objectStore(APPROVALS_STORE).getAll();
-    req.onerror = (): void => reject(req.error ?? new Error('read approvals'));
-    req.onsuccess = (): void => {
-      const out: Record<string, SectionApprovalRecord> = {};
-      for (const row of req.result as SectionApprovalRecord[]) {
-        const sk = row?.sectionKey;
-        if (!sk || !sk.startsWith(prefix)) continue;
-        const logicalId = sk.slice(prefix.length);
-        out[logicalId] = normalizeSectionApprovalRecord(row);
-      }
-      resolve(out);
-    };
-  });
+  const rows = await dbGetAll<SectionApprovalRecord>(APPROVALS_STORE);
+  const out: Record<string, SectionApprovalRecord> = {};
+  for (const row of rows) {
+    const sk = row?.sectionKey;
+    if (!sk || !sk.startsWith(prefix)) continue;
+    out[sk.slice(prefix.length)] = normalizeSectionApprovalRecord(row);
+  }
+  return out;
 }
 
 export async function saveSectionApproval(record: SectionApprovalRecord): Promise<void> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(APPROVALS_STORE, 'readwrite');
-    tx.oncomplete = (): void => resolve();
-    tx.onerror = (): void => reject(tx.error ?? new Error('write approval'));
-    // Plain JSON copy: records built from reactive state carry Vue proxies that IndexedDB cannot clone.
-    tx.objectStore(APPROVALS_STORE).put(JSON.parse(JSON.stringify(normalizeSectionApprovalRecord(record))));
-  });
+  // dbPut stores a plain copy: records built from reactive state carry Vue proxies that IndexedDB cannot clone.
+  await dbPut(APPROVALS_STORE, normalizeSectionApprovalRecord(record));
 }

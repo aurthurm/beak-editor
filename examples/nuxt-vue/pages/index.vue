@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, reactive, ref, watch, watchEffect } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, watchEffect } from 'vue';
 import {
   AIModal,
   CommentModal,
@@ -19,6 +19,14 @@ import {
   seedGramStainTemplateIfEmpty,
   type ComplianceTemplateRecord,
 } from '~/utils/complianceTemplates';
+import { ensureComplianceStorage, isComplianceStorageFallback } from '~/utils/complianceDb';
+import {
+  createDocumentInstance,
+  findDocumentInstance,
+  openTemplateInstance,
+  touchDocumentInstance,
+  type DocumentInstanceRecord,
+} from '~/utils/complianceDocumentInstance';
 import {
   boardOnePagerDocument,
   lessonPlanDocument,
@@ -85,14 +93,31 @@ const complianceManifest = ref<ComplianceMergeManifest | null>(null);
 const complianceReviewerMode = ref(false);
 const complianceAiOff = ref(false);
 
+const route = useRoute();
+const router = useRouter();
+
 const complianceView = ref<'document' | 'templates'>('document');
-const complianceDocumentInstanceId = ref(crypto.randomUUID());
+const complianceDocumentInstanceId = ref('');
 const complianceSelectedTemplateId = ref('');
 const complianceWorkingBlocks = ref<Block[]>([]);
 const complianceSectionRequiredMap = ref<Record<string, boolean>>({});
 const complianceExportTitle = ref('Compliance document');
 const complianceTemplateList = ref<ComplianceTemplateRecord[]>([]);
 const complianceBootstrapDone = ref(false);
+/** True when IndexedDB is unavailable and compliance data lives only for this tab (see utils/complianceDb.ts). */
+const complianceStorageFallback = ref(false);
+/** Set when the compliance workspace could not load; replaces the loading message so it never sticks. */
+const complianceLoadError = ref('');
+
+function routeDocParam(): string {
+  return typeof route.query.doc === 'string' ? route.query.doc : '';
+}
+
+/** Mirrors the active instance in `?doc=` (replace, so the back button is not polluted). */
+function syncComplianceDocumentRoute(instanceId: string) {
+  if (routeDocParam() === instanceId) return;
+  void router.replace({ query: { ...route.query, doc: instanceId } });
+}
 
 async function refreshComplianceTemplateOptions() {
   complianceTemplateList.value = await listTemplates();
@@ -104,25 +129,44 @@ async function refreshComplianceTemplateOptions() {
   }
 }
 
-async function applyComplianceTemplate(templateId: string) {
+/**
+ * Loads a template's working copy. Pass `instance` to open a specific instance (URL), `newInstance` to start a
+ * fresh one, or neither to resume the template's current instance (its approvals are kept).
+ */
+async function activateComplianceTemplate(
+  templateId: string,
+  opts: { instance?: DocumentInstanceRecord; newInstance?: boolean } = {}
+): Promise<boolean> {
   const t = await getTemplate(templateId);
-  if (!t) return;
+  if (!t) return false;
+  let instanceId: string;
+  if (opts.instance) {
+    instanceId = opts.instance.instanceId;
+    await touchDocumentInstance(opts.instance);
+  } else if (opts.newInstance) {
+    instanceId = await createDocumentInstance(templateId);
+  } else {
+    instanceId = await openTemplateInstance(templateId);
+  }
   complianceSelectedTemplateId.value = templateId;
-  complianceDocumentInstanceId.value = crypto.randomUUID();
+  complianceDocumentInstanceId.value = instanceId;
   complianceWorkingBlocks.value = cloneTemplateBlocksForNewDocument(t.blocks);
   complianceSectionRequiredMap.value = { ...t.sectionRequiredByLockId };
   complianceExportTitle.value = t.name;
+  syncComplianceDocumentRoute(instanceId);
+  return true;
 }
 
 async function onComplianceTemplateSelect() {
   if (complianceSelectedTemplateId.value) {
-    await applyComplianceTemplate(complianceSelectedTemplateId.value);
+    await activateComplianceTemplate(complianceSelectedTemplateId.value);
   }
 }
 
+/** Explicit "new instance" action: the only path that starts a fresh set of approvals for a template. */
 function newComplianceDocumentFromTemplate() {
   if (complianceSelectedTemplateId.value) {
-    void applyComplianceTemplate(complianceSelectedTemplateId.value);
+    void activateComplianceTemplate(complianceSelectedTemplateId.value, { newInstance: true });
   }
 }
 
@@ -146,15 +190,44 @@ const aiContextSnapshot = ref<AIContext | null>(null);
 watch(viewMode, async (m) => {
   commentOpen.value = false;
   aiOpen.value = false;
-  if (m !== 'compliance') return;
-  await seedGramStainTemplateIfEmpty();
-  await refreshComplianceTemplateOptions();
-  if (!complianceBootstrapDone.value) {
-    complianceBootstrapDone.value = true;
-    if (complianceWorkingBlocks.value.length === 0 && complianceTemplateList.value[0]) {
-      await applyComplianceTemplate(complianceTemplateList.value[0].id);
+  if (m !== 'compliance') {
+    if (routeDocParam()) {
+      void router.replace({ query: { ...route.query, doc: undefined } });
     }
+    return;
   }
+  try {
+    // Detects storage once; blocked IndexedDB switches the compliance stores to in-memory and does not throw.
+    await ensureComplianceStorage();
+    complianceStorageFallback.value = isComplianceStorageFallback();
+    await seedGramStainTemplateIfEmpty();
+    await refreshComplianceTemplateOptions();
+    if (!complianceBootstrapDone.value) {
+      complianceBootstrapDone.value = true;
+      if (complianceWorkingBlocks.value.length === 0) {
+        // URL wins, then the template's persisted current instance (via the first template when none is known).
+        const routed = routeDocParam() ? await findDocumentInstance(routeDocParam()) : null;
+        const openedFromRoute = routed
+          ? await activateComplianceTemplate(routed.templateId, { instance: routed })
+          : false;
+        if (!openedFromRoute && complianceTemplateList.value[0]) {
+          await activateComplianceTemplate(complianceTemplateList.value[0].id);
+        }
+      }
+      if (complianceWorkingBlocks.value.length === 0) {
+        throw new Error('No compliance template could be opened.');
+      }
+    }
+    complianceLoadError.value = '';
+  } catch (err) {
+    console.error('[compliance] workspace failed to load', err);
+    complianceLoadError.value = err instanceof Error ? err.message : 'Unknown error';
+  }
+});
+
+onMounted(() => {
+  // A ?doc= link opens the Compliance workspace directly.
+  if (routeDocParam()) viewMode.value = 'compliance';
 });
 
 const openCommentModal = () => {
@@ -436,6 +509,13 @@ watchEffect((onCleanup) => {
             />
 
             <div v-show="viewMode === 'compliance'" class="editor-stage__panel editor-stage__panel--compliance">
+              <p
+                v-if="complianceStorageFallback"
+                class="compliance-storage-notice"
+                role="status"
+              >
+                Storage is unavailable; changes last until you close this tab.
+              </p>
               <div class="compliance-toolbar">
                 <p class="compliance-toolbar__label">
                   {{ complianceView === 'templates' ? 'Template studio' : 'Controlled document' }}
@@ -528,6 +608,9 @@ watchEffect((onCleanup) => {
                 :reviewer-only="complianceReviewerMode"
                 :ai-governance-mode="complianceAiOff ? 'off' : 'governed'"
               />
+              <p v-else-if="complianceLoadError" class="compliance-toolbar__error" role="alert">
+                Could not load the compliance workspace: {{ complianceLoadError }}
+              </p>
               <p v-else class="compliance-toolbar__loading">Loading compliance document…</p>
             </div>
 

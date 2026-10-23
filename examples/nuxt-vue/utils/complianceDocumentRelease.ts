@@ -1,4 +1,4 @@
-import { DOCUMENT_RELEASE_STORE, openComplianceDb } from './complianceDb';
+import { DOCUMENT_RELEASE_STORE, dbGet, dbPut } from './complianceDb';
 
 export type DocumentReleaseSignOff = {
   at: string;
@@ -30,32 +30,16 @@ export function documentReleaseIsComplete(rec: DocumentReleaseRecord | null): bo
 }
 
 export async function loadDocumentRelease(docKey: string): Promise<DocumentReleaseRecord> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(DOCUMENT_RELEASE_STORE, 'readonly');
-    const req = tx.objectStore(DOCUMENT_RELEASE_STORE).get(docKey);
-    req.onerror = (): void => reject(req.error ?? new Error('read document release'));
-    req.onsuccess = (): void => {
-      const row = req.result as DocumentReleaseRecord | undefined;
-      if (!row) {
-        resolve(emptyDocumentRelease(docKey));
-        return;
-      }
-      resolve({
-        docKey: row.docKey,
-        requireTwoApprovers: Boolean(row.requireTwoApprovers),
-        signOffs: Array.isArray(row.signOffs) ? row.signOffs : [],
-      });
-    };
-  });
+  const row = await dbGet<DocumentReleaseRecord>(DOCUMENT_RELEASE_STORE, docKey);
+  if (!row) return emptyDocumentRelease(docKey);
+  return {
+    docKey: row.docKey,
+    requireTwoApprovers: Boolean(row.requireTwoApprovers),
+    signOffs: Array.isArray(row.signOffs) ? row.signOffs : [],
+  };
 }
 
 export async function saveDocumentRelease(record: DocumentReleaseRecord): Promise<void> {
-  const db = await openComplianceDb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(DOCUMENT_RELEASE_STORE, 'readwrite');
-    tx.oncomplete = (): void => resolve();
-    tx.onerror = (): void => reject(tx.error ?? new Error('write document release'));
-    tx.objectStore(DOCUMENT_RELEASE_STORE).put(record);
-  });
+  // dbPut stores a plain copy, so reactive state (Vue proxies) is safe to pass in.
+  await dbPut(DOCUMENT_RELEASE_STORE, record);
 }

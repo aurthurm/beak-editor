@@ -1,5 +1,5 @@
 import type { CommentEntry, CommentThread } from '@amusendame/beakblock-core';
-import { COMMENTS_STORE, openComplianceDb } from './complianceDb';
+import { COMMENTS_STORE, dbGet, dbPut } from './complianceDb';
 
 function reviveEntry(raw: CommentEntry): CommentEntry {
   return {
@@ -26,40 +26,16 @@ function reviveThread(raw: CommentThread): CommentThread {
 }
 
 export async function loadSectionComments(sectionKey: string): Promise<CommentThread[]> {
-  if (typeof indexedDB === 'undefined') return [];
+  const row = await dbGet<{ sectionKey: string; payload: string }>(COMMENTS_STORE, sectionKey);
+  if (!row?.payload) return [];
   try {
-    const db = await openComplianceDb();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(COMMENTS_STORE, 'readonly');
-      const req = tx.objectStore(COMMENTS_STORE).get(sectionKey);
-      req.onerror = (): void => reject(req.error ?? new Error('load comments failed'));
-      req.onsuccess = (): void => {
-        const row = req.result as { sectionKey: string; payload: string } | undefined;
-        if (!row?.payload) {
-          resolve([]);
-          return;
-        }
-        try {
-          const parsed = JSON.parse(row.payload) as CommentThread[];
-          resolve(parsed.map(reviveThread));
-        } catch {
-          resolve([]);
-        }
-      };
-    });
+    const parsed = JSON.parse(row.payload) as CommentThread[];
+    return parsed.map(reviveThread);
   } catch {
     return [];
   }
 }
 
 export async function saveSectionComments(sectionKey: string, threads: CommentThread[]): Promise<void> {
-  if (typeof indexedDB === 'undefined') return;
-  const db = await openComplianceDb();
-  const payload = JSON.stringify(threads);
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(COMMENTS_STORE, 'readwrite');
-    tx.objectStore(COMMENTS_STORE).put({ sectionKey, payload });
-    tx.oncomplete = (): void => resolve();
-    tx.onerror = (): void => reject(tx.error ?? new Error('save comments failed'));
-  });
+  await dbPut(COMMENTS_STORE, { sectionKey, payload: JSON.stringify(threads) });
 }

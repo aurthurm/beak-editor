@@ -26,6 +26,7 @@ const editName = ref('');
 const editRequiredMap = ref<Record<string, boolean>>({});
 const editInitialBlocks = ref<Block[]>([]);
 const saveError = ref('');
+const loadError = ref('');
 const editorRef = ref<InstanceType<typeof ComplianceFullDocumentEditor> | null>(null);
 
 async function refreshList() {
@@ -51,9 +52,15 @@ function onEditorUpdate() {
 }
 
 onMounted(async () => {
-  await seedGramStainTemplateIfEmpty();
-  await refreshList();
-  loading.value = false;
+  try {
+    await seedGramStainTemplateIfEmpty();
+    await refreshList();
+  } catch (err) {
+    console.error('[compliance] templates failed to load', err);
+    loadError.value = err instanceof Error ? err.message : 'Unknown error';
+  } finally {
+    loading.value = false;
+  }
 });
 
 function startNew() {
@@ -145,6 +152,9 @@ watch(editId, async (id) => {
     <template v-if="loading">
       <p class="compliance-template-studio__loading">Loading templates…</p>
     </template>
+    <p v-else-if="loadError" class="compliance-template-studio__error" role="alert">
+      Could not load templates: {{ loadError }}
+    </p>
     <template v-else-if="!editId">
       <div class="compliance-template-studio__list-head">
         <h2 class="compliance-template-studio__title">Compliance templates</h2>
@@ -231,6 +241,10 @@ watch(editId, async (id) => {
 .compliance-template-studio__loading,
 .compliance-template-studio__empty {
   color: #64748b;
+  font-size: 0.95rem;
+}
+.compliance-template-studio__error {
+  color: #9a3412;
   font-size: 0.95rem;
 }
 .compliance-template-studio__list-head {
